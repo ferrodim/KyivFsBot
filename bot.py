@@ -12,7 +12,7 @@ import csv
 import difflib
 import random
 import string
-from config import ADMINS, MODES, API_TOKEN, WELCOME
+from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
 
 print("restart")
 print(WELCOME)
@@ -32,9 +32,9 @@ if not "getStart" in data.keys():
 if not "getEnd" in data.keys():
     data["getEnd"] = False
 if not "okChat" in data.keys(): 
-    data["okChat"] = -389439413
+    data["okChat"] = CHAT_OK
 if not "failChat" in data.keys():
-    data["failChat"] = -259437692
+    data["failChat"] = CHAT_FAIL
 if not "reg" in data.keys():
     data["reg"] = {}
 if not "counters" in data.keys():
@@ -343,11 +343,11 @@ def forget(message):
     data["regchat"] = 0
     data["getStart"] = False
     data["getEnd"] = False
-    data["okChat"] = -389439413
-    data["failChat"] = -259437692
+    data["okChat"] = CHAT_OK
+    data["failChat"] = CHAT_FAIL
     data["reg"] = {}
     data["counters"] = {}
-    data["welcome"] = "Привет"
+    data["welcome"] = WELCOME
     save_data()
     bot.reply_to(message, ("Всё, я всё забыл :)"))
 
