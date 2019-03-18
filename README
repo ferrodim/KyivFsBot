@@ -1,0 +1,10 @@
+Созданно на базе https://github.com/DreidSpb/FsSpbBot
+
+
+# Установка
+## Скопируйте config.sample.py в config.py и заполните все поля внутри
+## Запустите:
+`sudo apt install docker-compose`
+`docker-compose up`
+## Проверяйте работу своего бота, написав ему в личку любое сообщение. Список доступных команд смотреть через /help
+
