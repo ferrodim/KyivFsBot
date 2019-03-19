@@ -307,6 +307,12 @@ def setwelcome(message):
     save_data()
     bot.send_message(message.chat.id, ("Обновил приветствие"))
 
+@bot.message_handler(commands=["chatid"])
+@restricted
+def get_chat_id(message):
+    bot.send_message(message.chat.id, ("Айди этого чата: %s"%(message.chat.id)))
+
+
 @bot.message_handler(commands=["set"])
 @restricted
 def setCounter(message):
