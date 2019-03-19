@@ -15,7 +15,6 @@ import string
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
 
 print("restart")
-print(WELCOME)
 
 bot = telebot.TeleBot(API_TOKEN)
 try:
