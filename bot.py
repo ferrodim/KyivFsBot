@@ -426,8 +426,7 @@ def get_my_info(message):
     bot.send_message(message.chat.id, (txt))
 
 @bot.message_handler(commands=["clearme"])
-@restricted
-def loadreg(message):
+def clear_me(message):
     if message.from_user.username in data["counters"].keys():
         del data["counters"][message.from_user.username]
         save_data()
