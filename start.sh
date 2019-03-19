@@ -1,5 +1,5 @@
 #!/bin/bash
-mkdir Screens
+mkdir -p Screens
 
 while true; do
 	python3 bot.py
