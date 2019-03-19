@@ -1,5 +1,5 @@
 FROM ubuntu:18.10
-RUN mkdir -p /code/Screens && chmod +w /code/Screens
+RUN mkdir /code
 WORKDIR /code
 RUN apt update && apt install -y \
   python3-pip \
