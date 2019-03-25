@@ -8,7 +8,6 @@ import telebot
 import json
 import datetime
 import re
-import csv
 import difflib
 import random
 import string
@@ -328,15 +327,12 @@ def cmd_set(message):
         data["counters"][agentname] = {"start": {}, "end": {}}
     data["counters"][agentname][step][counter] = value
     save_data()
-    #print(chunks)
     if agentname in data["counters"].keys():
         txt = "Досье на: @%s\n"%(agentname)
         txt += user_info(agentname)
     else:
         txt = "Такой пользователь не найден в базе"
     bot.send_message(message.chat.id, (txt))
-    #data["welcome"] = message.text[str(message.text + " ").find(" "):]
-    #bot.send_message(message.chat.id, ("Обновил приветствие"))
 
 
 @bot.message_handler(commands=["reset"])
