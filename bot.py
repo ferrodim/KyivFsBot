@@ -34,8 +34,6 @@ if not "okChat" in data.keys():
     data["okChat"] = CHAT_OK
 if not "failChat" in data.keys():
     data["failChat"] = CHAT_FAIL
-if not "reg" in data.keys():
-    data["reg"] = {}
 if not "counters" in data.keys():
     data["counters"] = {}
 datafile.close()
@@ -345,29 +343,14 @@ def setCounter(message):
 @restricted
 def forget(message):
     data.clear()
-    data["regchat"] = 0
     data["getStart"] = False
     data["getEnd"] = False
     data["okChat"] = CHAT_OK
     data["failChat"] = CHAT_FAIL
-    data["reg"] = {}
     data["counters"] = {}
     data["welcome"] = WELCOME
     save_data()
     bot.reply_to(message, ("Всё, я всё забыл :)"))
-
-
-@bot.message_handler(commands=["reg"])
-@restricted
-def addreg(message):
-    names = message.text.replace("@", "").split(" ")
-    if (len(names) == 3):
-        data["reg"][names[2].lower()] = names[1]
-        save_data()
-        bot.reply_to(message, ("Добавил агента %s с телеграм-ником %s"%(names[1], names[2].lower())))
-        return
-    bot.reply_to(message, ("Формат: /reg agentname telegramname"))
-    return
 
 
 @bot.message_handler(commands=["startevent"])
@@ -508,7 +491,6 @@ def get_level(AP):
 
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
-    #print(message.chat.id)
     if message.chat.username in ADMINS:
         if message.text in data["counters"].keys():
             txt = "Досье на: @%s\n"%(message.text)
