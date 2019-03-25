@@ -523,6 +523,8 @@ def process_msg(message):
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
 def process_photo(message):
     agentname = message.chat.username
+    if (agentname == None):
+        agentname = '%s' % message.chat.id
     if message.forward_from:
         if (message.chat.username in ADMINS) or (message.chat.username == message.forward_from.username):
             agentname = message.forward_from.username
