@@ -288,31 +288,31 @@ def restricted(func):
 
 
 @bot.message_handler(commands=["start"])
-def send_welcome(message):
+def cmd_start(message):
     bot.reply_to(message, (data["welcome"]))
 
 
 @bot.message_handler(commands=["help"])
-def send_welcome(message):
+def cmd_help(message):
     bot.reply_to(message, ("username - (for admins) Get userinfo\n/startevent - (for admins) Begin taking start screenshots\n/endevent - (for admins) Begin taking final screenshots\n/reset - (for admins) Clear all data and settings\n/result - (for admins) Get result table file\n/stop - (for admins) Stop taking events\n/setwelcome - (for admins) Set welcome message"))
 
 
 @bot.message_handler(commands=["setwelcome"])
 @restricted
-def setwelcome(message):
+def cmd_setwelcome(message):
     data["welcome"] = message.text[str(message.text + " ").find(" "):]
     save_data()
     bot.send_message(message.chat.id, ("Обновил приветствие"))
 
 @bot.message_handler(commands=["chatid"])
 @restricted
-def get_chat_id(message):
+def cmd_chatid(message):
     bot.send_message(message.chat.id, ("Айди этого чата: %s"%(message.chat.id)))
 
 
 @bot.message_handler(commands=["set"])
 @restricted
-def setCounter(message):
+def cmd_set(message):
     chunks = message.text.replace("@", "").split(" ")
     agentname = chunks[1]
     step = chunks[2]
@@ -341,7 +341,7 @@ def setCounter(message):
 
 @bot.message_handler(commands=["reset"])
 @restricted
-def forget(message):
+def cmd_reset(message):
     data.clear()
     data["getStart"] = False
     data["getEnd"] = False
@@ -355,7 +355,7 @@ def forget(message):
 
 @bot.message_handler(commands=["startevent"])
 @restricted
-def setstart(message):
+def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
@@ -364,7 +364,7 @@ def setstart(message):
 
 @bot.message_handler(commands=["endevent"])
 @restricted
-def setend(message):
+def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
@@ -373,7 +373,7 @@ def setend(message):
 
 @bot.message_handler(commands=["stop"])
 @restricted
-def setstop(message):
+def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
@@ -382,7 +382,7 @@ def setstop(message):
 
 @bot.message_handler(commands=["result"])
 @restricted
-def getresult(message):
+def cmd_result(message):
     txt = "Agent;Start_lvl;End_lvl;Start_AP;End_AP"
     for mode in MODES:
         txt += ";Start_%s;End_%s"%(mode,mode)
@@ -409,12 +409,12 @@ def getresult(message):
 
 
 @bot.message_handler(commands=["me"])
-def get_my_info(message):
+def cmd_me(message):
     txt = user_info(message.from_user.username);
     bot.send_message(message.chat.id, (txt))
 
 @bot.message_handler(commands=["clearme"])
-def clear_me(message):
+def cmd_clearme(message):
     if message.from_user.username in data["counters"].keys():
         del data["counters"][message.from_user.username]
         save_data()
