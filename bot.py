@@ -25,7 +25,7 @@ except FileNotFoundError:
     datafile = open("base.txt", "w")
     json.dump(data, datafile, ensure_ascii=False)
 if not "welcome" in data.keys():
-    data["welcome"] = u"hello"
+    data["welcome"] = WELCOME
 if not "getStart" in data.keys():
     data["getStart"] = False
 if not "getEnd" in data.keys():
@@ -525,10 +525,6 @@ def process_photo(message):
     username = message.chat.username
     if message.forward_from:
         username = message.forward_from.username
-    #if not data["getStart"] and not data["getEnd"]:
-    #    bot.send_message(message.chat.id, ("Я вообще-то сейчас не принимаю скрины!"))
-    #    return
-    print("username", username)
     if username.lower() in data["reg"].keys():
         agentname = data["reg"][username.lower()]
     else:
