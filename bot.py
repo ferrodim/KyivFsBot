@@ -522,13 +522,10 @@ def process_msg(message):
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
 def process_photo(message):
-    username = message.chat.username
+    agentname = message.chat.username
     if message.forward_from:
-        username = message.forward_from.username
-    if username.lower() in data["reg"].keys():
-        agentname = data["reg"][username.lower()]
-    else:
-        agentname = username
+        if (message.chat.username in ADMINS) or (message.chat.username == message.forward_from.username):
+            agentname = message.forward_from.username
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
     downloaded_file = bot.download_file(file_info.file_path)
