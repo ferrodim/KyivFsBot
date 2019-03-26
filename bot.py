@@ -379,6 +379,9 @@ def cmd_stop(message):
 @bot.message_handler(commands=["result"])
 @restricted
 def cmd_result(message):
+    delimiter = message.text[len("/result "):len("/result ")+1]
+    if delimiter == '':
+        delimiter = ','
     txt = "Agent;Start_lvl;End_lvl;Start_AP;End_AP"
     for mode in MODES:
         txt += ";Start_%s;End_%s"%(mode,mode)
@@ -396,6 +399,7 @@ def cmd_result(message):
         for mode in MODES:
             txt += ";%s;%s"%(agentdata["start"][mode], agentdata["end"][mode])
         txt += "\n"
+    txt = txt.replace(';', delimiter)
     resultfile = open("result.csv", "w")
     resultfile.write(txt)
     resultfile.close()
