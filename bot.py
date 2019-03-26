@@ -5,8 +5,6 @@ from PIL import Image
 from functools import wraps
 import telebot
 import json
-import datetime
-import re
 import random
 import string
 import io
@@ -45,15 +43,6 @@ def save_data():
     datafile = open("base.txt", "w")
     json.dump(data, datafile, ensure_ascii=False)
     datafile.close()
-
-
-
-
-
-
-
-
-
 
 
 def restricted(func):
@@ -190,7 +179,7 @@ def cmd_result(message):
 
 @bot.message_handler(commands=["me"])
 def cmd_me(message):
-    txt = user_info(message.from_user.username);
+    txt = user_info(message.from_user.username)
     bot.send_message(message.chat.id, (txt))
 
 @bot.message_handler(commands=["clearme"])
@@ -202,6 +191,7 @@ def cmd_clearme(message):
     else:
         bot.reply_to(message, ("Бот не располагает данными на вас"))
 
+
 def user_info(username):
     MODES_PLUS_AP = ["AP"] + MODES
     if not username in data["counters"].keys():
@@ -210,24 +200,23 @@ def user_info(username):
     print('userData', userData)
     txt = "== Стартовые показатели:"
     for mode in MODES_PLUS_AP:
-        value = userData["start"].get(mode,"-")
+        value = userData["start"].get(mode, "-")
         if mode == 'AP':
-            txt += '\nLevel: %s'%(get_level(value))
+            txt += '\nLevel: %s'%(userData["start"]['Level'])
         txt += "\n%s: %s"%(mode, value)
     if "end" in userData.keys() and len(userData['end'].keys()) > 0:
         txt += "\n== Финишные показатели:"
         for mode in MODES_PLUS_AP:
-            start_value = userData["start"].get(mode,"-")
-            value = userData["end"].get(mode,"-")
+            value = userData["end"].get(mode, "-")
             if mode == 'AP':
-                startLevel = get_level(start_value)
-                endLevel = get_level(value)
-                txt += '\nLevel: %s'%(get_level(value))
+                startLevel = userData["start"]['Level']
+                endLevel = userData["end"]['Level']
+                txt += '\nLevel: %s'%(endLevel)
                 if startLevel != endLevel:
                     txt += ' (+%s)'%(endLevel-startLevel)
             txt += "\n%s: %s"%(mode, value)
             if mode in userData["start"].keys() and mode in userData["end"].keys():
-                delta = (userData["end"][mode] - userData["start"][mode]);
+                delta = (userData["end"][mode] - userData["start"][mode])
                 txt += " (+%s)"%(delta)
     return txt
 
@@ -272,7 +261,7 @@ def process_photo(message):
         new_file.write(downloaded_file)
     parseResult = parse_image(img)
     if not data["getStart"] and not data["getEnd"]:
-        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n\n";
+        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n\n"
         if parseResult["success"]:
             txt += "Агент {},\nAP {:,},\nLvl {},\n{} {:,}".format(agentname, parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
         else:
