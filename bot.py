@@ -9,6 +9,7 @@ import datetime
 import re
 import random
 import string
+import io
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
 from image_process import parse_image
 
@@ -166,7 +167,7 @@ def cmd_result(message):
         txt += ";Start_%s;End_%s"%(mode,mode)
     txt += "\n"
     for agentname in data["counters"].keys():
-        agentdata = {"start": {"AP": "-"}, "end": {"AP": "-"}}
+        agentdata = {"start": {"AP": "-", "Level": "-"}, "end": {"AP": "-", "Level": "-"}}
         for mode in MODES:
             agentdata["start"][mode] = "-"
             agentdata["end"][mode] = "-"
@@ -174,7 +175,7 @@ def cmd_result(message):
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
-        txt += '"%s";%s;%s;%s;%s'%(agentname, get_level(agentdata["start"]["AP"]), get_level(agentdata["end"]["AP"]), agentdata["start"]["AP"], agentdata["end"]["AP"])
+        txt += '"%s";%s;%s;%s;%s'%(agentname, agentdata["start"]["Level"], agentdata["end"]["Level"], agentdata["start"]["AP"], agentdata["end"]["AP"])
         for mode in MODES:
             txt += ";%s;%s"%(agentdata["start"][mode], agentdata["end"][mode])
         txt += "\n"
@@ -231,43 +232,6 @@ def user_info(username):
     return txt
 
 
-def get_level(AP):
-   if AP == "-":
-       AP = 0
-   if AP >= 40000000:
-       return 16
-   elif AP >= 24000000:
-       return 15
-   elif AP >= 17000000:
-       return 14
-   elif AP >= 12000000:
-       return 13
-   elif AP >= 8400000:
-       return 12
-   elif AP >= 6000000:
-       return 11
-   elif AP >= 4000000:
-       return 10
-   elif AP >= 2400000:
-       return 9
-   elif AP >= 1200000:
-       return 8
-   elif AP >= 600000:
-       return 7
-   elif AP >= 300000:
-       return 6
-   elif AP >= 150000:
-       return 5
-   elif AP >= 70000:
-       return 4
-   elif AP >= 20000:
-       return 3
-   elif AP >= 2500:
-       return 2
-   else:
-       return 1
-
-
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
     if message.chat.username in ADMINS:
@@ -292,6 +256,9 @@ def process_photo(message):
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
     downloaded_file = bot.download_file(file_info.file_path)
+    f = io.BytesIO(downloaded_file)
+    f.seek(0)
+    img = Image.open(f)
     filename = "Screens/" + agentname + "_"
     if data["getStart"]:
         datakey = "start"
@@ -303,11 +270,11 @@ def process_photo(message):
     filename += datakey + "_" + str(postfix) + ".jpg"
     with open(filename, "wb") as new_file:
         new_file.write(downloaded_file)
-    parseResult = parse_image(filename)
+    parseResult = parse_image(img)
     if not data["getStart"] and not data["getEnd"]:
-        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n";
+        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n\n";
         if parseResult["success"]:
-            txt += "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]])
+            txt += "Агент {},\nAP {:,},\nLvl {},\n{} {:,}".format(agentname, parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
         bot.send_message(message.chat.id, (txt))
