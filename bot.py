@@ -81,12 +81,15 @@ def cmd_chatid(message):
 @bot.message_handler(commands=["set"])
 @restricted
 def cmd_set(message):
-    chunks = message.text.replace("@", "").split(" ")
+    chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
+    if len(chunks) != 5:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать `/set telegram_nick start Attribute value`"))
+        return
     agentname = chunks[1]
     step = chunks[2]
     counter = chunks[3]
     value = int(chunks[4])
-    if not step in ["start","end"]:
+    if not step in ["start", "end"]:
         bot.send_message(message.chat.id, ("вторым параметром должен быть start или end"))
         return
     if not counter in MODES and counter != 'AP':
@@ -222,9 +225,10 @@ def user_info(username):
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
     if message.chat.username in ADMINS:
-        if message.text in data["counters"].keys():
-            txt = "Досье на: @%s\n"%(message.text)
-            txt += user_info(message.text)
+        user_tg_name = message.text.replace('@', '')
+        if user_tg_name in data["counters"].keys():
+            txt = "Досье на: @%s\n"%(user_tg_name)
+            txt += user_info(user_tg_name)
         else:
             txt = "Такой пользователь не найден в базе"
         bot.send_message(message.chat.id, txt, parse_mode="Markdown")
