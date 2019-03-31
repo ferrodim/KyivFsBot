@@ -101,7 +101,7 @@ def cmd_set(message):
         txt += user_info(agentname)
     else:
         txt = "Такой пользователь не найден в базе"
-    bot.send_message(message.chat.id, (txt))
+    bot.send_message(message.chat.id, (txt), parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["reset"])
@@ -180,7 +180,7 @@ def cmd_result(message):
 @bot.message_handler(commands=["me"])
 def cmd_me(message):
     txt = user_info(message.from_user.username)
-    bot.send_message(message.chat.id, (txt))
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 @bot.message_handler(commands=["clearme"])
 def cmd_clearme(message):
@@ -193,7 +193,7 @@ def cmd_clearme(message):
 
 
 def user_info(username):
-    MODES_PLUS_AP = ["AP"] + MODES
+    MODES_PLUS_AP = ["AP", "Level"] + MODES
     if not username in data["counters"].keys():
         return 'Бот ничего не знает по вам'
     userData = data["counters"][username]
@@ -201,9 +201,7 @@ def user_info(username):
     txt = "== Стартовые показатели:"
     for mode in MODES_PLUS_AP:
         value = userData["start"].get(mode, "-")
-        if mode == 'AP':
-            txt += '\nLevel: %s'%(userData["start"]['Level'])
-        txt += "\n%s: %s"%(mode, value)
+        txt += "\n_%s:_ *%s*"%(mode, value)
     if "end" in userData.keys() and len(userData['end'].keys()) > 0:
         txt += "\n== Финишные показатели:"
         for mode in MODES_PLUS_AP:
@@ -211,10 +209,10 @@ def user_info(username):
             if mode == 'AP':
                 startLevel = userData["start"]['Level']
                 endLevel = userData["end"]['Level']
-                txt += '\nLevel: %s'%(endLevel)
+                txt += '\n_Level_: *%s*'%(endLevel)
                 if startLevel != endLevel:
                     txt += ' (+%s)'%(endLevel-startLevel)
-            txt += "\n%s: %s"%(mode, value)
+            txt += "\n_%s_: *%s*"%(mode, value)
             if mode in userData["start"].keys() and mode in userData["end"].keys():
                 delta = (userData["end"][mode] - userData["start"][mode])
                 txt += " (+%s)"%(delta)
@@ -229,9 +227,9 @@ def process_msg(message):
             txt += user_info(message.text)
         else:
             txt = "Такой пользователь не найден в базе"
-        bot.send_message(message.chat.id, (txt))
+        bot.send_message(message.chat.id, txt, parse_mode="Markdown")
     else:
-        bot.reply_to(message, (data["welcome"]))
+        bot.reply_to(message, (data["welcome"]), parse_mode="Markdown")
 
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
@@ -273,7 +271,7 @@ def process_photo(message):
             data["counters"][agentname] = {"pre":{}, "start": {}, "end": {}}
         data["counters"][agentname][datakey].update(parseResult)
         save_data()
-        bot.reply_to(message, ("Изображение распознано. Проверьте правильность цифр:\n%s"%(user_info(agentname))))
+        bot.reply_to(message, ("Изображение распознано. Проверьте правильность цифр:\n%s"%(user_info(agentname))), parse_mode="Markdown")
         if data["okChat"]:
             bot.forward_message(data["okChat"], message.chat.id, message.message_id)
             bot.send_message(data["okChat"], "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
