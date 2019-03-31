@@ -92,8 +92,9 @@ def cmd_set(message):
     if not step in ["start", "end"]:
         bot.send_message(message.chat.id, ("вторым параметром должен быть start или end"))
         return
-    if not counter in MODES and counter != 'AP':
-        bot.send_message(message.chat.id, ("третьим параметром должен быть AP или "+ ",".join(MODES)))
+    MODES_PLUS_AP = ["AP", "Level"] + MODES
+    if not counter in MODES_PLUS_AP:
+        bot.send_message(message.chat.id, ("третьим параметром должен быть "+ ", ".join(MODES_PLUS_AP)))
         return
     if agentname not in data["counters"].keys():
         data["counters"][agentname] = {"start": {}, "end": {}}
@@ -209,12 +210,6 @@ def user_info(username):
         txt += "\n== Финишные показатели:"
         for mode in MODES_PLUS_AP:
             value = userData["end"].get(mode, "-")
-            if mode == 'AP':
-                startLevel = userData["start"]['Level']
-                endLevel = userData["end"]['Level']
-                txt += '\n_Level_: *%s*'%(endLevel)
-                if startLevel != endLevel:
-                    txt += ' (+%s)'%(endLevel-startLevel)
             txt += "\n_%s_: *%s*"%(mode, value)
             if mode in userData["start"].keys() and mode in userData["end"].keys():
                 delta = (userData["end"][mode] - userData["start"][mode])
