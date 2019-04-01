@@ -263,8 +263,8 @@ def user_info(username):
 
 def get_tg_nick(message):
     tg_nick = message.chat.username
-    if tg_nick == None:
-        tg_nick = str(message.chat.id)
+    if tg_nick is None:
+        tg_nick = '#' + str(message.chat.id)
     return tg_nick
 
 
