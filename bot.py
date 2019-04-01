@@ -63,13 +63,23 @@ def cmd_start(message):
 
 @bot.message_handler(commands=["help"])
 def cmd_help(message):
-    bot.reply_to(message, "username - (for admins) Get userinfo\n"
-                          "/startevent - (for admins) Begin taking start screenshots\n"
-                          "/endevent - (for admins) Begin taking final screenshots\n"
-                          "/reset - (for admins) Clear all data and settings\n"
-                          "/result - (for admins) Get result table file\n"
-                          "/stop - (for admins) Stop taking events\n"
-                          "/setwelcome - (for admins) Set welcome message")
+    txt = "/me - View personal userinfo\n" \
+          "/nick %your_in_game_nick% - Set your in_game nick\n" \
+          "/clearme - Delete you account\n"
+    if get_tg_nick(message) in ADMINS:
+
+        txt += "== admin commands\n" \
+               "@username or username - Get userinfo\n" \
+               "/startevent - Begin taking start screenshots\n" \
+               "/endevent - Begin taking final screenshots\n" \
+               "/reset - Clear all data and settings\n" \
+               "/result - Get result table file\n" \
+               "/stop - Stop taking events\n" \
+               "/set tg_nick start Param Value - Set start value (AP, Level...)\n" \
+               "/set tg_nick end Param Value - Set start value (AP, Level...)\n" \
+               "/set tg_nick Nick ingame_nick - Set ingame nick for selected user\n" \
+               "/setwelcome - Set welcome message"
+    bot.reply_to(message, txt)
 
 
 @bot.message_handler(commands=["setwelcome"])
@@ -252,7 +262,7 @@ def user_info(username):
 
 def get_tg_nick(message):
     tg_nick = message.chat.username
-    if (tg_nick == None):
+    if tg_nick == None:
         tg_nick = str(message.chat.id)
     return tg_nick
 
