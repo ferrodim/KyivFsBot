@@ -176,7 +176,7 @@ def cmd_result(message):
     txt = "TG_nick;Game_nick"
     allowed_modes = ["AP", "Level"] + MODES
     for mode in allowed_modes:
-        txt += ";Start_%s;End_%s" % (mode, mode)
+        txt += ";Start_%s;End_%s;Delta_%s" % (mode, mode, mode)
     txt += "\n"
     for agentname in data["counters"].keys():
         agentdata = {"start": {}, "end": {}, "Nick": data["counters"][agentname].get("Nick", "-")}
@@ -189,7 +189,11 @@ def cmd_result(message):
             agentdata["end"].update(data["counters"][agentname]["end"])
         txt += '"%s";"%s"' % (agentname, agentdata["Nick"])
         for mode in allowed_modes:
-            txt += ";%s;%s" % (agentdata["start"][mode], agentdata["end"][mode])
+            if isinstance(agentdata["end"][mode], int) and isinstance(agentdata["start"][mode], int):
+                delta = agentdata["end"][mode] - agentdata["start"][mode]
+            else:
+                delta = '-'
+            txt += ";%s;%s;%s" % (agentdata["start"][mode], agentdata["end"][mode], delta)
         txt += "\n"
     txt = txt.replace(';', delimiter)
     resultfile = open("result.csv", "w")
