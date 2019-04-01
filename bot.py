@@ -8,6 +8,7 @@ import json
 import random
 import string
 import io
+import re
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
 from image_process import parse_image
 
@@ -81,31 +82,32 @@ def cmd_chatid(message):
 @bot.message_handler(commands=["set"])
 @restricted
 def cmd_set(message):
+    allowed_modes = ["AP", "Level"] + MODES
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
-    if len(chunks) != 5:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать `/set telegram_nick start Attribute value`"))
+    is_valid_query = (len(chunks) == 4 and chunks[2] == 'Nick') or \
+                     (len(chunks) == 5 and chunks[2] in ["start", "end"] and chunks[3] in allowed_modes)
+    if not is_valid_query:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                           "`/set telegram_nick start Param value`\n"
+                                           "`/set telegram_nick end Param value`\n"
+                                           "`/set telegram_nick Nick game_nick`"), parse_mode="Markdown")
         return
     agentname = chunks[1]
-    step = chunks[2]
-    counter = chunks[3]
-    value = int(chunks[4])
-    if not step in ["start", "end"]:
-        bot.send_message(message.chat.id, ("вторым параметром должен быть start или end"))
-        return
-    MODES_PLUS_AP = ["AP", "Level"] + MODES
-    if not counter in MODES_PLUS_AP:
-        bot.send_message(message.chat.id, ("третьим параметром должен быть "+ ", ".join(MODES_PLUS_AP)))
-        return
     if agentname not in data["counters"].keys():
         data["counters"][agentname] = {"start": {}, "end": {}}
-    data["counters"][agentname][step][counter] = value
-    save_data()
-    if agentname in data["counters"].keys():
-        txt = "Досье на: @%s\n"%(agentname)
-        txt += user_info(agentname)
+    if chunks[2] == 'Nick':
+        counter = chunks[2]
+        value = chunks[3]
+        data["counters"][agentname][counter] = value
     else:
-        txt = "Такой пользователь не найден в базе"
-    bot.send_message(message.chat.id, (txt), parse_mode="Markdown")
+        step = chunks[2]
+        counter = chunks[3]
+        value = int(chunks[4])
+        data["counters"][agentname][step][counter] = value
+    save_data()
+    txt = "Досье на: @%s\n" % agentname
+    txt += user_info(agentname)
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["reset"])
@@ -155,20 +157,21 @@ def cmd_result(message):
     delimiter = message.text[len("/result "):len("/result ")+1]
     if delimiter == '':
         delimiter = ','
-    txt = "Agent;Start_lvl;End_lvl;Start_AP;End_AP"
-    for mode in MODES:
+    txt = "TG_nick;Game_nick"
+    allowed_modes = ["AP", "Level"] + MODES
+    for mode in allowed_modes:
         txt += ";Start_%s;End_%s"%(mode,mode)
     txt += "\n"
     for agentname in data["counters"].keys():
-        agentdata = {"start": {"AP": "-", "Level": "-"}, "end": {"AP": "-", "Level": "-"}}
-        for mode in MODES:
+        agentdata = {"start": {}, "end": {}, "Nick": data["counters"][agentname].get("Nick", "-")}
+        for mode in allowed_modes:
             agentdata["start"][mode] = "-"
             agentdata["end"][mode] = "-"
         if "start" in data["counters"][agentname].keys():
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
-        txt += '"%s";%s;%s;%s;%s'%(agentname, agentdata["start"]["Level"], agentdata["end"]["Level"], agentdata["start"]["AP"], agentdata["end"]["AP"])
+        txt += '"%s";"%s";%s;%s;%s;%s'%(agentname, agentdata["Nick"], agentdata["start"]["Level"], agentdata["end"]["Level"], agentdata["start"]["AP"], agentdata["end"]["AP"])
         for mode in MODES:
             txt += ";%s;%s"%(agentdata["start"][mode], agentdata["end"][mode])
         txt += "\n"
@@ -196,26 +199,53 @@ def cmd_clearme(message):
         bot.reply_to(message, ("Бот не располагает данными на вас"))
 
 
+@bot.message_handler(commands=["nick"])
+def cmd_nick(message):
+    chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
+    is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
+    if not is_valid_query:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                           "`/nick my_game_nick`\n"), parse_mode="Markdown")
+        return
+    tg_name = get_tg_nick(message)
+    game_nick = chunks[1]
+    if tg_name not in data["counters"].keys():
+        data["counters"][tg_name] = {"start": {}, "end": {}}
+    data["counters"][tg_name]['Nick'] = game_nick
+    save_data()
+    txt = "Досье на: @%s\n" % tg_name
+    txt += user_info(tg_name)
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+
+
 def user_info(username):
     MODES_PLUS_AP = ["AP", "Level"] + MODES
     if not username in data["counters"].keys():
         return 'Бот ничего не знает по вам'
-    userData = data["counters"][username]
-    print('userData', userData)
-    txt = "== Стартовые показатели:"
+    user_data = data["counters"][username]
+    txt = ""
+    game_nick = user_data.get("Nick", "-")
+    if game_nick != '-' and game_nick !=  username:
+        txt = "Ник в игре: %s\n" % game_nick
+    txt += "== Стартовые показатели:"
     for mode in MODES_PLUS_AP:
-        value = userData["start"].get(mode, "-")
+        value = user_data["start"].get(mode, "-")
         txt += "\n_%s:_ *%s*"%(mode, value)
-    if "end" in userData.keys() and len(userData['end'].keys()) > 0:
+    if "end" in user_data.keys() and len(user_data['end'].keys()) > 0:
         txt += "\n== Финишные показатели:"
         for mode in MODES_PLUS_AP:
-            value = userData["end"].get(mode, "-")
-            txt += "\n_%s_: *%s*"%(mode, value)
-            if mode in userData["start"].keys() and mode in userData["end"].keys():
-                delta = (userData["end"][mode] - userData["start"][mode])
-                txt += " (+%s)"%(delta)
+            value = user_data["end"].get(mode, "-")
+            txt += "\n_%s_: *%s*" % (mode, value)
+            if mode in user_data["start"].keys() and mode in user_data["end"].keys():
+                delta = (user_data["end"][mode] - user_data["start"][mode])
+                txt += " (+%s)" % delta
     return txt
 
+def get_tg_nick(message):
+    tg_nick = message.chat.username
+    if (tg_nick == None):
+        tg_nick = str(message.chat.id)
+    return tg_nick
 
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
@@ -233,9 +263,7 @@ def process_msg(message):
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
 def process_photo(message):
-    agentname = message.chat.username
-    if (agentname == None):
-        agentname = '%s' % message.chat.id
+    agentname = get_tg_nick(message)
     if message.forward_from:
         if (message.chat.username in ADMINS) or (message.chat.username == message.forward_from.username):
             agentname = message.forward_from.username
