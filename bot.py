@@ -179,7 +179,7 @@ def cmd_result(message):
         txt += ";Start_%s;End_%s;Delta_%s" % (mode, mode, mode)
     txt += "\n"
     for agentname in data["counters"].keys():
-        agentdata = {"start": {}, "end": {}, "Nick": data["counters"][agentname].get("Nick", "-")}
+        agentdata = {"start": {}, "end": {}}
         for mode in allowed_modes:
             agentdata["start"][mode] = "-"
             agentdata["end"][mode] = "-"
@@ -187,7 +187,7 @@ def cmd_result(message):
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
-        txt += '"%s";"%s"' % (agentname, agentdata["Nick"])
+        txt += '"%s";"%s"' % (agentname, data["counters"][agentname].get("Nick", "-"))
         for mode in allowed_modes:
             if isinstance(agentdata["end"][mode], int) and isinstance(agentdata["start"][mode], int):
                 delta = agentdata["end"][mode] - agentdata["start"][mode]
