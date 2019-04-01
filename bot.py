@@ -67,7 +67,6 @@ def cmd_help(message):
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
           "/clearme - Delete you account\n"
     if get_tg_nick(message) in ADMINS:
-
         txt += "== admin commands\n" \
                "@username or username - Get userinfo\n" \
                "/startevent - Begin taking start screenshots\n" \
@@ -203,14 +202,16 @@ def cmd_result(message):
 
 @bot.message_handler(commands=["me"])
 def cmd_me(message):
-    txt = user_info(message.from_user.username)
+    tg_name = get_tg_nick(message)
+    txt = user_info(tg_name)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["clearme"])
 def cmd_clearme(message):
-    if message.from_user.username in data["counters"].keys():
-        del data["counters"][message.from_user.username]
+    tg_name = get_tg_nick(message)
+    if tg_name in data["counters"].keys():
+        del data["counters"][tg_name]
         save_data()
         bot.reply_to(message, "Ваши данные удалены")
     else:
@@ -238,7 +239,7 @@ def cmd_nick(message):
 
 def user_info(username):
     allowed_modes = ["AP", "Level"] + MODES
-    if not username in data["counters"].keys():
+    if username not in data["counters"].keys():
         return 'Бот ничего не знает по вам'
     user_data = data["counters"][username]
     txt = ""
@@ -269,7 +270,8 @@ def get_tg_nick(message):
 
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
-    if message.chat.username in ADMINS:
+    tg_name = get_tg_nick(message)
+    if tg_name in ADMINS:
         user_tg_name = message.text.replace('@', '')
         if user_tg_name in data["counters"].keys():
             txt = "Досье на: @%s\n" % user_tg_name
@@ -285,7 +287,7 @@ def process_msg(message):
 def process_photo(message):
     agentname = get_tg_nick(message)
     if message.forward_from:
-        if (message.chat.username in ADMINS) or (message.chat.username == message.forward_from.username):
+        if (agentname in ADMINS) or (agentname == message.forward_from.username):
             agentname = message.forward_from.username
     file_id = message.photo[-1].file_id
     file_info = bot.get_file(file_id)
