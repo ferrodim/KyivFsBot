@@ -22,17 +22,17 @@ except FileNotFoundError:
     data = {}
     datafile = open("base.txt", "w")
     json.dump(data, datafile, ensure_ascii=False)
-if not "welcome" in data.keys():
+if "welcome" not in data.keys():
     data["welcome"] = WELCOME
-if not "getStart" in data.keys():
+if "getStart" not in data.keys():
     data["getStart"] = False
-if not "getEnd" in data.keys():
+if "getEnd" not in data.keys():
     data["getEnd"] = False
-if not "okChat" in data.keys(): 
+if "okChat" not in data.keys():
     data["okChat"] = CHAT_OK
-if not "failChat" in data.keys():
+if "failChat" not in data.keys():
     data["failChat"] = CHAT_FAIL
-if not "counters" in data.keys():
+if "counters" not in data.keys():
     data["counters"] = {}
 datafile.close()
 datafile = open("base.txt", "w")
@@ -41,16 +41,16 @@ datafile.close()
 
 
 def save_data():
-    datafile = open("base.txt", "w")
-    json.dump(data, datafile, ensure_ascii=False)
-    datafile.close()
+    data_file = open("base.txt", "w")
+    json.dump(data, data_file, ensure_ascii=False)
+    data_file.close()
 
 
 def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
         if message.from_user.username not in ADMINS:
-            bot.reply_to(message, ("А ну кыш отсюда!"))
+            bot.reply_to(message, "А ну кыш отсюда!")
             return
         return func(message, *args, **kwargs)
     return wrapped
@@ -63,7 +63,13 @@ def cmd_start(message):
 
 @bot.message_handler(commands=["help"])
 def cmd_help(message):
-    bot.reply_to(message, ("username - (for admins) Get userinfo\n/startevent - (for admins) Begin taking start screenshots\n/endevent - (for admins) Begin taking final screenshots\n/reset - (for admins) Clear all data and settings\n/result - (for admins) Get result table file\n/stop - (for admins) Stop taking events\n/setwelcome - (for admins) Set welcome message"))
+    bot.reply_to(message, "username - (for admins) Get userinfo\n"
+                          "/startevent - (for admins) Begin taking start screenshots\n"
+                          "/endevent - (for admins) Begin taking final screenshots\n"
+                          "/reset - (for admins) Clear all data and settings\n"
+                          "/result - (for admins) Get result table file\n"
+                          "/stop - (for admins) Stop taking events\n"
+                          "/setwelcome - (for admins) Set welcome message")
 
 
 @bot.message_handler(commands=["setwelcome"])
@@ -71,12 +77,13 @@ def cmd_help(message):
 def cmd_setwelcome(message):
     data["welcome"] = message.text[str(message.text + " ").find(" "):]
     save_data()
-    bot.send_message(message.chat.id, ("Обновил приветствие"))
+    bot.send_message(message.chat.id, "Обновил приветствие")
+
 
 @bot.message_handler(commands=["chatid"])
 @restricted
 def cmd_chatid(message):
-    bot.send_message(message.chat.id, ("Айди этого чата: %s"%(message.chat.id)))
+    bot.send_message(message.chat.id, "Айди этого чата: %s" % message.chat.id)
 
 
 @bot.message_handler(commands=["set"])
@@ -121,7 +128,7 @@ def cmd_reset(message):
     data["counters"] = {}
     data["welcome"] = WELCOME
     save_data()
-    bot.reply_to(message, ("Всё, я всё забыл :)"))
+    bot.reply_to(message, "База данных очищена")
 
 
 @bot.message_handler(commands=["startevent"])
@@ -130,7 +137,7 @@ def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
-    bot.send_message(message.chat.id, ("Принимаю скрины!"))
+    bot.send_message(message.chat.id, "Принимаю стартовые скрины!")
 
 
 @bot.message_handler(commands=["endevent"])
@@ -139,7 +146,7 @@ def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
-    bot.send_message(message.chat.id, ("Принимаю скрины!"))
+    bot.send_message(message.chat.id, "Принимаю финишные скрины!")
 
 
 @bot.message_handler(commands=["stop"])
@@ -148,7 +155,7 @@ def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
-    bot.send_message(message.chat.id, ("Не принимаю скрины!"))
+    bot.send_message(message.chat.id, "Не принимаю скрины!")
 
 
 @bot.message_handler(commands=["result"])
@@ -160,7 +167,7 @@ def cmd_result(message):
     txt = "TG_nick;Game_nick"
     allowed_modes = ["AP", "Level"] + MODES
     for mode in allowed_modes:
-        txt += ";Start_%s;End_%s"%(mode,mode)
+        txt += ";Start_%s;End_%s" % (mode, mode)
     txt += "\n"
     for agentname in data["counters"].keys():
         agentdata = {"start": {}, "end": {}, "Nick": data["counters"][agentname].get("Nick", "-")}
@@ -171,9 +178,9 @@ def cmd_result(message):
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
-        txt += '"%s";"%s";%s;%s;%s;%s'%(agentname, agentdata["Nick"], agentdata["start"]["Level"], agentdata["end"]["Level"], agentdata["start"]["AP"], agentdata["end"]["AP"])
+        txt += '"%s";"%s";%s;%s;%s;%s' % (agentname, agentdata["Nick"], agentdata["start"]["Level"], agentdata["end"]["Level"], agentdata["start"]["AP"], agentdata["end"]["AP"])
         for mode in MODES:
-            txt += ";%s;%s"%(agentdata["start"][mode], agentdata["end"][mode])
+            txt += ";%s;%s" % (agentdata["start"][mode], agentdata["end"][mode])
         txt += "\n"
     txt = txt.replace(';', delimiter)
     resultfile = open("result.csv", "w")
@@ -189,14 +196,15 @@ def cmd_me(message):
     txt = user_info(message.from_user.username)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
+
 @bot.message_handler(commands=["clearme"])
 def cmd_clearme(message):
     if message.from_user.username in data["counters"].keys():
         del data["counters"][message.from_user.username]
         save_data()
-        bot.reply_to(message, ("Ваши данные удалены"))
+        bot.reply_to(message, "Ваши данные удалены")
     else:
-        bot.reply_to(message, ("Бот не располагает данными на вас"))
+        bot.reply_to(message, "Бот не располагает данными на вас")
 
 
 @bot.message_handler(commands=["nick"])
@@ -219,7 +227,7 @@ def cmd_nick(message):
 
 
 def user_info(username):
-    MODES_PLUS_AP = ["AP", "Level"] + MODES
+    allowed_modes = ["AP", "Level"] + MODES
     if not username in data["counters"].keys():
         return 'Бот ничего не знает по вам'
     user_data = data["counters"][username]
@@ -228,12 +236,12 @@ def user_info(username):
     if game_nick != '-' and game_nick !=  username:
         txt = "Ник в игре: %s\n" % game_nick
     txt += "== Стартовые показатели:"
-    for mode in MODES_PLUS_AP:
+    for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
-        txt += "\n_%s:_ *%s*"%(mode, value)
+        txt += "\n_%s:_ *%s*" % (mode, value)
     if "end" in user_data.keys() and len(user_data['end'].keys()) > 0:
         txt += "\n== Финишные показатели:"
-        for mode in MODES_PLUS_AP:
+        for mode in allowed_modes:
             value = user_data["end"].get(mode, "-")
             txt += "\n_%s_: *%s*" % (mode, value)
             if mode in user_data["start"].keys() and mode in user_data["end"].keys():
@@ -241,18 +249,20 @@ def user_info(username):
                 txt += " (+%s)" % delta
     return txt
 
+
 def get_tg_nick(message):
     tg_nick = message.chat.username
     if (tg_nick == None):
         tg_nick = str(message.chat.id)
     return tg_nick
 
+
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
     if message.chat.username in ADMINS:
         user_tg_name = message.text.replace('@', '')
         if user_tg_name in data["counters"].keys():
-            txt = "Досье на: @%s\n"%(user_tg_name)
+            txt = "Досье на: @%s\n" % user_tg_name
             txt += user_info(user_tg_name)
         else:
             txt = "Такой пользователь не найден в базе"
@@ -267,8 +277,8 @@ def process_photo(message):
     if message.forward_from:
         if (message.chat.username in ADMINS) or (message.chat.username == message.forward_from.username):
             agentname = message.forward_from.username
-    fileID = message.photo[-1].file_id
-    file_info = bot.get_file(fileID)
+    file_id = message.photo[-1].file_id
+    file_info = bot.get_file(file_id)
     downloaded_file = bot.download_file(file_info.file_path)
     f = io.BytesIO(downloaded_file)
     f.seek(0)
@@ -303,7 +313,7 @@ def process_photo(message):
             bot.forward_message(data["okChat"], message.chat.id, message.message_id)
             bot.send_message(data["okChat"], "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
     else:
-        bot.reply_to(message, ("Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную"))
+        bot.reply_to(message, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
         if data["failChat"] != 0:
             bot.forward_message(data["failChat"], message.chat.id, message.message_id)
 
