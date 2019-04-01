@@ -187,8 +187,8 @@ def cmd_result(message):
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
-        txt += '"%s";"%s";%s;%s;%s;%s' % (agentname, agentdata["Nick"], agentdata["start"]["Level"], agentdata["end"]["Level"], agentdata["start"]["AP"], agentdata["end"]["AP"])
-        for mode in MODES:
+        txt += '"%s";"%s"' % (agentname, agentdata["Nick"])
+        for mode in allowed_modes:
             txt += ";%s;%s" % (agentdata["start"][mode], agentdata["end"][mode])
         txt += "\n"
     txt = txt.replace(';', delimiter)
