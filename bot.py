@@ -293,6 +293,7 @@ def process_photo(message):
     if message.forward_from:
         if (agentname in ADMINS) or (agentname == message.forward_from.username):
             agentname = message.forward_from.username
+    bot.send_message(message.chat.id, "\U000023F3 Подождите", parse_mode="Markdown")
     file_id = message.photo[-1].file_id
     file_info = bot.get_file(file_id)
     downloaded_file = bot.download_file(file_info.file_path)
