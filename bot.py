@@ -317,14 +317,14 @@ def process_photo(message):
             txt += "Агент {},\nAP {:,},\nLvl {},\n{} {:,}".format(agentname, parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
-        bot.send_message(message.chat.id, (txt))
+        bot.send_message(message.chat.id, txt)
         return
     if parseResult["success"]:
         if agentname not in data["counters"].keys():
-            data["counters"][agentname] = {"pre":{}, "start": {}, "end": {}}
+            data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
         data["counters"][agentname][datakey].update(parseResult)
         save_data()
-        bot.reply_to(message, ("Изображение распознано. Проверьте правильность цифр:\n%s"%(user_info(agentname))), parse_mode="Markdown")
+        bot.reply_to(message, ("Изображение распознано. Проверьте правильность цифр:\n%s" % (user_info(agentname))), parse_mode="Markdown")
         if data["okChat"]:
             bot.forward_message(data["okChat"], message.chat.id, message.message_id)
             bot.send_message(data["okChat"], "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
