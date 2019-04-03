@@ -121,9 +121,19 @@ def cmd_set(message):
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
-    txt = "Досье на: @%s\n" % agentname
-    txt += user_info(agentname)
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    bot.reply_to(message, "Done")
+    #txt = "Досье на: @%s\n" % agentname
+    #txt += user_info(agentname)
+    #bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    user_inform(agentname)
+
+
+def user_inform(agentname):
+    if agentname in data["counters"]:
+        chatid = data["counters"][agentname].get('chatid')
+        if chatid is not None:
+            txt = 'Данные по вам изменились:\n'+user_info(agentname)
+            bot.send_message(chatid, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["reset"])
@@ -294,6 +304,7 @@ def process_photo(message):
         if (agentname in ADMINS) or (agentname == message.forward_from.username):
             agentname = message.forward_from.username
     bot.send_message(message.chat.id, "\U000023F3 Подождите", parse_mode="Markdown")
+    user_save_chatid(agentname, message.chat.id)
     file_id = message.photo[-1].file_id
     file_info = bot.get_file(file_id)
     downloaded_file = bot.download_file(file_info.file_path)
@@ -321,11 +332,9 @@ def process_photo(message):
         bot.send_message(message.chat.id, txt)
         return
     if parseResult["success"]:
-        if agentname not in data["counters"].keys():
-            data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
         data["counters"][agentname][datakey].update(parseResult)
         save_data()
-        bot.reply_to(message, ("Изображение распознано. Проверьте правильность цифр:\n%s" % (user_info(agentname))), parse_mode="Markdown")
+        user_inform(agentname)
         if data["okChat"]:
             bot.forward_message(data["okChat"], message.chat.id, message.message_id)
             bot.send_message(data["okChat"], "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
@@ -333,6 +342,15 @@ def process_photo(message):
         bot.reply_to(message, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
         if data["failChat"] != 0:
             bot.forward_message(data["failChat"], message.chat.id, message.message_id)
+
+
+def user_save_chatid(agentname, chatid):
+    if agentname not in data["counters"].keys():
+        data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
+        save_data()
+    if data["counters"][agentname].get('chatid') != chatid:
+        data["counters"][agentname]['chatid'] = chatid
+        save_data()
 
 
 if __name__ == "__main__":
