@@ -121,10 +121,7 @@ def cmd_set(message):
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
-    bot.reply_to(message, "Done")
-    #txt = "Досье на: @%s\n" % agentname
-    #txt += user_info(agentname)
-    #bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    bot.reply_to(message, "Done\n"+user_info(agentname), parse_mode="Markdown")
     user_inform(agentname)
 
 
@@ -246,8 +243,7 @@ def cmd_nick(message):
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['Nick'] = game_nick
     save_data()
-    txt = "Досье на: @%s\n" % tg_name
-    txt += user_info(tg_name)
+    txt = user_info(tg_name)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
@@ -256,10 +252,10 @@ def user_info(username):
     if username not in data["counters"].keys():
         return 'Бот ничего не знает по вам'
     user_data = data["counters"][username]
-    txt = ""
+    txt = "Ник телеги: @%s\n" % username
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-' and game_nick !=  username:
-        txt = "Ник в игре: %s\n" % game_nick
+        txt += "Ник в игре: %s\n" % game_nick
     txt += "== Стартовые показатели:"
     for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
@@ -288,8 +284,7 @@ def process_msg(message):
     if tg_name in ADMINS:
         user_tg_name = message.text.replace('@', '')
         if user_tg_name in data["counters"].keys():
-            txt = "Досье на: @%s\n" % user_tg_name
-            txt += user_info(user_tg_name)
+            txt = user_info(user_tg_name)
         else:
             txt = "Такой пользователь не найден в базе"
         bot.send_message(message.chat.id, txt, parse_mode="Markdown")
