@@ -28,10 +28,6 @@ if "getStart" not in data.keys():
     data["getStart"] = False
 if "getEnd" not in data.keys():
     data["getEnd"] = False
-if "okChat" not in data.keys():
-    data["okChat"] = CHAT_OK
-if "failChat" not in data.keys():
-    data["failChat"] = CHAT_FAIL
 if "counters" not in data.keys():
     data["counters"] = {}
 datafile.close()
@@ -139,8 +135,6 @@ def cmd_reset(message):
     data.clear()
     data["getStart"] = False
     data["getEnd"] = False
-    data["okChat"] = CHAT_OK
-    data["failChat"] = CHAT_FAIL
     data["counters"] = {}
     data["welcome"] = WELCOME
     save_data()
@@ -330,13 +324,11 @@ def process_photo(message):
         data["counters"][agentname][datakey].update(parseResult)
         save_data()
         user_inform(agentname)
-        if data["okChat"]:
-            bot.forward_message(data["okChat"], message.chat.id, message.message_id)
-            bot.send_message(data["okChat"], "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
+        bot.forward_message(CHAT_OK, message.chat.id, message.message_id)
+        bot.send_message(CHAT_OK, "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
     else:
         bot.reply_to(message, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
-        if data["failChat"] != 0:
-            bot.forward_message(data["failChat"], message.chat.id, message.message_id)
+        bot.forward_message(CHAT_FAIL, message.chat.id, message.message_id)
 
 
 def user_save_chatid(agentname, chatid):
