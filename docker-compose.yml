@@ -4,7 +4,30 @@ services:
     build: .
     volumes:
       - ".:/code"
-#    ports:
-#     - "5000:5000"
-#  redis:
-#    image: "redis:alpine"
+  rabbit:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+  decoder:
+    build: decoder
+    links:
+      - rabbit
+    command: /usr/bin/python3.6 /app/decoder.py -p 5672 -s rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/config.py"
+  decoder2:
+    build: decoder
+    links:
+      - rabbit
+    command: /usr/bin/python3.6 /app/decoder.py -p 5672 -s rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/config.py"
