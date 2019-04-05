@@ -10,14 +10,15 @@ services:
       RABBITMQ_DEFAULT_USER: "rabbitmq"
       RABBITMQ_DEFAULT_PASS: "rabbitmq"
       RABBITMQ_DEFAULT_VHOST: "/"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+#    ports:
+#      - "15672:15672"
+    expose:
+      - 5672
   decoder:
     build: decoder
     links:
       - rabbit
-    command: /usr/bin/python3.6 /app/decoder.py -p 5672 -s rabbit
+    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
@@ -26,7 +27,43 @@ services:
     build: decoder
     links:
       - rabbit
-    command: /usr/bin/python3.6 /app/decoder.py -p 5672 -s rabbit
+    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder3:
+    build: decoder
+    links:
+      - rabbit
+    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder4:
+    build: decoder
+    links:
+      - rabbit
+    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder5:
+    build: decoder
+    links:
+      - rabbit
+    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder6:
+    build: decoder
+    links:
+      - rabbit
+    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
