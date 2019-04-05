@@ -16,54 +16,36 @@ services:
       - 5672
   decoder:
     build: decoder
-    links:
-      - rabbit
-    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
       - "./config.py:/app/config.py"
   decoder2:
     build: decoder
-    links:
-      - rabbit
-    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
       - "./config.py:/app/config.py"
   decoder3:
     build: decoder
-    links:
-      - rabbit
-    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
       - "./config.py:/app/config.py"
   decoder4:
     build: decoder
-    links:
-      - rabbit
-    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
       - "./config.py:/app/config.py"
   decoder5:
     build: decoder
-    links:
-      - rabbit
-    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
       - "./config.py:/app/config.py"
   decoder6:
     build: decoder
-    links:
-      - rabbit
-    command: sh -c "/usr/bin/python3.6 /app/decoder.py"
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
