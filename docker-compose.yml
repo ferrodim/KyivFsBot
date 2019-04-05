@@ -21,7 +21,7 @@ services:
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
-      - "./config.py:/config.py"
+      - "./config.py:/app/config.py"
   decoder2:
     build: decoder
     links:
@@ -30,4 +30,4 @@ services:
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
-      - "./config.py:/config.py"
+      - "./config.py:/app/config.py"
