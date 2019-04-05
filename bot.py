@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PIL import Image
 from functools import wraps
 import telebot
 import json
 import random
 import string
-import io
 import re
 import pika
 import logging
@@ -300,9 +298,6 @@ def process_photo(message):
     file_id = message.photo[-1].file_id
     file_info = bot.get_file(file_id)
     downloaded_file = bot.download_file(file_info.file_path)
-    f = io.BytesIO(downloaded_file)
-    f.seek(0)
-    img = Image.open(f)
     filename = agentname + "_"
     if data["getStart"]:
         datakey = "start"
@@ -330,7 +325,6 @@ def on_message(channel, method_frame, header_frame, body):
     chatid = parseResult['chatid']
     datakey = parseResult['datakey']
     agentname = parseResult['agentname']
-    #chatid = data["counters"][agentname].get('chatid')
     if not data["getStart"] and not data["getEnd"]:
         txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n\n"
         if parseResult["success"]:
