@@ -47,7 +47,7 @@ def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
         if message.from_user.username not in ADMINS:
-            bot.reply_to(message, "А ну кыш отсюда!")
+            bot.reply_to(message, "Доступ запрещён")
             return
         return func(message, *args, **kwargs)
     return wrapped
@@ -55,7 +55,7 @@ def restricted(func):
 
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
-    bot.reply_to(message, (data["welcome"]))
+    bot.reply_to(message, (data["welcome"]), parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["help"])
@@ -75,7 +75,7 @@ def cmd_help(message):
                "/set tg_nick end Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick Nick ingame_nick - Set ingame nick for selected user\n" \
                "/setwelcome - Set welcome message"
-    bot.reply_to(message, txt)
+    bot.reply_to(message, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["setwelcome"])
