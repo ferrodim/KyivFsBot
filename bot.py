@@ -133,6 +133,10 @@ def user_inform(agentname):
 @bot.message_handler(commands=["reset"])
 @restricted
 def cmd_reset(message):
+    if message.text != '/reset ok':
+        bot.reply_to(message, "Вы правда хотите очистить всю базу?\n\n"
+                              "Введите */reset ok*, если да", parse_mode="Markdown")
+        return
     data.clear()
     data["getStart"] = False
     data["getEnd"] = False
