@@ -363,7 +363,7 @@ def user_save_chatid(agentname, chatid):
 
 def response_thread():
     credentials2 = pika.PlainCredentials('rabbitmq', 'rabbitmq')
-    parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, frame_max=200000)
+    parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, frame_max=20000)
     connection2 = pika.BlockingConnection(parameters2)
     channel_read = connection2.channel()
     channel_read.queue_declare('results')
