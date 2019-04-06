@@ -2,10 +2,12 @@ version: '3'
 services:
   bot:
     build: .
+    restart: always
     volumes:
       - ".:/code"
   rabbit:
     image: "rabbitmq:3-management"
+    restart: always
     environment:
       RABBITMQ_DEFAULT_USER: "rabbitmq"
       RABBITMQ_DEFAULT_PASS: "rabbitmq"
@@ -16,6 +18,7 @@ services:
       - 5672
   decoder:
     build: decoder
+    restart: always
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
