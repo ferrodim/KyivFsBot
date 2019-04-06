@@ -351,12 +351,13 @@ def on_message(channel, method_frame, header_frame, body):
 
 
 def user_save_chatid(agentname, chatid):
-    if agentname not in data["counters"].keys():
-        data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
-        save_data()
-    if data["counters"][agentname].get('chatid') != chatid:
-        data["counters"][agentname]['chatid'] = chatid
-        save_data()
+    if chatid > 0:
+        if agentname not in data["counters"].keys():
+            data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
+            save_data()
+        if data["counters"][agentname].get('chatid') != chatid:
+            data["counters"][agentname]['chatid'] = chatid
+            save_data()
 
 
 def response_thread():
