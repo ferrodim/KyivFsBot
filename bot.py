@@ -338,15 +338,16 @@ def on_message(channel, method_frame, header_frame, body):
         bot.send_message(chatid, txt)
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
-    if parseResult["success"]:
+    if "success" in parseResult.keys() and parseResult["success"]:
         data["counters"][agentname][datakey].update(parseResult)
         save_data()
         user_inform(agentname)
         bot.forward_message(CHAT_OK, chatid, msgid)
         bot.send_message(CHAT_OK, "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
     else:
-        bot.reply_to(msgid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
         bot.forward_message(CHAT_FAIL, chatid, msgid)
+        bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
+        # bot.reply_to(msgid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
