@@ -336,6 +336,7 @@ def on_message(channel, method_frame, header_frame, body):
         else:
             txt += "Данные с изображения распарсить не удалось"
         bot.send_message(chatid, txt)
+        channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
     if parseResult["success"]:
         data["counters"][agentname][datakey].update(parseResult)
