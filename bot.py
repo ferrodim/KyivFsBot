@@ -358,8 +358,10 @@ def user_save_chatid(agentname, chatid):
         data["counters"][agentname]['chatid'] = chatid
         save_data()
 
+
 def response_thread():
-    parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', pika.PlainCredentials('rabbitmq', 'rabbitmq'))
+    credentials2 = pika.PlainCredentials('rabbitmq', 'rabbitmq')
+    parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, heartbeat=5, retry_delay=1)
     connection2 = pika.BlockingConnection(parameters2)
     channel_read = connection2.channel()
     channel_read.queue_declare('results')
@@ -375,7 +377,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     LOG = logging.getLogger(__name__)
     credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
-    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials)
+    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials, heartbeat=5, retry_delay=1)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     _thread.start_new_thread(response_thread, ())
