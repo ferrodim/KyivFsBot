@@ -249,7 +249,7 @@ def user_info(username):
     user_data = data["counters"][username]
     txt = "Ник телеги: @%s\n" % username
     game_nick = user_data.get("Nick", "-")
-    if game_nick != '-' and game_nick !=  username:
+    if game_nick != '-':
         txt += "Ник в игре: %s\n" % game_nick
     txt += "== Стартовые показатели:"
     for mode in allowed_modes:
