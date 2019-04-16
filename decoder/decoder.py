@@ -16,7 +16,7 @@ def on_message(channel, method_frame, header_frame, body):
     parse_result['datakey'] = msg['datakey']
     parse_result['agentname'] = msg['agentname']
     LOG.info(' => ' + json.dumps(parse_result))
-    channel.basic_publish('', 'results', json.dumps(parse_result))
+    channel.basic_publish('main', 'parseResult', json.dumps(parse_result))
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
@@ -30,8 +30,13 @@ if __name__ == '__main__':
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
-    channel.queue_declare('decoder')
-    channel.basic_consume('decoder', on_message)
+    channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel.queue_declare(queue='bot', durable=True)
+    channel.queue_declare(queue='decoders', durable=True)
+    channel.queue_bind('bot', 'main', 'parseResult')
+    channel.queue_bind('decoders', 'main', 'parseRequest')
+
+    channel.basic_consume('decoders', on_message)
 
     try:
         channel.start_consuming()

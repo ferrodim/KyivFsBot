@@ -319,7 +319,7 @@ def process_photo(message):
     decode_query['chatid'] = message.chat.id
     decode_query['datakey'] = datakey
     decode_query['agentname'] = agentname
-    channel.basic_publish('', 'decoder', json.dumps(decode_query))
+    channel.basic_publish('main', 'parseRequest', json.dumps(decode_query))
 
 
 def on_message(channel, method_frame, header_frame, body):
@@ -366,8 +366,12 @@ def response_thread():
     parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, frame_max=20000)
     connection2 = pika.BlockingConnection(parameters2)
     channel_read = connection2.channel()
-    channel_read.queue_declare('results')
-    channel_read.basic_consume('results', on_message)
+    channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel.queue_declare(queue='bot', durable=True)
+    channel.queue_declare(queue='decoders', durable=True)
+    channel.queue_bind('bot', 'main', 'parseResult')
+    channel.queue_bind('decoders', 'main', 'parseRequest')
+    channel_read.basic_consume('bot', on_message)
     try:
         channel_read.start_consuming()
     except KeyboardInterrupt:
@@ -375,12 +379,16 @@ def response_thread():
 
 
 if __name__ == "__main__":
-    sleep(3)
     logging.basicConfig(level=logging.INFO)
     LOG = logging.getLogger(__name__)
     credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
-    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials, heartbeat=0, retry_delay=5)
+    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
+    channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel.queue_declare(queue='bot', durable=True)
+    channel.queue_declare(queue='decoders', durable=True)
+    channel.queue_bind('bot', 'main', 'parseResult')
+    channel.queue_bind('decoders', 'main', 'parseRequest')
     _thread.start_new_thread(response_thread, ())
     bot.polling(none_stop=True)
