@@ -32,6 +32,7 @@ if __name__ == '__main__':
     parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
+    channel.basic_qos(prefetch_count=1)
 
     channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
     channel.queue_declare(queue='bot', durable=True)
