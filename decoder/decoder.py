@@ -10,7 +10,10 @@ def on_message(channel, method_frame, header_frame, body):
     LOG.info(' <= %s', body)
     msg = json.loads(body)
     img = Image.open('/Screens/' + msg['img'])
-    parse_result = parse_image(img)
+    try:
+        parse_result = parse_image(img)
+    except:
+        parse_result = {"filename": 'exception', "success": False}
     parse_result['msgid'] = msg['msgid']
     parse_result['chatid'] = msg['chatid']
     parse_result['datakey'] = msg['datakey']
