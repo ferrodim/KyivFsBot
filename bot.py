@@ -9,9 +9,9 @@ import string
 import re
 import pika
 import logging
-import _thread
+import threading
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
-from time import sleep
+from queue import Queue
 
 print("restart")
 
@@ -319,7 +319,7 @@ def process_photo(message):
     decode_query['chatid'] = message.chat.id
     decode_query['datakey'] = datakey
     decode_query['agentname'] = agentname
-    channel.basic_publish('main', 'parseRequest', json.dumps(decode_query))
+    write_queue.put(json.dumps(decode_query))
 
 
 def on_message(channel, method_frame, header_frame, body):
@@ -361,16 +361,17 @@ def user_save_chatid(agentname, chatid):
             save_data()
 
 
-def response_thread():
+def rabbit_read_thread():
     credentials2 = pika.PlainCredentials('rabbitmq', 'rabbitmq')
     parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, frame_max=20000)
     connection2 = pika.BlockingConnection(parameters2)
     channel_read = connection2.channel()
-    channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
-    channel.queue_declare(queue='bot', durable=True)
-    channel.queue_declare(queue='decoders', durable=True)
-    channel.queue_bind('bot', 'main', 'parseResult')
-    channel.queue_bind('decoders', 'main', 'parseRequest')
+    channel_read.basic_qos(prefetch_count=1)
+    channel_read.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel_read.queue_declare(queue='bot', durable=True)
+    channel_read.queue_declare(queue='decoders', durable=True)
+    channel_read.queue_bind('bot', 'main', 'parseResult')
+    channel_read.queue_bind('decoders', 'main', 'parseRequest')
     channel_read.basic_consume('bot', on_message)
     try:
         channel_read.start_consuming()
@@ -378,17 +379,29 @@ def response_thread():
         channel_read.stop_consuming()
 
 
+def rabbit_write_thread():
+    credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
+    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials, heartbeat=None)
+    connection = pika.BlockingConnection(parameters)
+    channel_write = connection.channel()
+    channel_write.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel_write.queue_declare(queue='bot', durable=True)
+    channel_write.queue_declare(queue='decoders', durable=True)
+    channel_write.queue_bind('bot', 'main', 'parseResult')
+    channel_write.queue_bind('decoders', 'main', 'parseRequest')
+    while True:
+        if not write_queue.empty():
+            msg = write_queue.get(timeout=1000)
+            channel_write.basic_publish('main', 'parseRequest', msg)
+            write_queue.task_done()
+        connection.process_data_events()
+        connection.sleep(1)
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     LOG = logging.getLogger(__name__)
-    credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
-    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials)
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
-    channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
-    channel.queue_declare(queue='bot', durable=True)
-    channel.queue_declare(queue='decoders', durable=True)
-    channel.queue_bind('bot', 'main', 'parseResult')
-    channel.queue_bind('decoders', 'main', 'parseRequest')
-    _thread.start_new_thread(response_thread, ())
-    bot.polling(none_stop=True)
+    write_queue = Queue()
+    threading.Thread(target=rabbit_read_thread, args=()).start()
+    threading.Thread(target=rabbit_write_thread, args=()).start()
+    bot.polling(none_stop=True, interval=10)
