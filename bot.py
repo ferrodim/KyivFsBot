@@ -235,7 +235,7 @@ def cmd_nick(message):
     game_nick = chunks[1]
     if tg_name not in data["counters"].keys():
         data["counters"][tg_name] = {"start": {}, "end": {}}
-    data["counters"][tg_name]['Nick'] = game_nick.replace('_', '\_')
+    data["counters"][tg_name]['Nick'] = game_nick
     save_data()
     txt = user_info(tg_name)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
@@ -249,7 +249,7 @@ def user_info(username):
     txt = "Ник телеги: @%s\n" % username.replace('_', '\_')
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-' and game_nick != username:
-        txt += "Ник в игре: %s\n" % game_nick
+        txt += "Ник в игре: %s\n" % game_nick.replace('_', '\_')
     txt += "== Стартовые показатели:"
     for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
