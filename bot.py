@@ -251,10 +251,10 @@ def user_info(username):
     if username not in data["counters"].keys():
         return 'Бот ничего не знает по вам'
     user_data = data["counters"][username]
-    txt = "Ник телеги: @%s\n" % username
+    txt = "Ник телеги: @%s\n" % username.replace('_', '\\_')
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-':
-        txt += "Ник в игре: %s\n" % game_nick
+        txt += "Ник в игре: %s\n" % game_nick.replace('_', '\\_')
     txt += "== Стартовые показатели:"
     for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
