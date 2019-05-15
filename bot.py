@@ -404,4 +404,4 @@ if __name__ == "__main__":
     write_queue = Queue()
     threading.Thread(target=rabbit_read_thread, args=()).start()
     threading.Thread(target=rabbit_write_thread, args=()).start()
-    bot.polling(none_stop=True, interval=10)
+    bot.infinity_polling(none_stop=True)
