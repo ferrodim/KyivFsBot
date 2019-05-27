@@ -15,7 +15,7 @@ from queue import Queue
 
 print("restart")
 
-bot = telebot.TeleBot(API_TOKEN)
+bot = telebot.TeleBot(API_TOKEN, threaded=False)
 try:
     datafile = open("base.txt", "r")
     data = json.load(datafile)
