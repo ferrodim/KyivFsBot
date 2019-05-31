@@ -67,3 +67,67 @@ services:
       - "./decoder:/app"
       - "./Screens:/Screens"
       - "./config.py:/app/config.py"
+  decoder7:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder8:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder9:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder10:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder11:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder12:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder13:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
+  decoder14:
+    build: decoder
+    depends_on:
+      - rabbit
+    volumes:
+      - "./decoder:/app"
+      - "./Screens:/Screens"
+      - "./config.py:/app/config.py"
