@@ -392,6 +392,7 @@ def rabbit_write_thread():
     while True:
         if not write_queue.empty():
             msg = write_queue.get(timeout=1000)
+            LOG.info('bot => %s', msg)
             channel_write.basic_publish('main', 'parseRequest', msg)
             write_queue.task_done()
         connection.process_data_events()
