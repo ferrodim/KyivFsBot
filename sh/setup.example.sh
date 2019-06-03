@@ -9,11 +9,7 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt update
 
-install docker-ce docker-ce-cli containerd.io
-apt install docker-ce docker-ce-cli containerd.io
-docker run hello-world
-apt install docker-compose
-apt install git
+apt install docker-ce docker-ce-cli containerd.io docker-compose git
 git clone https://github.com/ferrodim/KyivFsBot.git
 cd KyivFsBot/
 vi config.py
