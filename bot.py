@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PIL import Image
 from functools import wraps
 import telebot
 import json
 import random
 import string
-import io
 import re
+import pika
+import logging
+import threading
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
-from image_process import parse_image
+from queue import Queue
 
 print("restart")
 
-bot = telebot.TeleBot(API_TOKEN)
+bot = telebot.TeleBot(API_TOKEN, threaded=False)
 try:
     datafile = open("base.txt", "r")
     data = json.load(datafile)
@@ -46,7 +47,7 @@ def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
         if message.from_user.username not in ADMINS:
-            bot.reply_to(message, "А ну кыш отсюда!")
+            bot.reply_to(message, "Доступ запрещён")
             return
         return func(message, *args, **kwargs)
     return wrapped
@@ -54,7 +55,7 @@ def restricted(func):
 
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
-    bot.reply_to(message, (data["welcome"]))
+    bot.reply_to(message, (data["welcome"]), parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["help"])
@@ -74,7 +75,7 @@ def cmd_help(message):
                "/set tg_nick end Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick Nick ingame_nick - Set ingame nick for selected user\n" \
                "/setwelcome - Set welcome message"
-    bot.reply_to(message, txt)
+    bot.reply_to(message, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["setwelcome"])
@@ -132,6 +133,10 @@ def user_inform(agentname):
 @bot.message_handler(commands=["reset"])
 @restricted
 def cmd_reset(message):
+    if message.text != '/reset ok':
+        bot.reply_to(message, "Вы правда хотите очистить всю базу?\n\n"
+                              "Введите */reset ok*, если да", parse_mode="Markdown")
+        return
     data.clear()
     data["getStart"] = False
     data["getEnd"] = False
@@ -297,10 +302,7 @@ def process_photo(message):
     file_id = message.photo[-1].file_id
     file_info = bot.get_file(file_id)
     downloaded_file = bot.download_file(file_info.file_path)
-    f = io.BytesIO(downloaded_file)
-    f.seek(0)
-    img = Image.open(f)
-    filename = "Screens/" + agentname + "_"
+    filename = agentname + "_"
     if data["getStart"]:
         datakey = "start"
     elif data["getEnd"]:
@@ -309,36 +311,98 @@ def process_photo(message):
         datakey = "pre"
     postfix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     filename += datakey + "_" + str(postfix) + ".jpg"
-    with open(filename, "wb") as new_file:
+    with open("Screens/" + filename, "wb") as new_file:
         new_file.write(downloaded_file)
-    parseResult = parse_image(img)
+    decode_query = {}
+    decode_query['img'] = filename
+    decode_query['msgid'] = message.message_id
+    decode_query['chatid'] = message.chat.id
+    decode_query['datakey'] = datakey
+    decode_query['agentname'] = agentname
+    write_queue.put(json.dumps(decode_query))
+
+
+def on_message(channel, method_frame, header_frame, body):
+    LOG.info('bot <= %s', body)
+    parseResult = json.loads(body)
+    msgid = parseResult['msgid']
+    chatid = parseResult['chatid']
+    datakey = parseResult['datakey']
+    agentname = parseResult['agentname']
     if not data["getStart"] and not data["getEnd"]:
         txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n\n"
         if parseResult["success"]:
             txt += "Агент {},\nAP {:,},\nLvl {},\n{} {:,}".format(agentname, parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
-        bot.send_message(message.chat.id, txt)
+        bot.send_message(chatid, txt)
+        channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
-    if parseResult["success"]:
+    if "success" in parseResult.keys() and parseResult["success"]:
         data["counters"][agentname][datakey].update(parseResult)
         save_data()
         user_inform(agentname)
-        bot.forward_message(CHAT_OK, message.chat.id, message.message_id)
+        bot.forward_message(CHAT_OK, chatid, msgid)
         bot.send_message(CHAT_OK, "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
     else:
-        bot.reply_to(message, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
-        bot.forward_message(CHAT_FAIL, message.chat.id, message.message_id)
+        bot.forward_message(CHAT_FAIL, chatid, msgid)
+        bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
+        # bot.reply_to(msgid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
+    channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
 def user_save_chatid(agentname, chatid):
-    if agentname not in data["counters"].keys():
-        data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
-        save_data()
-    if data["counters"][agentname].get('chatid') != chatid:
-        data["counters"][agentname]['chatid'] = chatid
-        save_data()
+    if chatid > 0:
+        if agentname not in data["counters"].keys():
+            data["counters"][agentname] = {"pre": {}, "start": {}, "end": {}}
+            save_data()
+        if data["counters"][agentname].get('chatid') != chatid:
+            data["counters"][agentname]['chatid'] = chatid
+            save_data()
+
+
+def rabbit_read_thread():
+    credentials2 = pika.PlainCredentials('rabbitmq', 'rabbitmq')
+    parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, frame_max=20000)
+    connection2 = pika.BlockingConnection(parameters2)
+    channel_read = connection2.channel()
+    channel_read.basic_qos(prefetch_count=1)
+    channel_read.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel_read.queue_declare(queue='bot', durable=True)
+    channel_read.queue_declare(queue='decoders', durable=True)
+    channel_read.queue_bind('bot', 'main', 'parseResult')
+    channel_read.queue_bind('decoders', 'main', 'parseRequest')
+    channel_read.basic_consume('bot', on_message)
+    try:
+        channel_read.start_consuming()
+    except KeyboardInterrupt:
+        channel_read.stop_consuming()
+
+
+def rabbit_write_thread():
+    credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
+    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials, heartbeat=None)
+    connection = pika.BlockingConnection(parameters)
+    channel_write = connection.channel()
+    channel_write.exchange_declare(exchange='main', exchange_type='direct', durable=True)
+    channel_write.queue_declare(queue='bot', durable=True)
+    channel_write.queue_declare(queue='decoders', durable=True)
+    channel_write.queue_bind('bot', 'main', 'parseResult')
+    channel_write.queue_bind('decoders', 'main', 'parseRequest')
+    while True:
+        if not write_queue.empty():
+            msg = write_queue.get(timeout=1000)
+            LOG.info('bot => %s', msg)
+            channel_write.basic_publish('main', 'parseRequest', msg)
+            write_queue.task_done()
+        connection.process_data_events()
+        connection.sleep(1)
 
 
 if __name__ == "__main__":
-    bot.polling(none_stop=True)
+    logging.basicConfig(level=logging.INFO)
+    LOG = logging.getLogger(__name__)
+    write_queue = Queue()
+    threading.Thread(target=rabbit_read_thread, args=()).start()
+    threading.Thread(target=rabbit_write_thread, args=()).start()
+    bot.infinity_polling(timeout=5, interval=1)
