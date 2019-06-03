@@ -23,8 +23,6 @@ except FileNotFoundError:
     data = {}
     datafile = open("base.txt", "w")
     json.dump(data, datafile, ensure_ascii=False)
-if "welcome" not in data.keys():
-    data["welcome"] = WELCOME
 if "getStart" not in data.keys():
     data["getStart"] = False
 if "getEnd" not in data.keys():
@@ -55,7 +53,7 @@ def restricted(func):
 
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
-    bot.reply_to(message, (data["welcome"]), parse_mode="Markdown")
+    bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["help"])
@@ -73,17 +71,8 @@ def cmd_help(message):
                "/stop - Stop taking events\n" \
                "/set tg_nick start Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick end Param Value - Set start value (AP, Level...)\n" \
-               "/set tg_nick Nick ingame_nick - Set ingame nick for selected user\n" \
-               "/setwelcome - Set welcome message"
+               "/set tg_nick Nick ingame_nick - Set ingame nick for selected user"
     bot.reply_to(message, txt, parse_mode="Markdown")
-
-
-@bot.message_handler(commands=["setwelcome"])
-@restricted
-def cmd_setwelcome(message):
-    data["welcome"] = message.text[str(message.text + " ").find(" "):]
-    save_data()
-    bot.send_message(message.chat.id, "Обновил приветствие")
 
 
 @bot.message_handler(commands=["chatid"])
@@ -141,7 +130,6 @@ def cmd_reset(message):
     data["getStart"] = False
     data["getEnd"] = False
     data["counters"] = {}
-    data["welcome"] = WELCOME
     save_data()
     bot.reply_to(message, "База данных очищена")
 
@@ -288,7 +276,7 @@ def process_msg(message):
             txt = "Такой пользователь не найден в базе"
         bot.send_message(message.chat.id, txt, parse_mode="Markdown")
     else:
-        bot.reply_to(message, (data["welcome"]), parse_mode="Markdown")
+        bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
