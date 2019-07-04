@@ -10,6 +10,7 @@ import re
 import pika
 import logging
 import threading
+from operator import itemgetter
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
 from queue import Queue
 
@@ -196,6 +197,35 @@ def cmd_result(message):
     resultfile = open("result.csv", "rb")
     bot.send_document(message.chat.id, resultfile)
     resultfile.close()
+
+
+@bot.message_handler(commands=["best"])
+@restricted
+def cmd_best(message):
+    allowed_modes = ["AP", "Level"] + MODES
+    chunks = message.text.replace("  ", " ").split(" ")
+    is_valid_query = (len(chunks) == 2 and (chunks[1] in allowed_modes))
+    if not is_valid_query:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                           "`/top <category>`\n"
+                                           "где category принимает значения\n"
+                                           "" + ', '.join(allowed_modes)), parse_mode="Markdown")
+        return
+    mode = str(chunks[1])
+    bot.send_message(message.chat.id, "Вы запросили инфу по " + mode)
+    user_data = []
+    for agentname in data["counters"].keys():
+        if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
+            if mode in data["counters"][agentname]['start'] and mode in data["counters"][agentname]['end']:
+                delta = data["counters"][agentname]['end'][mode] - data["counters"][agentname]['start'][mode]
+                user_data.append((agentname, delta))
+    user_data.sort(key=itemgetter(1), reverse=True)
+    txt = 'Best %s:' % mode
+    for i in range(10):
+        if i < len(user_data):
+            user = user_data[i]
+            txt += "\n#%s *%s* - %s" % (i+1, user[0], user[1])
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["me"])
