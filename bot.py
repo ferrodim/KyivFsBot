@@ -86,9 +86,13 @@ def cmd_chatid(message):
 @restricted
 def cmd_set(message):
     allowed_modes = ["AP", "Level"] + MODES
+    modes_lowercased = {}
+    for x in allowed_modes:
+        modes_lowercased[x.lower()] = x
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 4 and chunks[2] == 'Nick') or \
-                     (len(chunks) == 5 and chunks[2] in ["start", "end"] and chunks[3] in allowed_modes)
+                     (len(chunks) == 5 and chunks[2] in ["start", "end"] and
+                      (chunks[3] in allowed_modes or chunks[3] in modes_lowercased.keys()))
     if not is_valid_query:
         bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
                                            "`/set telegram_nick start Param value`\n"
@@ -105,6 +109,8 @@ def cmd_set(message):
     else:
         step = chunks[2]
         counter = chunks[3]
+        if counter in modes_lowercased.keys():
+            counter = modes_lowercased[counter]
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
