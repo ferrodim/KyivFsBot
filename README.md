@@ -5,17 +5,16 @@ Manual installation
 * register you own telegramm bot via https://telegram.me/botfather and save Token for future use (API_TOKEN)
 * download the sources
 * copy config.sample.py -> config.py
-* edit config.py
-** fill API_TOKEN - value, obtained from BotFather
-** fill ADMINS - telegram nicks of users, that can manage bot
-** fill MODES - what screens you bot will count (Trekker/Builder/Purifier is default. Change if you wish)
-** fill WELCOME - new users will see it, on conversation start
-* start you bot by "docker-compose up -d" (it will take nearly 10 minutes)
-* create two telegram chats (Supergroups is better), and add you new bot to them. First group for good screens, and second - for bad screens
+* inside config.py fill API_TOKEN - value, obtained from BotFather
+* inside config.py fill ADMINS - telegram nicks of users, that can manage bot
+* inside config.py fill MODES - what screens you bot will count (Trekker/Builder/Purifier is default. Change if you wish)
+* inside config.py fill WELCOME - new users will see it, on conversation start
+* start your bot by "docker-compose up -d" (it will take nearly 10 minutes)
+* create two telegram chats (Supergroups is better), and add your new bot to them. First group for good screens, and second - for bad screens
 * write "/chatid" in them, and detect its ID
 * edit your config.py one more time and:
-** fill CHAT_OK - id of chat, where bot will forward good screens
-** fill CHAT_FAIL - id of chat, where bot will forward bad screens (that it cant to recognize)
+* inside config.py fill CHAT_OK - id of chat, where bot will forward good screens
+* inside config.py fill CHAT_FAIL - id of chat, where bot will forward bad screens (that it cant to recognize)
 * restart bot with "docker-compose restart"
 * test you bot with /help or /me command. Or send some screenshots to it
 
@@ -24,9 +23,9 @@ Fast install for Ubuntu 18.04 (if you already have config file)
 -----------------------------------
 * sudo -s
 * curl -s https://raw.githubusercontent.com/ferrodim/KyivFsBot/master/install.sh | bash -s --
-* < Fill the config.py with your parameters >
+* ... fill the config.py with your parameters ...
 * docker-compose up -d
-* < Wait ~10 minutes, while docker install all dependencies >
+* ... wait ~10 minutes, while docker install all dependencies ...
 
 
 Main differences with DreidSpb/FsSpbBot
@@ -36,12 +35,12 @@ Main differences with DreidSpb/FsSpbBot
 * docker + rabbit added
 * commands like /me, /clearme for GDPR compliance
 * user can send any count of screens. New screens will overwrite older
-* bot will recognise user screen ever before event start or after event end
+* bot will recognise users screens even before event start or after event end
 * bot will notify user, when users data changes
-* debug instruments deleted
+* debug instruments removed
 * no full profile-images
-* no unused modes, that will never to be used on Kyiv FS
+* no modes, that have never been used on Kyiv FS
 * it's nearly impossible to broke bot by telegram commands - all critical settings defined in config file
-* user without telegramm nickname can use bot
+* users without telegramm nickname are welcome
 * admins can change users data manually by /set command
-* admins can forward users screens
+* admins can forward users screens to bot
