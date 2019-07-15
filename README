@@ -1,25 +1,47 @@
-Созданно на базе https://github.com/DreidSpb/FsSpbBot
+With friendship with: https://github.com/DreidSpb/FsSpbBot
 
-# Установка
-## Скопируйте config.sample.py в config.py и заполните все поля внутри
-### Зарегистрируйте себе бота через @BotFather - получите API_TOKEN
-### Добавьте себя и других администраторов бота в ADMINS
-## Запустите:
-`sudo apt install docker-compose`
-`sudo docker-compose up`
-## Создайте два чата Ok / Fail (не супергруппы), добавьте туда своего бота, и командой /chatid получите значения для CHAT_OK, CHAT_FAIL. Занесите в конфиг и перезагрузите бота.
-## Проверяйте работу своего бота, написав ему в личку любое сообщение. Список доступных команд смотреть через /help
+Manual installation
+-----------------------------------
+* register you own telegramm bot via https://telegram.me/botfather and save Token for future use (API_TOKEN)
+* download the sources
+* copy config.sample.py -> config.py
+* edit config.py
+** fill API_TOKEN - value, obtained from BotFather
+** fill ADMINS - telegram nicks of users, that can manage bot
+** fill MODES - what screens you bot will count (Trekker/Builder/Purifier is default. Change if you wish)
+** fill WELCOME - new users will see it, on conversation start
+* start you bot by "docker-compose up -d" (it will take nearly 10 minutes)
+* create two telegram chats (Supergroups is better), and add you new bot to them. First group for good screens, and second - for bad screens
+* write "/chatid" in them, and detect its ID
+* edit your config.py one more time and:
+** fill CHAT_OK - id of chat, where bot will forward good screens
+** fill CHAT_FAIL - id of chat, where bot will forward bad screens (that it cant to recognize)
+* restart bot with "docker-compose restart"
+* test you bot with /help or /me command. Or send some screenshots to it
 
 
+Fast install for Ubuntu 18.04 (if you already have config file)
+-----------------------------------
+* sudo -s
+* curl -s https://raw.githubusercontent.com/ferrodim/KyivFsBot/master/install.sh | bash -s --
+* < Fill the config.py with your parameters >
+* docker-compose up -d
+* < Wait ~10 minutes, while docker install all dependencies >
 
-# Отличия от Питерского бота:
-## работает внутри докер-контейнера, не засоряя вам систему зависимостями. И автоматически устанавливает все эти зависимости.
-## максимальная вежливость к игроку
-### когда игрок присылает скрин - бот отвечает что на нём увидел
-### когда игрок прислал скрин - бот распарсит его, даже если эвент ещё не начался
-### на любой чих игрока ему отправляются правила эвента (приветствие), и карточка с его данными
-### разрешается присылать скрины сколько угодно раз - старые значения перезатираются, а файлы сохраняются на диск с рандомными именами
-## удалены инструменты отладки и неиспользуемые у нас режимы
-## все жизненно-важные настройки вынесены в конфиг, и не могут быть обнулены командой /reset
-## форвардить чужие скрины может только админ
-## пользователь без телеграмм-ника может пользоваться ботом
+
+Main differences with DreidSpb/FsSpbBot
+-----------------------------------
+* better installation docs
+* faster installation
+* docker + rabbit added
+* commands like /me, /clearme for GDPR compliance
+* user can send any count of screens. New screens will overwrite older
+* bot will recognise user screen ever before event start or after event end
+* bot will notify user, when users data changes
+* debug instruments deleted
+* no full profile-images
+* no unused modes, that will never to be used on Kyiv FS
+* it's nearly impossible to broke bot by telegram commands - all critical settings defined in config file
+* user without telegramm nickname can use bot
+* admins can change users data manually by /set command
+* admins can forward users screens
