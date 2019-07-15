@@ -13,5 +13,4 @@ git clone https://github.com/ferrodim/KyivFsBot.git
 cd KyivFsBot/
 cp config.sample.py config.py
 vi config.py
-# change THREAD_NUM in docker-compose.yml if you with to use more/less than 5 CPU cores for image decoding
 docker-compose up -d

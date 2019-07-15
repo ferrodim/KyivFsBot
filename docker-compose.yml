@@ -23,8 +23,6 @@ services:
     depends_on:
       - rabbit
     restart: always
-    environment:
-      THREAD_NUM: 5
     volumes:
       - "./decoder:/app"
       - "./Screens:/Screens"
