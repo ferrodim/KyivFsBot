@@ -1,5 +1,4 @@
 #!/bin/bash
-sudo -s
 apt update -y
 apt upgrade -y
 apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
