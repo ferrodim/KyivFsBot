@@ -40,4 +40,7 @@ Main differences with DreidSpb/FsSpbBot
 * debug instruments removed
 * no full profile-images
 * no modes, that have never been used on Kyiv FS
+* no internal sheduler for automatic start/end event
+* no broadcasts - admin can't send message to all user by /sendAll command
 * admins can change users data manually by /set command
+* bot automatically use all available CPU cores
