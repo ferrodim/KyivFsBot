@@ -40,7 +40,4 @@ Main differences with DreidSpb/FsSpbBot
 * debug instruments removed
 * no full profile-images
 * no modes, that have never been used on Kyiv FS
-* it's nearly impossible to broke bot by telegram commands - all critical settings defined in config file
-* users without telegramm nickname are welcome
 * admins can change users data manually by /set command
-* admins can forward users screens to bot
