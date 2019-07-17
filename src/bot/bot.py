@@ -358,9 +358,9 @@ def on_message(channel, method_frame, header_frame, body):
     datakey = parseResult['datakey']
     agentname = parseResult['agentname']
     if not data["getStart"] and not data["getEnd"]:
-        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n\n"
+        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
         if parseResult["success"]:
-            txt += "Агент {},\nAP {:,},\nLvl {},\n{} {:,}".format(agentname, parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
+            txt += "AP {:,},\nLvl {},\n{} {:,}".format(parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
         bot.send_message(chatid, txt)
