@@ -22,7 +22,7 @@ Manual installation
 Fast install for Ubuntu 18.04 (if you already have config file)
 -----------------------------------
 * sudo -s
-* curl -s https://raw.githubusercontent.com/ferrodim/KyivFsBot/master/install.sh | bash -s --
+* curl -s https://raw.githubusercontent.com/ferrodim/KyivFsBot/master/sh/autoinstall.sh | bash -s --
 * ... fill the config.py with your parameters ...
 * docker-compose up -d
 * ... wait ~10 minutes, while docker install all dependencies ...

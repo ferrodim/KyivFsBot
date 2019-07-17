@@ -23,4 +23,4 @@ RUN pip3 install -r /requirements.txt && rm /requirements.txt
 #RUN wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/eng.traineddata && mv eng.traineddata /usr/local/share/tessdata/
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-CMD ["bash", "start.sh"]
+CMD ["bash", "/app/start.sh"]

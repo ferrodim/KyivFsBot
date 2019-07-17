@@ -1,10 +1,12 @@
 version: '3'
 services:
   bot:
-    build: .
+    build: src/bot
     restart: always
     volumes:
-      - ".:/code"
+      - "./src/bot:/app"
+      - "./data/Screens:/Screens"
+      - "./config.py:/app/config.py"
     depends_on:
       - rabbit
   rabbit:
@@ -19,11 +21,11 @@ services:
     expose:
       - 5672
   decoder:
-    build: decoder
+    build: src/decoder
     depends_on:
       - rabbit
     restart: always
     volumes:
-      - "./decoder:/app"
-      - "./Screens:/Screens"
+      - "./src/decoder:/app"
+      - "./data/Screens:/Screens"
       - "./config.py:/app/config.py"

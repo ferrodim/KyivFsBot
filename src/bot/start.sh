@@ -1,7 +1,7 @@
 #!/bin/bash
-mkdir -p Screens
+mkdir -p /Screens
 
 while true; do
-	python3 bot.py
+	python3 /app/bot.py
 	sleep 1
 done

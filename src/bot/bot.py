@@ -34,6 +34,7 @@ datafile.close()
 datafile = open("base.txt", "w")
 json.dump(data, datafile, ensure_ascii=False)
 datafile.close()
+print('v1')
 
 
 def save_data():
@@ -45,7 +46,9 @@ def save_data():
 def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
+        print('restricted check')
         if message.from_user.username not in ADMINS:
+            print('restricted fired')
             bot.reply_to(message, "Доступ запрещён")
             return
         return func(message, *args, **kwargs)
@@ -54,7 +57,8 @@ def restricted(func):
 
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
-    bot.reply_to(message, WELCOME, parse_mode="Markdown")
+    print('start')
+    #bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["help"])
@@ -335,7 +339,7 @@ def process_photo(message):
         datakey = "pre"
     postfix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     filename += datakey + "_" + str(postfix) + ".jpg"
-    with open("Screens/" + filename, "wb") as new_file:
+    with open("/Screens/" + filename, "wb") as new_file:
         new_file.write(downloaded_file)
     decode_query = {}
     decode_query['img'] = filename
