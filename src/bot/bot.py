@@ -34,7 +34,6 @@ datafile.close()
 datafile = open("base.txt", "w")
 json.dump(data, datafile, ensure_ascii=False)
 datafile.close()
-print('v1')
 
 
 def save_data():
@@ -46,9 +45,7 @@ def save_data():
 def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
-        print('restricted check')
         if message.from_user.username not in ADMINS:
-            print('restricted fired')
             bot.reply_to(message, "Доступ запрещён")
             return
         return func(message, *args, **kwargs)
@@ -57,8 +54,7 @@ def restricted(func):
 
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
-    print('start')
-    #bot.reply_to(message, WELCOME, parse_mode="Markdown")
+    bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["help"])
