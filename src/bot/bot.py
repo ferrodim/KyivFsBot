@@ -357,6 +357,7 @@ def process_photo(message):
         datakey = "pre"
     postfix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     filename += datakey + "_" + str(postfix) + ".jpg"
+    LOG.info(agentname + ' <- IMG ' + filename)
     with open("/Screens/" + filename, "wb") as new_file:
         new_file.write(downloaded_file)
     decode_query = {}
@@ -369,7 +370,7 @@ def process_photo(message):
 
 
 def on_message(channel, method_frame, header_frame, body):
-    LOG.info('bot <= %s', body)
+    LOG.info('{Rabbit} <= %s', body)
     parseResult = json.loads(body)
     msgid = parseResult['msgid']
     chatid = parseResult['chatid']
@@ -438,7 +439,7 @@ def rabbit_write_thread():
     while True:
         if not write_queue.empty():
             msg = write_queue.get(timeout=1000)
-            LOG.info('bot => %s', msg)
+            LOG.info('{Rabbit} => %s', msg)
             channel_write.basic_publish('main', 'parseRequest', msg)
             write_queue.task_done()
         connection.process_data_events()
