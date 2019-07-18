@@ -52,12 +52,22 @@ def restricted(func):
     return wrapped
 
 
+def log_incoming(func):
+    @wraps(func)
+    def wrapped(message, *args, **kwargs):
+        LOG.info(get_tg_nick(message) + ' <- ' + message.text)
+        return func(message, *args, **kwargs)
+    return wrapped
+
+
 @bot.message_handler(commands=["start"])
+@log_incoming
 def cmd_start(message):
     bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["help"])
+@log_incoming
 def cmd_help(message):
     txt = "/me - View personal userinfo\n" \
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
@@ -78,12 +88,14 @@ def cmd_help(message):
 
 @bot.message_handler(commands=["chatid"])
 @restricted
+@log_incoming
 def cmd_chatid(message):
     bot.send_message(message.chat.id, "Айди этого чата: %s" % message.chat.id)
 
 
 @bot.message_handler(commands=["set"])
 @restricted
+@log_incoming
 def cmd_set(message):
     allowed_modes = ["AP", "Level"] + MODES
     modes_lowercased = {}
@@ -128,6 +140,7 @@ def user_inform(agentname):
 
 @bot.message_handler(commands=["reset"])
 @restricted
+@log_incoming
 def cmd_reset(message):
     if message.text != '/reset ok':
         bot.reply_to(message, "Вы правда хотите очистить всю базу?\n\n"
@@ -143,6 +156,7 @@ def cmd_reset(message):
 
 @bot.message_handler(commands=["startevent"])
 @restricted
+@log_incoming
 def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
@@ -152,6 +166,7 @@ def cmd_startevent(message):
 
 @bot.message_handler(commands=["endevent"])
 @restricted
+@log_incoming
 def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
@@ -161,6 +176,7 @@ def cmd_endevent(message):
 
 @bot.message_handler(commands=["stop"])
 @restricted
+@log_incoming
 def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
@@ -170,6 +186,7 @@ def cmd_stop(message):
 
 @bot.message_handler(commands=["result"])
 @restricted
+@log_incoming
 def cmd_result(message):
     delimiter = message.text[len("/result "):len("/result ")+1]
     if delimiter == '':
@@ -207,6 +224,7 @@ def cmd_result(message):
 
 @bot.message_handler(commands=["best"])
 @restricted
+@log_incoming
 def cmd_best(message):
     allowed_modes = ["AP", "Level"] + MODES
     chunks = message.text.replace("  ", " ").split(" ")
@@ -235,6 +253,7 @@ def cmd_best(message):
 
 
 @bot.message_handler(commands=["me"])
+@log_incoming
 def cmd_me(message):
     tg_name = get_tg_nick(message)
     txt = user_info(tg_name)
@@ -242,6 +261,7 @@ def cmd_me(message):
 
 
 @bot.message_handler(commands=["clearme"])
+@log_incoming
 def cmd_clearme(message):
     tg_name = get_tg_nick(message)
     if tg_name in data["counters"].keys():
@@ -253,6 +273,7 @@ def cmd_clearme(message):
 
 
 @bot.message_handler(commands=["nick"])
+@log_incoming
 def cmd_nick(message):
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
@@ -302,6 +323,7 @@ def get_tg_nick(message):
 
 
 @bot.message_handler(func=lambda message: True, content_types=["text"])
+@log_incoming
 def process_msg(message):
     tg_name = get_tg_nick(message)
     if tg_name in ADMINS:
