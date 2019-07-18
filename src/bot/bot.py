@@ -371,30 +371,30 @@ def process_photo(message):
 
 def on_message(channel, method_frame, header_frame, body):
     LOG.info('{Rabbit} <= %s', body)
-    parseResult = json.loads(body)
-    msgid = parseResult['msgid']
-    chatid = parseResult['chatid']
-    datakey = parseResult['datakey']
-    agentname = parseResult['agentname']
+    decoded = json.loads(body)
+    msgid = decoded['msgid']
+    chatid = decoded['chatid']
+    datakey = decoded['datakey']
+    agentname = decoded['agentname']
     if not data["getStart"] and not data["getEnd"]:
         txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
-        if parseResult["success"]:
-            txt += "AP {:,},\nLvl {},\n{} {:,}".format(parseResult["AP"], parseResult["Level"], parseResult["mode"], parseResult[parseResult["mode"]])
+        if decoded["success"]:
+            # txt += "\n_%s_: *%s*" % (mode, value)
+            txt += "AP *%s*\nLvl *%s*\n%s *%s*" % (decoded["AP"], decoded["Level"], decoded["mode"], decoded[decoded["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
-        bot.send_message(chatid, txt)
+        bot.send_message(chatid, txt, parse_mode="Markdown")
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
-    if "success" in parseResult.keys() and parseResult["success"]:
-        data["counters"][agentname][datakey].update(parseResult)
+    if "success" in decoded.keys() and decoded["success"]:
+        data["counters"][agentname][datakey].update(decoded)
         save_data()
         user_inform(agentname)
         bot.forward_message(CHAT_OK, chatid, msgid)
-        bot.send_message(CHAT_OK, "Агент {}, AP {:,}, {} {:,}".format(agentname, parseResult["AP"], parseResult["mode"], parseResult[parseResult["mode"]]))
+        bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
     else:
         bot.forward_message(CHAT_FAIL, chatid, msgid)
         bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
-        # bot.reply_to(msgid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
