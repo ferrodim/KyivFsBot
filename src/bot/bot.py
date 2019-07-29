@@ -325,6 +325,8 @@ def get_tg_nick(message):
 @bot.message_handler(func=lambda message: True, content_types=["text"])
 @log_incoming
 def process_msg(message):
+    if message.chat.id < 0:
+        return
     tg_name = get_tg_nick(message)
     if tg_name in ADMINS:
         user_tg_name = message.text.replace('@', '')
