@@ -139,6 +139,23 @@ def user_inform(agentname):
             bot.send_message(chatid, txt, parse_mode="Markdown")
 
 
+@bot.message_handler(commands=["softreset"])
+@restricted
+@log_incoming
+def cmd_softreset(message):
+    if message.text != '/softreset ok':
+        bot.reply_to(message, "Вы правда хотите очистить всю базу, кроме ников?\n\n"
+                              "Введите */reset ok*, если да", parse_mode="Markdown")
+        return
+    data["getStart"] = False
+    data["getEnd"] = False
+    for agentname in data["counters"].keys():
+        data["counters"][agentname]['start'] = {}
+        data["counters"][agentname]['end'] = {}
+    save_data()
+    bot.reply_to(message, "База данных очищена")
+
+
 @bot.message_handler(commands=["reset"])
 @restricted
 @log_incoming
