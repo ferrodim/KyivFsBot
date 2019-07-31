@@ -308,6 +308,7 @@ def crop_primeap(img:Image):
                         level = 0
                 else:
                     level = 0
+                    fraction = ''
                 return [ap, level, fraction]
     return []
 
