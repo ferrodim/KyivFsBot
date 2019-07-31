@@ -71,6 +71,7 @@ def cmd_start(message):
 def cmd_help(message):
     txt = "/me - View personal userinfo\n" \
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
+          "/fraction %e_or_r% - Set your fraction\n" \
           "/clearme - Delete you account\n"
     if get_tg_nick(message) in ADMINS:
         txt += "== admin commands\n" \
@@ -191,7 +192,7 @@ def cmd_result(message):
     delimiter = message.text[len("/result "):len("/result ")+1]
     if delimiter == '':
         delimiter = ','
-    txt = "TG_nick;Game_nick"
+    txt = "TG_nick;Game_nick;Fraction"
     allowed_modes = ["AP", "Level"] + MODES
     for mode in allowed_modes:
         txt += ";Start_%s;End_%s;Delta_%s" % (mode, mode, mode)
@@ -205,7 +206,9 @@ def cmd_result(message):
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
-        txt += '"%s";"%s"' % (agentname, data["counters"][agentname].get("Nick", "-"))
+        nick = data["counters"][agentname].get("Nick", "-")
+        fraction = data["counters"][agentname].get("fraction", "-")
+        txt += '"%s";"%s";"%s"' % (agentname, nick, fraction)
         for mode in allowed_modes:
             if isinstance(agentdata["end"][mode], int) and isinstance(agentdata["start"][mode], int):
                 delta = agentdata["end"][mode] - agentdata["start"][mode]
@@ -272,6 +275,25 @@ def cmd_clearme(message):
         bot.reply_to(message, "Бот не располагает данными на вас")
 
 
+@bot.message_handler(commands=["fraction"])
+@log_incoming
+def cmd_nick(message):
+    chunks = message.text.replace("  ", " ").split(" ")
+    is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
+    if not is_valid_query:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                           "`/fraction e`\n`/fraction r`"), parse_mode="Markdown")
+        return
+    tg_name = get_tg_nick(message)
+    fraction = chunks[1]
+    if tg_name not in data["counters"].keys():
+        data["counters"][tg_name] = {"start": {}, "end": {}}
+    data["counters"][tg_name]['fraction'] = fraction
+    save_data()
+    txt = user_info(tg_name)
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+
+
 @bot.message_handler(commands=["nick"])
 @log_incoming
 def cmd_nick(message):
@@ -300,6 +322,9 @@ def user_info(username):
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-':
         txt += "Ник в игре: %s\n" % game_nick.replace('_', '\\_')
+    fraction = user_data.get("fraction", "")
+    if fraction:
+        txt += "Фракция: %s\n" % full_fraction_name(fraction)
     txt += "== Стартовые показатели:"
     for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
@@ -371,6 +396,14 @@ def process_photo(message):
     write_queue.put(json.dumps(decode_query))
 
 
+def full_fraction_name(short_name):
+    if short_name == 'e':
+        return 'Enlight'
+    elif short_name == 'r':
+        return 'Resist'
+    else:
+        return 'Unknown'
+
 def on_message(channel, method_frame, header_frame, body):
     LOG.info('{Rabbit} <= %s', body)
     decoded = json.loads(body)
@@ -382,13 +415,17 @@ def on_message(channel, method_frame, header_frame, body):
         txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
         if decoded["success"]:
             # txt += "\n_%s_: *%s*" % (mode, value)
-            txt += "AP *%s*\nLvl *%s*\n%s *%s*" % (decoded["AP"], decoded["Level"], decoded["mode"], decoded[decoded["mode"]])
+            d = decoded
+            fraction = full_fraction_name(d['fraction'])
+            txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
         bot.send_message(chatid, txt, parse_mode="Markdown")
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
     if "success" in decoded.keys() and decoded["success"]:
+        if decoded['fraction']:
+            data["counters"][agentname]['fraction'] = decoded['fraction']
         data["counters"][agentname][datakey].update(decoded)
         save_data()
         user_inform(agentname)

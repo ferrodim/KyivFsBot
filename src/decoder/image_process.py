@@ -3,6 +3,7 @@
 import pytesseract
 import re
 import difflib
+import numpy
 from PIL import Image
 from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
 
@@ -116,7 +117,7 @@ def parse_image(img:Image):
                         if debugLevel >= 2:
                             print("Name:", name, "Value:", value)
                         #Check if everything is OK
-                        ret = returnVal(ap, level, name, value)
+                        ret = returnVal(ap, level, name, value, '')
                         if ret != False:
                             if debugLevel >= 1:
                                 img.save("results/ok/"+filename)
@@ -141,6 +142,7 @@ def parse_image(img:Image):
                     #OCR AP, replace letters
                     ap = apData[0]
                     level = int(apData[1])
+                    fraction = apData[2]
                     if debugLevel >= 2:
                         print("Filename:", filename, "Prime AP:", ap, ", LVL:", level)
                     match = apregexp.match(ap)
@@ -163,7 +165,7 @@ def parse_image(img:Image):
                         if debugLevel >= 2:
                             print("Name:", name, "Value:", value)
                         #Check if everything is OK
-                        ret = returnVal(ap, level, name, value)
+                        ret = returnVal(ap, level, name, value, fraction)
                         if ret != False:
                             if debugLevel >= 1:
                                 img.save("results/ok/"+filename)
@@ -219,7 +221,7 @@ def find_lines(pixels:tuple, width:int, rect:tuple, colors:list, threshhold:int,
 
 
 
-def returnVal(ap:int, level:int, name:str, value:str):
+def returnVal(ap:int, level:int, name:str, value:str, fraction:str):
     kmregexp = re.compile(r"([0-9]+)k(m|rn|n)")
     numregexp = re.compile(r"^([0-9]+)$")
     xmregexp = re.compile(r"([0-9]+)XM")
@@ -236,7 +238,7 @@ def returnVal(ap:int, level:int, name:str, value:str):
             else:
                 match = numregexp.match(value)
             if match:
-                return {"success": True, "AP": ap, mode: int(match.group(1)), "mode": mode, "Level": level}
+                return {"success": True, "AP": ap, mode: int(match.group(1)), "mode": mode, "Level": level, "fraction": fraction}
     return False
 
 
@@ -296,13 +298,17 @@ def crop_primeap(img:Image):
                 if len(top):
                     lvlImg = img.crop((backs[len(backs)-1] - 5, top[len(top)-1], int(img.width * 0.97), img.height))
                     pixels = lvlImg.getdata()
+                    avg_color = numpy.average(numpy.average(lvlImg, axis=0), axis=0)
+                    # fraction = (avg_color[1] > avg_color[2]) ? "G" : "B"
+                    fraction = "e" if (avg_color[1] > avg_color[2]) else "r"
+                    # print(avg_color)
                     lvlImg.putdata([px if px[0] + px[1] + px[2] > 200 else (0,0,0) for px in pixels])
                     level = pytesseract.image_to_string(doubled(lvlImg), config='-psm 7 -c tessedit_char_whitelist="0123456789"').replace(" ", "")
                     if level == "":
                         level = 0
                 else:
                     level = 0
-                return [ap, level]
+                return [ap, level, fraction]
     return []
 
 def parse_full(img:Image):
