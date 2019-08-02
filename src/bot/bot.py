@@ -139,6 +139,21 @@ def user_inform(agentname):
             bot.send_message(chatid, txt, parse_mode="Markdown")
 
 
+@bot.message_handler(commands=["sendAll"])
+@restricted
+def cmd_send_all(message):
+    agents_total = 0
+    agents_received = 0
+    text = message.text[len('/sendAll '):]
+    for agentname in data["counters"].keys():
+        agents_total += 1
+        chat_id = data["counters"][agentname].get('chatid', '')
+        if chat_id:
+            agents_received += 1
+            bot.send_message(chat_id, "Агент, вам сообщение от организаторов:\n\n" + text)
+    bot.reply_to(message, "Массовое сообщение доставленно %s/%s агентам" % (agents_received, agents_total))
+
+
 @bot.message_handler(commands=["softreset"])
 @restricted
 @log_incoming
