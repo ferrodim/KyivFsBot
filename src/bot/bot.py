@@ -257,20 +257,31 @@ def cmd_result(message):
     resultfile.close()
 
 
+def category_name_normalize(name):
+    allowed_modes = ["AP", "Level"] + MODES
+    for mode in allowed_modes:
+        if name.lower() == mode.lower():
+            return mode
+    if name in ['lvl']:
+        return 'Level'
+    return ''
+
+
 @bot.message_handler(commands=["best"])
 @restricted
 @log_incoming
 def cmd_best(message):
     allowed_modes = ["AP", "Level"] + MODES
     chunks = message.text.replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) == 2 and (chunks[1] in allowed_modes))
+    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
+    amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
         bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/top <category>`\n"
+                                           "`/best <category>`\n"
                                            "где category принимает значения\n"
                                            "" + ', '.join(allowed_modes)), parse_mode="Markdown")
         return
-    mode = str(chunks[1])
+    mode = category_name_normalize(chunks[1])
     bot.send_message(message.chat.id, "Вы запросили инфу по " + mode)
     user_data = []
     for agentname in data["counters"].keys():
@@ -280,7 +291,7 @@ def cmd_best(message):
                 user_data.append((agentname, delta))
     user_data.sort(key=itemgetter(1), reverse=True)
     txt = 'Best %s:' % mode
-    for i in range(10):
+    for i in range(amount):
         if i < len(user_data):
             user = user_data[i]
             txt += "\n#%s *%s* - %s" % (i+1, user[0], user[1])
