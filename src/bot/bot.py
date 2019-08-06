@@ -614,7 +614,7 @@ def on_message(channel, method_frame, header_frame, body):
             d = decoded
             fraction = full_fraction_name(d['fraction'])
             txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (
-            fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
+                fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
         bot.send_message(chatid, txt, parse_mode="Markdown")
@@ -628,7 +628,7 @@ def on_message(channel, method_frame, header_frame, body):
         user_inform(agentname)
         bot.forward_message(CHAT_OK, chatid, msgid)
         bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (
-        agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
+            agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
     else:
         bot.forward_message(CHAT_FAIL, chatid, msgid)
         bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
