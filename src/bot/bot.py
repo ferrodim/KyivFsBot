@@ -30,6 +30,8 @@ if "getEnd" not in data.keys():
     data["getEnd"] = False
 if "counters" not in data.keys():
     data["counters"] = {}
+if "notify" not in data.keys():
+    data["notify"] = False
 datafile.close()
 datafile = open("base.txt", "w")
 json.dump(data, datafile, ensure_ascii=False)
@@ -49,6 +51,7 @@ def restricted(func):
             bot.reply_to(message, "Доступ запрещён")
             return
         return func(message, *args, **kwargs)
+
     return wrapped
 
 
@@ -57,6 +60,7 @@ def log_incoming(func):
     def wrapped(message, *args, **kwargs):
         LOG.info(get_tg_nick(message) + ' <- ' + message.text)
         return func(message, *args, **kwargs)
+
     return wrapped
 
 
@@ -78,9 +82,17 @@ def cmd_help(message):
                "@username or username - Get userinfo\n" \
                "/startevent - Begin taking start screenshots\n" \
                "/endevent - Begin taking final screenshots\n" \
-               "/reset - Clear all data and settings\n" \
-               "/result - Get result table file\n" \
                "/stop - Stop taking events\n" \
+               "/notify - Toggle notification of agents\n" \
+               "/sendall - Send message to all agents\n" \
+               "/agents - Get agents table\n" \
+               "/result - Get result table file\n" \
+               "/resultfev - Get result table file in FEV style\n" \
+               "/best <category> Get best results\n" \
+               "/clear <tg_nick> Clear by tg_nick\n" \
+               "/clearzero Clear agents by zero results\n" \
+               "/softreset - Clear everything exept nick and fraciton\n" \
+               "/reset - Clear all data and settings\n" \
                "/set tg_nick start Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick end Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick Nick ingame_nick - Set ingame nick for selected user"
@@ -127,7 +139,7 @@ def cmd_set(message):
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
-    bot.reply_to(message, "Done\n"+user_info(agentname), parse_mode="Markdown")
+    bot.reply_to(message, "Done\n" + user_info(agentname), parse_mode="Markdown")
     user_inform(agentname)
 
 
@@ -135,16 +147,16 @@ def user_inform(agentname):
     if agentname in data["counters"]:
         chatid = data["counters"][agentname].get('chatid')
         if chatid is not None:
-            txt = 'Данные по вам изменились:\n'+user_info(agentname)
+            txt = 'Данные по вам изменились:\n' + user_info(agentname)
             bot.send_message(chatid, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["sendAll"])
+@bot.message_handler(commands=["sendall"])
 @restricted
 def cmd_send_all(message):
     agents_total = 0
     agents_received = 0
-    text = message.text[len('/sendAll '):]
+    text = message.text[len('/sendall '):]
     for agentname in data["counters"].keys():
         agents_total += 1
         chat_id = data["counters"][agentname].get('chatid', '')
@@ -160,7 +172,7 @@ def cmd_send_all(message):
 def cmd_softreset(message):
     if message.text != '/softreset ok':
         bot.reply_to(message, "Вы правда хотите очистить всю базу, кроме ников?\n\n"
-                              "Введите */reset ok*, если да", parse_mode="Markdown")
+                              "Введите */softreset ok*, если да", parse_mode="Markdown")
         return
     data["getStart"] = False
     data["getEnd"] = False
@@ -183,8 +195,54 @@ def cmd_reset(message):
     data["getStart"] = False
     data["getEnd"] = False
     data["counters"] = {}
+    data["notify"] = False
     save_data()
     bot.reply_to(message, "База данных очищена")
+
+
+@bot.message_handler(commands=["notify"])
+@restricted
+@log_incoming
+def cmd_notify(message):
+    data["notify"] = not data["notify"]
+    save_data()
+    if data["notify"]:
+        bot.reply_to(message, "Уведомление агентов включено")
+    else:
+        bot.reply_to(message, "Уведомление агентов выключено")
+
+
+@bot.message_handler(commands=["agents"])
+@restricted
+@log_incoming
+def cmd_agents(message):
+    txt = "Зарегистрированные агенты"
+    agents_total = 0
+    agents_enl = 0
+    agents_res = 0
+    agents_nick = 0
+    agents_fraction = 0
+    for agentname in data["counters"].keys():
+        agents_total += 1
+        fraction = data["counters"][agentname].get("fraction", "-")
+        nick = data["counters"][agentname].get("Nick", "-")
+        if fraction == "e":
+            agents_enl += 1
+        if fraction == "r":
+            agents_res += 1
+        if nick == "-":
+            agents_nick += 1
+        if fraction == "-":
+            agents_fraction += 1
+    txt += "\nВсего: %d Enl: %d Res: %d" % (agents_total, agents_enl, agents_res)
+    if agents_nick or agents_fraction:
+        txt += "\nБез ника: %d Без фракции: %d" % (agents_nick, agents_fraction)
+    for agentname in data["counters"].keys():
+        txt += "\n"
+        nick = data["counters"][agentname].get("Nick", "-")
+        fraction = data["counters"][agentname].get("fraction", "-")  # \U0001F438 Frog  \U0001F41F Fish
+        txt += "@%s / `%s` / %s" % (agentname.replace('_', '\\_'), nick.replace('_', '\\_'), fraction)
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["startevent"])
@@ -194,7 +252,11 @@ def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
-    bot.send_message(message.chat.id, "Принимаю стартовые скрины!")
+    if data["notify"]:
+        for agentname in data["counters"].keys():
+            bot.send_message(data["counters"][agentname]['chatid'], "Принимаю стартовые скрины!")
+    else:
+        bot.send_message(message.chat.id, "Принимаю стартовые скрины!")
 
 
 @bot.message_handler(commands=["endevent"])
@@ -204,7 +266,11 @@ def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
-    bot.send_message(message.chat.id, "Принимаю финишные скрины!")
+    if data["notify"]:
+        for agentname in data["counters"].keys():
+            bot.send_message(data["counters"][agentname]['chatid'], "Принимаю финишные скрины!")
+    else:
+        bot.send_message(message.chat.id, "Принимаю финишные скрины!")
 
 
 @bot.message_handler(commands=["stop"])
@@ -214,14 +280,18 @@ def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
-    bot.send_message(message.chat.id, "Не принимаю скрины!")
+    if data["notify"]:
+        for agentname in data["counters"].keys():
+            bot.send_message(data["counters"][agentname]['chatid'], "Прием скринов закончен.")
+    else:
+        bot.send_message(message.chat.id, "Прием скринов закончен.")
 
 
 @bot.message_handler(commands=["result"])
 @restricted
 @log_incoming
 def cmd_result(message):
-    delimiter = message.text[len("/result "):len("/result ")+1]
+    delimiter = message.text[len("/result "):len("/result ") + 1]
     if delimiter == '':
         delimiter = ','
     txt = "TG_nick;Game_nick;Fraction"
@@ -253,6 +323,40 @@ def cmd_result(message):
     resultfile.write(txt)
     resultfile.close()
     resultfile = open("result.csv", "rb")
+    bot.send_document(message.chat.id, resultfile)
+    resultfile.close()
+
+
+@bot.message_handler(commands=["resultfev"])
+@restricted
+@log_incoming
+def cmd_resultfev(message):
+    delimiter = message.text[len("/resultfev "):len("/resultfev ") + 1]
+    if delimiter == '':
+        delimiter = ','
+    txt = "TG_nick;Fraction;Game_nick;Start_Level;Start_AP,Start_Trekker;End_Level;End_AP;End_Trekker"
+    allowed_modes = ["Level", "AP", "Trekker"]
+    txt += "\n"
+    for agentname in data["counters"].keys():
+        agentdata = {"start": {}, "end": {}}
+        for mode in allowed_modes:
+            agentdata["start"][mode] = "-"
+            agentdata["end"][mode] = "-"
+        if "start" in data["counters"][agentname].keys():
+            agentdata["start"].update(data["counters"][agentname]["start"])
+        if "end" in data["counters"][agentname].keys():
+            agentdata["end"].update(data["counters"][agentname]["end"])
+        nick = data["counters"][agentname].get("Nick", "-")
+        fraction = data["counters"][agentname].get("fraction", "-")
+        txt += '"%s";"%s";"%s"' % (agentname, fraction, nick)
+        txt += ";%s;%s;%s" % (agentdata["start"]["Level"], agentdata["start"]["AP"], agentdata["start"]["Trekker"])
+        txt += ";%s;%s;%s" % (agentdata["end"]["Level"], agentdata["end"]["AP"], agentdata["end"]["Trekker"])
+        txt += "\n"
+    txt = txt.replace(';', delimiter)
+    resultfile = open("resultfev.csv", "w")
+    resultfile.write(txt)
+    resultfile.close()
+    resultfile = open("resultfev.csv", "rb")
     bot.send_document(message.chat.id, resultfile)
     resultfile.close()
 
@@ -294,8 +398,50 @@ def cmd_best(message):
     for i in range(amount):
         if i < len(user_data):
             user = user_data[i]
-            txt += "\n#%s *%s* - %s" % (i+1, user[0], user[1])
+            txt += "\n#%s *%s* - %s" % (i + 1, user[0], user[1])
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+
+
+@bot.message_handler(commands=["clearzero"])
+@restricted
+@log_incoming
+def cmd_clearzero(message):
+    if message.text != '/clearzero ok':
+        bot.reply_to(message, "Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
+                              "Введите */clearzero ok*, если да", parse_mode="Markdown")
+        return
+    zero = 0
+    #    agents_to_delete = { }
+    for agentname in data["counters"].keys():
+        ap = data["counters"][agentname]["start"].get("AP", "")
+        trekker = data["counters"][agentname]["start"].get("Trekker", "")
+        if (not ap) and (not trekker):
+            zero += 1
+    #            del data["counters"][agentname]
+    #            agents_to_delete += agentname
+    #    for agentname in agents_to_delete:
+    #        del data["counters"][agentname]
+
+    bot.reply_to(message, "Удалено %d записей с нулевой стартовой статистикой" % (zero))
+
+
+@bot.message_handler(commands=["clear"])
+@restricted
+@log_incoming
+def cmd_clear(message):
+    chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
+    is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
+    if not is_valid_query:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                           "`/clear telegram_nick`\n"), parse_mode="Markdown")
+        return
+    tg_name = chunks[1]
+    if tg_name in data["counters"].keys():
+        del data["counters"][tg_name]
+        save_data()
+        bot.reply_to(message, "Данные @%s удалены" % (tg_name))
+    else:
+        bot.reply_to(message, "Бот не располагает данными на @%s" % (tg_name))
 
 
 @bot.message_handler(commands=["me"])
@@ -309,6 +455,10 @@ def cmd_me(message):
 @bot.message_handler(commands=["clearme"])
 @log_incoming
 def cmd_clearme(message):
+    if message.text != '/clearme ok':
+        bot.reply_to(message, "Вы правда хотите удалить свои данные?\n\n"
+                              "Введите */clearme ok*, если да", parse_mode="Markdown")
+        return
     tg_name = get_tg_nick(message)
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
@@ -333,6 +483,7 @@ def cmd_nick(message):
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['fraction'] = fraction
     save_data()
+    user_save_chatid(tg_name, message.chat.id)
     txt = user_info(tg_name)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
@@ -352,6 +503,7 @@ def cmd_nick(message):
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['Nick'] = game_nick
     save_data()
+    user_save_chatid(tg_name, message.chat.id)
     txt = user_info(tg_name)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
@@ -447,6 +599,7 @@ def full_fraction_name(short_name):
     else:
         return 'Unknown'
 
+
 def on_message(channel, method_frame, header_frame, body):
     LOG.info('{Rabbit} <= %s', body)
     decoded = json.loads(body)
@@ -460,7 +613,8 @@ def on_message(channel, method_frame, header_frame, body):
             # txt += "\n_%s_: *%s*" % (mode, value)
             d = decoded
             fraction = full_fraction_name(d['fraction'])
-            txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
+            txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (
+            fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
         else:
             txt += "Данные с изображения распарсить не удалось"
         bot.send_message(chatid, txt, parse_mode="Markdown")
@@ -473,7 +627,8 @@ def on_message(channel, method_frame, header_frame, body):
         save_data()
         user_inform(agentname)
         bot.forward_message(CHAT_OK, chatid, msgid)
-        bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
+        bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (
+        agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
     else:
         bot.forward_message(CHAT_FAIL, chatid, msgid)
         bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
