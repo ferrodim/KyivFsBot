@@ -145,7 +145,8 @@ def cmd_set(message):
         data["counters"][agentname][step][counter] = value
     save_data()
     bot.reply_to(message, "Done\n" + user_info(agentname), parse_mode="Markdown")
-    user_inform(agentname)
+    if message.from_user.username != agentname:
+        user_inform(agentname)
 
 
 def user_inform(agentname):
