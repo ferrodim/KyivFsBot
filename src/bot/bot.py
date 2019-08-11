@@ -398,13 +398,14 @@ def cmd_best(message):
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
             if mode in data["counters"][agentname]['start'] and mode in data["counters"][agentname]['end']:
                 delta = data["counters"][agentname]['end'][mode] - data["counters"][agentname]['start'][mode]
-                user_data.append((agentname, delta))
-    user_data.sort(key=itemgetter(1), reverse=True)
+                fraction = data["counters"][agentname].get('fraction', '-')
+                user_data.append({"agentname": agentname, "delta": delta, "fraction": fraction})
+    user_data.sort(key=itemgetter('delta'), reverse=True)
     txt = 'Best %s:' % mode
     for i in range(amount):
         if i < len(user_data):
             user = user_data[i]
-            txt += "\n#%s *%s* - %s" % (i + 1, user[0], user[1])
+            txt += "\n#%s *%s*(%s) - %s" % (i + 1, user['agentname'], user['fraction'], user['delta'])
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
