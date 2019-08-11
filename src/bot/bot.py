@@ -410,18 +410,16 @@ def cmd_clearzero(message):
         bot.reply_to(message, "Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
                               "Введите */clearzero ok*, если да", parse_mode="Markdown")
         return
-    zero = 0
     agents_to_delete = {}
     for agentname in data["counters"].keys():
         ap = data["counters"][agentname]["start"].get("AP", "")
         trekker = data["counters"][agentname]["start"].get("Trekker", "")
         if (not ap) and (not trekker):
-            zero += 1
             agents_to_delete[agentname] = True
     for agentname in agents_to_delete:
         del data["counters"][agentname]
     save_data()
-    bot.reply_to(message, "Удалено %d записей с нулевой стартовой статистикой" % (zero))
+    bot.reply_to(message, "Удалено %d записей с нулевой стартовой статистикой" % len(agents_to_delete))
 
 
 @bot.message_handler(commands=["clear"])
@@ -438,9 +436,9 @@ def cmd_clear(message):
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
         save_data()
-        bot.reply_to(message, "Данные @%s удалены" % (tg_name))
+        bot.reply_to(message, "Данные @%s удалены" % tg_name)
     else:
-        bot.reply_to(message, "Бот не располагает данными на @%s" % (tg_name))
+        bot.reply_to(message, "Бот не располагает данными на @%s" % tg_name)
 
 
 @bot.message_handler(commands=["me"])
