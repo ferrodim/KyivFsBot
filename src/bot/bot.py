@@ -473,7 +473,7 @@ def cmd_clearme(message):
 
 @bot.message_handler(commands=["fraction"])
 @log_incoming
-def cmd_nick(message):
+def cmd_fraction(message):
     chunks = message.text.replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
     if not is_valid_query:
