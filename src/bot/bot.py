@@ -379,6 +379,17 @@ def category_name_normalize(name):
     return ''
 
 
+def fraction_icon(fraction):
+    if fraction == "e":
+        # return "\U0001F438"
+        return "\U0001F49A"
+    elif fraction == "r":
+        # return "\U0001F41F"
+        return "\U0001F499"
+    else:
+        return ""
+
+
 @bot.message_handler(commands=["best"])
 @restricted
 @log_incoming
@@ -407,7 +418,8 @@ def cmd_best(message):
     for i in range(amount):
         if i < len(user_data):
             user = user_data[i]
-            txt += "\n#%s *%s*(%s) - %s" % (i + 1, user['agentname'], user['fraction'], user['delta'])
+            img = fraction_icon(user['fraction'])
+            txt += "\n#%s %s*%s* - %s" % (i + 1, img, user['agentname'], user['delta'])
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
