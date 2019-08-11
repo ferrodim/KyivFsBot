@@ -58,9 +58,11 @@ def restricted(func):
 def log_incoming(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
-        LOG.info(get_tg_nick(message) + ' <- ' + message.text)
-        return func(message, *args, **kwargs)
-
+        try:
+            LOG.info(get_tg_nick(message) + ' <- ' + message.text)
+            return func(message, *args, **kwargs)
+        except Exception as e:
+            LOG.error('Exception: ' + str(e))
     return wrapped
 
 
