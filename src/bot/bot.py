@@ -411,17 +411,16 @@ def cmd_clearzero(message):
                               "Введите */clearzero ok*, если да", parse_mode="Markdown")
         return
     zero = 0
-    #    agents_to_delete = { }
+    agents_to_delete = {}
     for agentname in data["counters"].keys():
         ap = data["counters"][agentname]["start"].get("AP", "")
         trekker = data["counters"][agentname]["start"].get("Trekker", "")
         if (not ap) and (not trekker):
             zero += 1
-    #            del data["counters"][agentname]
-    #            agents_to_delete += agentname
-    #    for agentname in agents_to_delete:
-    #        del data["counters"][agentname]
-
+            agents_to_delete[agentname] = True
+    for agentname in agents_to_delete:
+        del data["counters"][agentname]
+    save_data()
     bot.reply_to(message, "Удалено %d записей с нулевой стартовой статистикой" % (zero))
 
 
