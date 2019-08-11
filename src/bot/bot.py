@@ -115,22 +115,27 @@ def cmd_set(message):
     for x in allowed_modes:
         modes_lowercased[x.lower()] = x
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) == 4 and chunks[2] == 'Nick') or \
+    is_valid_query = (len(chunks) == 4 and chunks[2] in ['Nick', 'fraction']) or \
                      (len(chunks) == 5 and chunks[2] in ["start", "end"] and
                       (chunks[3] in allowed_modes or chunks[3] in modes_lowercased.keys()))
+    if chunks[2] == 'fraction' and not chunks[3] in ['e', 'r', '']:
+        is_valid_query = False
     if not is_valid_query:
         bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
                                            "`/set telegram_nick start Param value`\n"
                                            "`/set telegram_nick end Param value`\n"
+                                           "`/set telegram_nick fraction e/r`\n"
                                            "`/set telegram_nick Nick game_nick`"), parse_mode="Markdown")
         return
     agentname = chunks[1]
     if agentname not in data["counters"].keys():
         data["counters"][agentname] = {"start": {}, "end": {}}
     if chunks[2] == 'Nick':
-        counter = chunks[2]
         value = chunks[3]
-        data["counters"][agentname][counter] = value
+        data["counters"][agentname]['Nick'] = value
+    elif chunks[2] == 'fraction':
+        value = chunks[3]
+        data["counters"][agentname]['fraction'] = value
     else:
         step = chunks[2]
         counter = chunks[3]
