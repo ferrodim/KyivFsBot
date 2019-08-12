@@ -120,7 +120,7 @@ def cmd_set(message):
     is_valid_query = (len(chunks) == 4 and chunks[2] in ['Nick', 'fraction']) or \
                      (len(chunks) == 5 and chunks[2] in ["start", "end"] and
                       (chunks[3] in allowed_modes or chunks[3] in modes_lowercased.keys()))
-    if chunks[2] == 'fraction' and not chunks[3] in ['e', 'r', '']:
+    if len(chunks) == 4 and chunks[2] == 'fraction' and not chunks[3] in ['e', 'r', '']:
         is_valid_query = False
     if not is_valid_query:
         bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
