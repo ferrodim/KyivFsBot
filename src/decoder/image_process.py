@@ -5,7 +5,9 @@ import re
 import difflib
 import numpy
 from PIL import Image
-from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
+MODES = ["Explorer", "XM Collected", "Trekker", "Builder", "Connector", "Mind Controller", "Illuminator", "Recharger",
+         "Liberator", "Pioneer", "Engineer", "Purifier", "Portal Destroy", "Links Destroy", "Fields Destroy", "SpecOps",
+         "Hacker", "Translator"]
 
 def parse_image(img:Image):
     filename = ''  # never used
