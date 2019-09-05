@@ -391,7 +391,6 @@ def fraction_icon(fraction):
 
 
 @bot.message_handler(commands=["best"])
-@restricted
 @log_incoming
 def cmd_best(message):
     allowed_modes = ["AP", "Level"] + MODES
