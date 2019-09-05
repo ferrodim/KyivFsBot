@@ -671,14 +671,18 @@ def on_message(channel, method_frame, header_frame, body):
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
     if "success" in decoded.keys() and decoded["success"]:
-        if decoded['fraction']:
-            data["counters"][agentname]['fraction'] = decoded['fraction']
-        data["counters"][agentname][datakey].update(decoded)
-        save_data()
-        user_inform(agentname)
-        bot.forward_message(CHAT_OK, chatid, msgid)
-        bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (
-            agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
+        if decoded.get('mode') in MODES:
+            if decoded['fraction']:
+                data["counters"][agentname]['fraction'] = decoded['fraction']
+            data["counters"][agentname][datakey].update(decoded)
+            save_data()
+            user_inform(agentname)
+            bot.forward_message(CHAT_OK, chatid, msgid)
+            bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (
+                agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
+        else:
+            bot.send_message(chatid, "Вы прислали скрин из неактивной категории *%s*. Пришлите вместо него *%s*" %
+                             (decoded.get('mode'), ', '.join(MODES)), parse_mode="Markdown")
     else:
         bot.forward_message(CHAT_FAIL, chatid, msgid)
         bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
