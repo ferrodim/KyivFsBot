@@ -356,10 +356,17 @@ def cmd_resultfev(message):
             agentdata["end"].update(data["counters"][agentname]["end"])
         nick = data["counters"][agentname].get("Nick", "-")
         fraction = data["counters"][agentname].get("fraction", "-")
-        txt += '"%s";"%s";"%s"' % (agentname, fraction, nick)
-        txt += ";%s;%s;%s" % (agentdata["start"]["Level"], agentdata["start"]["AP"], agentdata["start"]["Trekker"])
-        txt += ";%s;%s;%s" % (agentdata["end"]["Level"], agentdata["end"]["AP"], agentdata["end"]["Trekker"])
-        txt += "\n"
+        is_anything_filled = False
+        for mode in allowed_modes:
+            if agentdata["start"][mode] != '-':
+                is_anything_filled = True
+            if agentdata["end"][mode] != '-':
+                is_anything_filled = True
+        if is_anything_filled:
+            txt += '"%s";"%s";"%s"' % (agentname, fraction, nick)
+            txt += ";%s;%s;%s" % (agentdata["start"]["Level"], agentdata["start"]["AP"], agentdata["start"]["Trekker"])
+            txt += ";%s;%s;%s" % (agentdata["end"]["Level"], agentdata["end"]["AP"], agentdata["end"]["Trekker"])
+            txt += "\n"
     txt = txt.replace(';', delimiter)
     resultfile = open("resultfev.csv", "w")
     resultfile.write(txt)
