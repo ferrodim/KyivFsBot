@@ -152,6 +152,9 @@ def cmd_set(message):
 
 
 def user_inform(agentname):
+    if "night" in data.keys() and data["night"]:
+        # don't send notifications during night
+        return
     if agentname in data["counters"]:
         chatid = data["counters"][agentname].get('chatid')
         if chatid is not None:
@@ -218,6 +221,23 @@ def cmd_notify(message):
         bot.reply_to(message, "Уведомление агентов включено")
     else:
         bot.reply_to(message, "Уведомление агентов выключено")
+
+
+@bot.message_handler(commands=["night"])
+@restricted
+@log_incoming
+def cmd_night(message):
+    if "night" not in data.keys():
+        data["night"] = False
+    if not data["night"] and (data["getStart"] or data["getEnd"]):
+        bot.reply_to(message, "Нельзя включить ночной режим во время эвента")
+        return
+    data["night"] = not data["night"]
+    save_data()
+    if data["night"]:
+        bot.reply_to(message, "Ночной режим включен")
+    else:
+        bot.reply_to(message, "Ночной режим выключен")
 
 
 @bot.message_handler(commands=["agents"])
