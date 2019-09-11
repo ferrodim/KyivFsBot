@@ -365,6 +365,8 @@ def cmd_resultfev(message):
     txt = "TG_nick;Fraction;Game_nick;Start_Level;Start_AP,Start_Trekker;End_Level;End_AP;End_Trekker"
     allowed_modes = ["Level", "AP", "Trekker"]
     txt += "\n"
+
+    user_data = []
     for agentname in data["counters"].keys():
         agentdata = {"start": {}, "end": {}}
         for mode in allowed_modes:
@@ -383,10 +385,12 @@ def cmd_resultfev(message):
             if agentdata["end"][mode] != '-':
                 is_anything_filled = True
         if is_anything_filled:
-            txt += '"%s";"%s";"%s"' % (agentname, fraction, nick)
-            txt += ";%s;%s;%s" % (agentdata["start"]["Level"], agentdata["start"]["AP"], agentdata["start"]["Trekker"])
-            txt += ";%s;%s;%s" % (agentdata["end"]["Level"], agentdata["end"]["AP"], agentdata["end"]["Trekker"])
-            txt += "\n"
+            user_data.append((agentname, fraction, nick, agentdata["start"]["Level"], agentdata["start"]["AP"],
+                              agentdata["start"]["Trekker"], agentdata["end"]["Level"], agentdata["end"]["AP"],
+                              agentdata["end"]["Trekker"]))
+    user_data.sort(key=itemgetter(1))
+    for row in user_data:
+        txt += '"%s";"%s";"%s";%s;%s;%s;%s;%s;%s\n' % row
     txt = txt.replace(';', delimiter)
     resultfile = open("resultfev.csv", "w")
     resultfile.write(txt)
