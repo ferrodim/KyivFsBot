@@ -648,12 +648,13 @@ def process_prime_tab_separated_text(message):
 
     chunks = message.text.split("\n")
     if len(chunks) != 2:
-        LOG.info('wrong number of lines')
+        bot.send_message(chatid, "Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?")
         return
     title = chunks[0]
+    titles = parse_title(title)
     values = chunks[1]
 
-    regexp = re.compile('.*\s(\S+)\s(Enlightened|Resistance)\s\d{4}-\d\d-\d\d\s\d\d:\d\d:\d\d' + ('\s(\d+)' * 34))
+    regexp = re.compile('(.*)\s(\S+)\s(Enlightened|Resistance)\s(\d\d\d\d-\d\d-\d\d)\s(\d\d:\d\d:\d\d)\s([\s\d]+)')
     found = re.fullmatch(regexp, values)
 
     if not found:
@@ -661,17 +662,26 @@ def process_prime_tab_separated_text(message):
         bot.send_message(chatid, "Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой")
         return
 
+    time_span = found[1]
+    nick = found[2]
+    fraction = 'e' if found[3] == 'Enlightened' else 'r'
+    date = found[4]
+    time = found[5]
+    rest = found[6].split(' ')
+    rest2 = [time_span, nick, fraction, date, time] + rest
+
+    if len(titles) != len(rest2):
+        bot.forward_message(CHAT_FAIL, chatid, msgid)
+        bot.send_message(chatid, "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой")
+        return
+
     decoded = {}
-    decoded['Nick'] = found[1]
-    decoded['Fraction'] = 'e' if found[2] == 'Enlightened' else 'r'
-    decoded['AP'] = int(found[3])
-    decoded['Level'] = 0
-    decoded['Trekker'] = int(found[9])
-    decoded['Builder'] = int(found[10])
-    # decoded['Linker'] = int(found[11])
-    decoded['Liberator'] = int(found[17])
-    decoded['Purifier'] = int(found[20])
-    decoded['Hacker'] = int(found[30])
+    for i in range(len(rest2)):
+        val = rest2[i]
+        if re.fullmatch(r'\d+', val):
+            val = int(val)
+        decoded[titles[i]] = val
+
     LOG.info('decoded ' + str(decoded))
 
     agentname = get_tg_nick(message)
@@ -699,6 +709,53 @@ def process_prime_tab_separated_text(message):
     user_inform(agentname)
     bot.forward_message(CHAT_OK, chatid, msgid)
     bot.send_message(CHAT_OK, "Parsed: " + str(decoded))
+
+
+def parse_title(title):
+    title = str(title).replace('Time Span', 'TimeSpan')
+    title = str(title).replace('Agent Name', 'Nick')
+    title = str(title).replace('Agent Faction', 'Fraction')
+    title = str(title).replace('Date (yyyy-mm-dd)', 'Date')
+    title = str(title).replace('Time (hh:mm:ss)', 'Time')
+    title = str(title).replace('Lifetime AP', 'AP')
+    title = str(title).replace('Current AP', 'CurrentAP')
+    title = str(title).replace('Unique Portals Visited', 'Explorer')
+    title = str(title).replace('Portals Discovered', 'PortalsDiscovered')
+    title = str(title).replace('Seer Points', 'Seer')
+    title = str(title).replace('XM Collected', 'XMCollected')
+    title = str(title).replace('OPR Agreements', 'OprAgreements')
+    title = str(title).replace('Distance Walked', 'Trekker')
+    title = str(title).replace('Resonators Deployed', 'Builder')
+    title = str(title).replace('Links Created', 'Connector')
+    title = str(title).replace('Control Fields Created', 'MindController')
+    title = str(title).replace('Mind Units Captured', 'Illuminator')
+    title = str(title).replace('Longest Link Ever Created', 'LongestLinkEverCreated')
+    title = str(title).replace('Largest Control Field', 'LargestControlField')
+    title = str(title).replace('XM Recharged', 'Recharger')
+    title = str(title).replace('Unique Portals Captured', 'Pioneer')
+    title = str(title).replace('Portals Captured', 'Liberator')
+    title = str(title).replace('Mods Deployed', 'Engineer')
+    title = str(title).replace('Resonators Destroyed', 'ResonatorsDestroyed')
+    title = str(title).replace('Portals Neutralized', 'Purifier')
+    title = str(title).replace('Enemy Links Destroyed', 'EnemyLinksDestroyed')
+    title = str(title).replace('Enemy Fields Destroyed', 'EnemyFieldsDestroyed')
+    title = str(title).replace('Max Time Portal Held', 'MaxTimePortalHeld')
+    title = str(title).replace('Max Time Link Maintained', 'MaxTimeLinkMaintained')
+    title = str(title).replace('Max Link Length x Days', 'MaxLinkLengthxDays')
+    title = str(title).replace('Max Time Field Held', 'MaxTimeFieldHeld')
+    title = str(title).replace('Largest Field MUs x Days', 'LargestFieldMUsxDays')
+    title = str(title).replace('Unique Missions Completed', 'UniqueMissionsCompleted')
+    title = str(title).replace('Hacks', 'Hacker')
+    title = str(title).replace('Glyph Hack Points', 'Translator')
+    title = str(title).replace('Longest Hacking Streak', 'LongestHackingStreak')
+    title = str(title).replace('Agents Successfully Recruited', 'AgentsSuccessfullyRecruited')
+    title = str(title).replace('Mission Day(s) Attended', 'MissionDay')
+    title = str(title).replace('NL-1331 Meetup(s) Attended', 'NL1331Meetup')
+    title = str(title).replace('First Saturday Events', 'FirstSaturday')
+    title = str(title).replace('Recursions', 'Recursions')
+    ans = title.split(' ')
+    ans.pop()
+    return ans
 
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
