@@ -776,10 +776,78 @@ def calc_level(parsed):
     if parsed['Recursions'] > 0:
         # skip medals checking for recursed agents
         return level
+    if level <= 8:
+        # no medals requirements for 8- levels
+        return level
 
-    # TODO: calculate here amount of medals, and maybe reduce the players level
+    medals = {}
+    medals['Sojourner'] = [30, 60, 180, 360]
+    medals['Illuminator'] = [50*k, 250*k, 1*m, 4*m]
+    medals['Translator'] = [2*k, 6*k, 20*k, 50*k]
+    medals['Recruiter'] = [10, 25, 50, 100]
+    medals['Trekker'] = [100, 300, 1000, 2500]
+    medals['Engineer'] = [1500, 5*k, 20*k, 50*k]
+    medals['SpecOps'] = [25, 100, 200, 500]
+    medals['Recharger'] = [1*m, 3*m, 10*m, 25*m]
+    medals['Connector'] = [1*k, 5*k, 25*k, 100*k]
+    medals['Builder'] = [10*k, 30*k, 100*k, 200*k]
+    medals['Explorer'] = [1*k, 2*k, 10*k, 30*k]
+    medals['Guardian'] = [10, 20, 90, 150]
+    medals['Hacker'] = [10*k, 30*k, 100*k, 200*k]
+    medals['MindController'] = [500, 2*k, 10*k, 40*k]
+    medals['Purifier'] = [10*k, 30*k, 100*k, 300*k]
+    medals['Liberator'] = [1*k, 5*k, 15*k, 40*k]
+    medals['Pioneer'] = [200, 1*k, 5*k, 20*k]
+    medals['Recon'] = [750, 2500, 5*k, 10*k]
+    medals['MissionDay'] = [3, 6, 10, 20]
+    medals['NL1331Meetup'] = [5, 10, 25, 50]
+    medals['MissionDay'] = [3, 6, 10, 20]
+    medals['FirstSaturday'] = [6, 12, 24, 36]
+
+    player_has_medals = [0, 0, 0, 0]
+
+    for medal_name in medals:
+        if medal_name in parsed.keys():
+            medal_requirements = medals[medal_name]
+            i = -1
+            for treshold in medal_requirements:
+                if parsed[medal_name] >= treshold:
+                    i += 1
+            if i == 1:
+                LOG.info('silver: ' + medal_name)
+            if i > -1:
+                player_has_medals[i] += 1
+
+    LOG.info('player_has_medals ' + str(player_has_medals))
+
+    player_has_medals[0] += player_has_medals[1] + player_has_medals[2] + player_has_medals[3]
+    player_has_medals[1] += player_has_medals[2] + player_has_medals[3]
+    player_has_medals[2] += player_has_medals[3]
+
+    LOG.info('player_has_medals normalized ' + str(player_has_medals))
+
+    medals_required_for_each_level = {}
+    medals_required_for_each_level[8] = [0, 0, 0, 0]
+    medals_required_for_each_level[9] = [4, 1, 0, 0]
+    medals_required_for_each_level[10] = [5, 2, 0, 0]
+    medals_required_for_each_level[11] = [6, 4, 0, 0]
+    medals_required_for_each_level[12] = [7, 6, 0, 0]
+    medals_required_for_each_level[13] = [0, 7, 1, 0]
+    medals_required_for_each_level[14] = [0, 0, 2, 0]
+    medals_required_for_each_level[15] = [0, 0, 3, 0]
+    medals_required_for_each_level[16] = [0, 0, 4, 2]
+
+    while not pass_level_requirements(player_has_medals, medals_required_for_each_level[level]):
+        level -= 1
 
     return level
+
+
+def pass_level_requirements(player_medals, medals_required):
+    for i in range(4):
+        if player_medals[i] < medals_required[i]:
+            return False
+    return True
 
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
