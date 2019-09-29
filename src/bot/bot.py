@@ -683,6 +683,7 @@ def process_prime_tab_separated_text(message):
         decoded[titles[i]] = val
 
     LOG.info('decoded ' + str(decoded))
+    decoded['Level'] = calc_level(decoded)
 
     agentname = get_tg_nick(message)
     if message.forward_from:
@@ -756,6 +757,29 @@ def parse_title(title):
     ans = title.split(' ')
     ans.pop()
     return ans
+
+
+def calc_level(parsed):
+    LOG.info('calc_level ' + str(parsed))
+    k = 1000
+    m = 1000 * 1000
+    levels_ap_required = [2500, 20*k, 70*k, 150*k, 0.3*m, 0.6*m, 1.2*m, 2.4*m, 4*m, 6*m, 8.4*m, 12*m, 17*m, 24*m, 40*m]
+
+    if not parsed['CurrentAP']:
+        return None
+
+    level = 1
+    for level_ap_needed in levels_ap_required:
+        if parsed['CurrentAP'] >= level_ap_needed:
+            level += 1
+
+    if parsed['Recursions'] > 0:
+        # skip medals checking for recursed agents
+        return level
+
+    # TODO: calculate here amount of medals, and maybe reduce the players level
+
+    return level
 
 
 @bot.message_handler(func=lambda message: True, content_types=["photo"])
