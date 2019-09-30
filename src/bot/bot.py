@@ -671,7 +671,21 @@ def process_prime_tab_separated_text(message):
     rest = found[6].split(' ')
     rest2 = [time_span, nick, fraction, date, time] + rest
 
+    if time_span in ['ЗА МЕСЯЦ', 'MONTH']:
+        bot.send_message(chatid, 'Вы прислали месячную стату. А нужно "за всё время"')
+        return
+
+    if time_span in ['ЗА НЕДЕЛЮ', 'WEEK']:
+        bot.send_message(chatid, 'Вы прислали недельную стату. А нужно "за всё время"')
+        return
+
+    if time_span in ['СЕЙЧАС', 'NOW'] or 'ActivePortalsOwned' in titles:
+        bot.send_message(chatid, 'Вы прислали дневную стату. А нужно "за всё время"')
+        return
+
     if len(titles) != len(rest2):
+        LOG.info(titles)
+        LOG.info(rest2)
         bot.forward_message(CHAT_FAIL, chatid, msgid)
         bot.send_message(chatid, "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой")
         return
@@ -755,13 +769,17 @@ def parse_title(title):
     title = str(title).replace('NL-1331 Meetup(s) Attended', 'NL1331Meetup')
     title = str(title).replace('First Saturday Events', 'FirstSaturday')
     title = str(title).replace('Recursions', 'Recursions')
+    title = str(title).replace('Active Portals Owned', 'ActivePortalsOwned')
+    title = str(title).replace('Control Fields Active', 'ActivePortalsOwned')
+    title = str(title).replace('Mind Unit Control', 'MindUnitControl')
+    title = str(title).replace('Current Hacking Streak', 'CurrentHackingStreak')
     ans = title.split(' ')
     ans.pop()
     return ans
 
 
 def calc_level(parsed):
-    LOG.info('calc_level ' + str(parsed))
+    # LOG.info('calc_level ' + str(parsed))
     k = 1000
     m = 1000 * 1000
     levels_ap_required = [2500, 20*k, 70*k, 150*k, 0.3*m, 0.6*m, 1.2*m, 2.4*m, 4*m, 6*m, 8.4*m, 12*m, 17*m, 24*m, 40*m]
