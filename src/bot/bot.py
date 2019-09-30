@@ -813,8 +813,8 @@ def calc_level(parsed):
             for treshold in medal_requirements:
                 if parsed[medal_name] >= treshold:
                     i += 1
-            if i == 1:
-                LOG.info('silver: ' + medal_name)
+            # if i == 1:
+            #    LOG.info('silver: ' + medal_name)
             if i > -1:
                 player_has_medals[i] += 1
 
