@@ -773,7 +773,7 @@ def calc_level(parsed):
         if parsed['CurrentAP'] >= level_ap_needed:
             level += 1
 
-    if parsed['Recursions'] > 0:
+    if 'Recursions' in parsed.keys() and parsed['Recursions'] > 0:
         # skip medals checking for recursed agents
         return level
     if level <= 8:
