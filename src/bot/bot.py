@@ -269,7 +269,8 @@ def cmd_agents(message):
         txt += "\n"
         nick = data["counters"][agentname].get("Nick", "-")
         fraction = data["counters"][agentname].get("fraction", "-")  # \U0001F438 Frog  \U0001F41F Fish
-        txt += "@%s / `%s` / %s" % (agentname.replace('_', '\\_'), nick.replace('_', '\\_'), fraction)
+        img = fraction_icon(fraction) or '-'
+        txt += "@%s / `%s` / %s" % (agentname.replace('_', '\\_'), nick.replace('_', '\\_'), img)
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
