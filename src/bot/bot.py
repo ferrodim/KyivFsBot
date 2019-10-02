@@ -773,6 +773,9 @@ def parse_title(title):
     title = str(title).replace('Control Fields Active', 'ActivePortalsOwned')
     title = str(title).replace('Mind Unit Control', 'MindUnitControl')
     title = str(title).replace('Current Hacking Streak', 'CurrentHackingStreak')
+    title = str(title).replace('Clear Fields Events', 'ClearField')
+    title = str(title).replace('Prime Challenges', 'PrimeChallenges')
+    title = str(title).replace('Stealth Ops Missions', 'StealthOps')
     ans = title.split(' ')
     ans.pop()
     return ans
