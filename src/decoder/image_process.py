@@ -10,7 +10,6 @@ MODES = ["Explorer", "XM Collected", "Trekker", "Builder", "Connector", "Mind Co
          "Hacker", "Translator"]
 
 def parse_image(img: Image, filename):
-    debug_level = 0
     apregexp = re.compile(r"[^0-9]?([0-9]+)A[PF]")
     pink = (188, 50, 124)
     prime_back = (11, 18, 36)
@@ -26,26 +25,19 @@ def parse_image(img: Image, filename):
             prime_height = prime_backs[0] - pink_lines[0]
             # Extract AP to IMG
             prime_ap_img = img.crop((int(img.width * 0.1), prime_backs[0] - int(prime_height * 1.6), img.width, prime_backs[0]))
-            if debug_level >= 1:
-                prime_ap_img.save("tables/" + filename + "_ap.png")
 
             # Parse AP data
             ap_data = crop_primeap(prime_ap_img)
-            LOG.info('ap_data %s', ap_data)
             if len(ap_data):
                 # OCR AP, replace letters
                 ap = ap_data[0]
                 level = int(ap_data[1])
                 fraction = ap_data[2]
-                if debug_level >= 2:
-                    print("Filename:", filename, "Prime AP:", ap, ", LVL:", level)
                 match = apregexp.match(ap)
                 if match:  # Got AP!
                     ap = int(match.group(1))
                     # Get medal part
                     prime_tr_img = img.crop((int(img.width / 4), pink_lines[1] - int(prime_height / 2), int(img.width * 3 / 4), pink_lines[1] + int(prime_height * 2 / 3)))
-                    if debug_level >= 1:
-                        prime_tr_img.save("tables/" + filename + "_val.png")
                     # OCR, get name and value, replace letters in val
                     prime_tr_name = prime_tr_img.crop((0, int(prime_tr_img.height / 2), prime_tr_img.width, prime_tr_img.height))
                     name = pytesseract.image_to_string(prime_tr_name)
@@ -56,16 +48,10 @@ def parse_image(img: Image, filename):
                         value = pytesseract.image_to_string(prime_tr_val, config='-psm 7 -c tessedit_char_whitelist="0123456789km.,"').replace(" ", "").replace(".", "").replace(",", "")
                     else:
                         value = pytesseract.image_to_string(prime_tr_val, config='-psm 7 -c tessedit_char_whitelist="0123456789.,"').replace(" ", "").replace(".", "").replace(",", "")
-                    if debug_level >= 2:
-                        print("Name:", name, "Value:", value)
                     # Check if everything is OK
                     ret = return_val(ap, level, name, value, fraction)
                     if ret is not False:
-                        if debug_level >= 1:
-                            img.save("results/ok/" + filename)
                         return ret
-    if debug_level >= 1:
-        img.save("results/bad/" + filename)
     return {"filename": filename, "success": False}
 
 
