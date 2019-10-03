@@ -9,228 +9,119 @@ MODES = ["Explorer", "XM Collected", "Trekker", "Builder", "Connector", "Mind Co
          "Liberator", "Pioneer", "Engineer", "Purifier", "Portal Destroy", "Links Destroy", "Fields Destroy", "SpecOps",
          "Hacker", "Translator"]
 
-def parse_image(img:Image):
-    filename = ''  # never used
-    debugLevel = 0
-    ap = 0
-    numregexp = re.compile(r"^([0-9]+)$")
+def parse_image(img: Image, filename):
+    debug_level = 0
     apregexp = re.compile(r"[^0-9]?([0-9]+)A[PF]")
-    yellow = (255, 243, 140)
-    green = (0, 134, 123)
-    marble = (20, 175, 165)
-    redactLine = (0, 186, 181)
     pink = (188, 50, 124)
-    primeBack = (11, 18,36)
+    prime_back = (11, 18, 36)
     pxls = tuple(img.getdata())
 
-    #Search for AP line
-    APLines = find_lines(pxls, img.width, (int(img.width * 0.3), int(img.height * 0.075), int(img.width * 0.9), int(img.height * 0.4)), [yellow, green], 70, 3, 1)
-    APLine = APLines[0] if len(APLines) else False
+    # Find pink lines (1 - above AP, 2 - in medal)
+    pink_lines = find_lines(pxls, img.width, (int(img.width * 0.3), 0, int(img.width * 0.7), int(img.height * 0.7)), [pink], 170, 1, 2)
+    if len(pink_lines) == 2:  # Found
+        # Search for empty line after AP
+        prime_backs = find_lines(pxls, img.width, (int(img.width * 0.25), pink_lines[0] + 50, int(img.width * 0.98), pink_lines[1]), [prime_back], 50, 1, 1, False)
+        if len(prime_backs) == 1:
+            # Main height parameter
+            prime_height = prime_backs[0] - pink_lines[0]
+            # Extract AP to IMG
+            prime_ap_img = img.crop((int(img.width * 0.1), prime_backs[0] - int(prime_height * 1.6), img.width, prime_backs[0]))
+            if debug_level >= 1:
+                prime_ap_img.save("tables/" + filename + "_ap.png")
 
-    if APLine: #We found AP line - Scanner "Redacted" mode
-        redactLines = find_lines(pxls, img.width, (int(img.width * 0.1), int(img.height * 0.25), int(img.width * 0.9), int(img.height * 0.95)), [redactLine], 200, 1)
-        if len(redactLines) > 1: #Found top and bottom border of opened medal
-            redactVLines = find_lines(pxls, img.width, (0, redactLines[0], img.width, redactLines[1]), [redactLine], 200, 1, 0, True, False)
-            if len(redactVLines) in (2,3): #found left and right
-                #Extract medal name to IMG
-                medalName=img.crop((int(redactVLines[1] * 0.25 + redactVLines[0] * 0.75) + 10, redactLines[0] + 5, int(redactVLines[1] * 0.9 + redactVLines[0] * 0.1), int(redactLines[0] * 0.65 + redactLines[1] * 0.35)))
-                if debugLevel >= 1:
-                    medalName.save("tables/" + filename + "_name.png")
-                #Find first black line above medal value
-                blackLines=find_lines(pxls, img.width, (redactVLines[0] + 5, int(redactLines[0] * 0.6 + redactLines[1] * 0.4), int(redactVLines[0] / 2 + redactVLines[1] / 2), int(redactLines[0] * 0.35 + redactLines[1] * 0.65)), [(0,0,0)], 100, 1, 1, False)
-                if len(blackLines): #Found
-                    medalValRect = [redactVLines[0] + 10, blackLines[0], int(redactVLines[1] * 0.3 + redactVLines[0] * 0.7), int(redactLines[0] * 0.4 + redactLines[1] * 0.6)]
-                    #Crop from top
-                    top = medalValRect[1]
-                    currpx = img.width * top + int(medalValRect[0] / 2 + medalValRect[2] / 2)
-                    while top < medalValRect[3] and pxls[currpx][0] + pxls[currpx][1] + pxls[currpx][2] < 50:
-                        currpx += img.width
-                        top +=1
-                    medalValRect[1] = top + 2
-
-                    #Crop from bottom
-                    bottom = medalValRect[3]
-                    currpx = img.width * bottom + int(medalValRect[0] / 2 + medalValRect[2] / 2)
-                    while bottom > top and pxls[currpx][0] + pxls[currpx][1] + pxls[currpx][2] < 50:
-                        currpx -= img.width
-                        bottom -=1
-                    medalValRect[3] = bottom - 2
-
-                    #Extract medal value to IMG
-                    medalValue=img.crop(medalValRect)
-                    if debugLevel >= 1:
-                        medalValue.save("tables/" + filename + "_val.png")
-
-                    #Find black dot before AP line (left AP border)
-                    left = int(img.width / 2)
-                    currpx = img.width * APLine + left
-                    while left > 0 and pxls[currpx][0] + pxls[currpx][1] + pxls[currpx][2] > 150:
-                        currpx -= 1
-                        left -= 1
-
-                    #Find first black line after AP line
-                    top = 0
-                    currpx = img.width * APLine + left + 1
-                    while APLine + top < img.height and pxls[currpx][0] + pxls[currpx][1] + pxls[currpx][2] > 150:
-                        currpx += img.width
-                        top += 1
-
-                    #Extract AP to file (height == height of medal value)
-                    apImg = img.crop((left - 5, APLine + top + 3, img.width, APLine + medalValue.height + 5))
-                    if debugLevel >= 1:
-                        apImg.save("tables/" + filename + "_ap.png")
-
-                    #Extract level to file
-                    lvlImg = img.crop((left - 5, APLine - int(apImg.height * 1.25), int(img.width * 2 / 3), APLine - 3))
-                    if debugLevel >= 1:
-                        lvlImg.save("tables/" + filename + "_lvl.png")
-
-                    #Filter out non-yellow pixels
-                    pixels = apImg.getdata()
-                    apImg.putdata([px if px[0] > px[2] else (0,0,0) for px in pixels])
-                    if debugLevel >= 1:
-                        apImg.save("tables/" + filename + "_ap_filter.png")
-                    #OCR, replace some letters
-                    ap = pytesseract.image_to_string(apImg, config='-psm 7 -c tessedit_char_whitelist="0123456789AP.,"').replace(" ", "").replace(".", "").replace(",", "")
-                    level = pytesseract.image_to_string(lvlImg, config='-psm 7 -c tessedit_char_whitelist="0123456789YP.LV"').replace(" ", "").replace(".", " ").replace("L", "L ").replace("P", "P ").split(" ")
-                    if len(level):
-                        match = numregexp.match(level[len(level)-1])
-                        if match:
-                            level = int(level[len(level)-1])
-                        else:
-                            level = 0
+            # Parse AP data
+            ap_data = crop_primeap(prime_ap_img)
+            LOG.info('ap_data %s', ap_data)
+            if len(ap_data):
+                # OCR AP, replace letters
+                ap = ap_data[0]
+                level = int(ap_data[1])
+                fraction = ap_data[2]
+                if debug_level >= 2:
+                    print("Filename:", filename, "Prime AP:", ap, ", LVL:", level)
+                match = apregexp.match(ap)
+                if match:  # Got AP!
+                    ap = int(match.group(1))
+                    # Get medal part
+                    prime_tr_img = img.crop((int(img.width / 4), pink_lines[1] - int(prime_height / 2), int(img.width * 3 / 4), pink_lines[1] + int(prime_height * 2 / 3)))
+                    if debug_level >= 1:
+                        prime_tr_img.save("tables/" + filename + "_val.png")
+                    # OCR, get name and value, replace letters in val
+                    prime_tr_name = prime_tr_img.crop((0, int(prime_tr_img.height / 2), prime_tr_img.width, prime_tr_img.height))
+                    name = pytesseract.image_to_string(prime_tr_name)
+                    prime_tr_val = prime_tr_img.crop((0, 0, prime_tr_img.width, int(prime_tr_img.height * 0.42)))
+                    pixels = prime_tr_val.getdata()
+                    prime_tr_val.putdata([px if px[0] + px[2] > 220 else (0, 0, 0) for px in pixels])
+                    if str_diff(name, "Trekker"):
+                        value = pytesseract.image_to_string(prime_tr_val, config='-psm 7 -c tessedit_char_whitelist="0123456789km.,"').replace(" ", "").replace(".", "").replace(",", "")
                     else:
-                        level = 0
-                    if debugLevel >= 2:
-                        print("Filename:", filename, "Redacted AP:", ap, ", LVL:", level)
-                    match = apregexp.match(ap)
-                    if match: #Got AP!
-                        ap = int(match.group(1))
-                        #OCR name and value, replace letters in value
-                        name = pytesseract.image_to_string(medalName).split("\n")[0]
-                        if strDiff(name, "Trekker"):
-                            value = pytesseract.image_to_string(medalValue, config='-psm 7 -c tessedit_char_whitelist="0123456789km.,"').replace(" ", "").replace(".", "").replace(",", "")
-                        elif strDiff(name, "Recharger"):
-                            value = pytesseract.image_to_string(medalValue, config='-psm 7 -c tessedit_char_whitelist="0123456789XM.,"').replace(" ", "").replace(".", "").replace(",", "")
-                        elif strDiff(name, "Illuminator"):
-                            value = pytesseract.image_to_string(medalValue, config='-psm 7 -c tessedit_char_whitelist="0123456789MUs.,"').replace(" ", "").replace(".", "").replace(",", "")
-                        else:
-                            value = pytesseract.image_to_string(medalValue, config='-psm 7 -c tessedit_char_whitelist="0123456789.,"').replace(" ", "").replace(".", "").replace(",", "")
-                        if debugLevel >= 2:
-                            print("Name:", name, "Value:", value)
-                        #Check if everything is OK
-                        ret = returnVal(ap, level, name, value, '')
-                        if ret != False:
-                            if debugLevel >= 1:
-                                img.save("results/ok/"+filename)
-                            return ret
-    else: #No AP line. Prime?
-        #Find pink lines (1 - above AP, 2 - in medal)
-        pinkLines=find_lines(pxls, img.width, (int(img.width * 0.3), 0, int(img.width * 0.7), int(img.height * 0.7)), [pink], 150, 1, 2)
-        if len(pinkLines) == 2: #Found
-            #Search for empry line after AP
-            primeBacks=find_lines(pxls, img.width, (int(img.width * 0.25), pinkLines[0] + 50, int(img.width * 0.98), pinkLines[1]), [primeBack], 50, 1, 1, False)
-            if len(primeBacks) == 1:
-                #Main height parameter
-                primeHeight = primeBacks[0] - pinkLines[0]
-                #Extract AP to IMG
-                primeAPImg = img.crop((int(img.width * 0.25), pinkLines[0] + 10, img.width, primeBacks[0]))
-                if debugLevel >= 1:
-                    primeAPImg.save("tables/" + filename + "_ap.png")
-
-                #Parse AP data
-                apData = crop_primeap(primeAPImg)
-                if len(apData):
-                    #OCR AP, replace letters
-                    ap = apData[0]
-                    level = int(apData[1])
-                    fraction = apData[2]
-                    if debugLevel >= 2:
-                        print("Filename:", filename, "Prime AP:", ap, ", LVL:", level)
-                    match = apregexp.match(ap)
-                    if match: #Got AP!
-                        ap = int(match.group(1))
-                        #Get medal part
-                        primeTRImg = img.crop((int(img.width / 4), pinkLines[1] - int(primeHeight / 2), int(img.width * 3 / 4), pinkLines[1] + int(primeHeight * 2 / 3)))
-                        if debugLevel >= 1:
-                            primeTRImg.save("tables/" + filename + "_val.png")
-                        #OCR, get name and value, replace letters in val
-                        primeTRName = primeTRImg.crop((0, int(primeTRImg.height / 2), primeTRImg.width, primeTRImg.height))
-                        name = pytesseract.image_to_string(primeTRName)
-                        primeTRVal = primeTRImg.crop((0, 0, primeTRImg.width, int(primeTRImg.height * 0.42)))
-                        pixels = primeTRVal.getdata()
-                        primeTRVal.putdata([px if px[0] + px[2] > 220 else (0,0,0) for px in pixels])
-                        if strDiff(name, "Trekker"):
-                            value = pytesseract.image_to_string(primeTRVal, config='-psm 7 -c tessedit_char_whitelist="0123456789km.,"').replace(" ", "").replace(".", "").replace(",", "")
-                        else:
-                            value = pytesseract.image_to_string(primeTRVal, config='-psm 7 -c tessedit_char_whitelist="0123456789.,"').replace(" ", "").replace(".", "").replace(",", "")
-                        if debugLevel >= 2:
-                            print("Name:", name, "Value:", value)
-                        #Check if everything is OK
-                        ret = returnVal(ap, level, name, value, fraction)
-                        if ret != False:
-                            if debugLevel >= 1:
-                                img.save("results/ok/"+filename)
-                            return ret
-    if debugLevel >= 1:
-        img.save("results/bad/"+filename)
+                        value = pytesseract.image_to_string(prime_tr_val, config='-psm 7 -c tessedit_char_whitelist="0123456789.,"').replace(" ", "").replace(".", "").replace(",", "")
+                    if debug_level >= 2:
+                        print("Name:", name, "Value:", value)
+                    # Check if everything is OK
+                    ret = return_val(ap, level, name, value, fraction)
+                    if ret is not False:
+                        if debug_level >= 1:
+                            img.save("results/ok/" + filename)
+                        return ret
+    if debug_level >= 1:
+        img.save("results/bad/" + filename)
     return {"filename": filename, "success": False}
 
-def colorDiff(px:tuple, color:tuple):
-    return abs(px[0]-color[0]) + abs(px[1]-color[1]) + abs(px[2]-color[2])
+
+def color_diff(px: tuple, color: tuple):
+    return abs(px[0] - color[0]) + abs(px[1] - color[1]) + abs(px[2] - color[2])
 
 
-def find_lines(pixels:tuple, width:int, rect:tuple, colors:list, threshhold:int, minWidth:int=1, findCount:int=0, average:bool=True, horizontal:bool=True):
-    xRange = rect[2]-rect[0] if horizontal else rect[3]-rect[1]
-    yStart = rect[1] if horizontal else rect[0]
-    yEnd = rect[3] if horizontal else rect[2]
-    pxDiff = 1 if horizontal else width
+def find_lines(pixels: tuple, width: int, rect: tuple, colors: list, threshhold: int, min_width: int = 1, find_count: int = 0, average: bool = True, horizontal: bool = True):
+    x_range = rect[2] - rect[0] if horizontal else rect[3] - rect[1]
+    y_start = rect[1] if horizontal else rect[0]
+    y_end = rect[3] if horizontal else rect[2]
+    px_diff = 1 if horizontal else width
     results = []
-    last = 0
     concurrent = 0
-    alreadySaved = False
-    for y in range(yStart, yEnd):
-        lineError = 0
+    already_saved = False
+    for y in range(y_start, y_end):
+        line_error = 0
         if horizontal:
-            currPx = y * width + rect[0]
+            curr_px = y * width + rect[0]
         else:
-            currPx = y + rect[1] * width
+            curr_px = y + rect[1] * width
         process = True
-        for x in range(xRange):
+        for x in range(x_range):
             if process:
-                diffs = tuple(colorDiff(pixels[currPx], color) for color in colors)
-                currPx += pxDiff
-                lineError += min(diffs)
+                diffs = tuple(color_diff(pixels[curr_px], color) for color in colors)
+                curr_px += px_diff
+                line_error += min(diffs)
                 if not average:
                     if min(diffs) > threshhold:
                         process = False
         if process:
-            lineError /= xRange
-            if lineError < threshhold:
+            line_error /= x_range
+            if line_error < threshhold:
                 concurrent += 1
-                if concurrent >= minWidth and not alreadySaved:
+                if concurrent >= min_width and not already_saved:
                     results.append(y)
-                    alreadySaved = True
-                    if findCount and (len(results) >= findCount):
+                    already_saved = True
+                    if find_count and (len(results) >= find_count):
                         return results
             else:
                 concurrent = 0
-                alreadySaved = False
+                already_saved = False
         else:
             concurrent = 0
-            alreadySaved = False
+            already_saved = False
     return results
 
 
-
-def returnVal(ap:int, level:int, name:str, value:str, fraction:str):
+def return_val(ap: int, level: int, name: str, value: str, fraction: str):
     kmregexp = re.compile(r"([0-9]+)k(m|rn|n)")
     numregexp = re.compile(r"^([0-9]+)$")
     xmregexp = re.compile(r"([0-9]+)XM")
     muregexp = re.compile(r"([0-9]+)MUs")
     global MODES
     for mode in MODES:
-        if strDiff(name, mode):
+        if str_diff(name, mode):
             if mode == "Trekker":
                 match = kmregexp.match(value)
             elif mode == "Recharger":
@@ -244,176 +135,71 @@ def returnVal(ap:int, level:int, name:str, value:str, fraction:str):
     return False
 
 
-def strDiff(str1:str, str2:str):
+def str_diff(str1: str, str2: str):
     d = difflib.ndiff(str1, str2)
     diffs = []
     for dd in d:
         if dd[0] in ["+", "-"]:
             diffs.append(dd)
-    #print('diffs', diffs);
-    return len(diffs) < len(str2) - 4
+    return len(diffs) < len(str2)
 
-def doubled(img:Image):
+
+def doubled(img: Image):
     d = Image.new("RGB", (img.width * 2, img.height * 2))
     d.paste(img, (int(img.width / 2), int(img.height / 2)))
     return d
 
 
-def crop_primeap(img:Image):
-    primeBack = (11, 18, 36)
+def crop_primeap(img: Image):
     pxls = tuple(img.getdata())
-    backs = find_lines(pxls, img.width, (0, int(img.height * 0.42), int(img.width * 0.8), img.height), [primeBack], 50, 5, 0, False)
-    if len(backs):
-        lastBack = backs[len(backs)-1]
-        #BAD CODE!
-        concurrent = 0
-        lastL = 0
-        for x in range(img.height, int(img.width * 0.9)):
-            currpx = int(img.height * 0.42) * img.width + x
-            pxCount = 0
-            lineError = 0
-            if lastL == 0:
-                for y in range(0, lastBack - int(img.height * 0.42)):
-                    if colorDiff(pxls[int(currpx)], primeBack) > 40:
-                        cDiff = colorDiff(pxls[int(currpx)], (160, 165, 240))
-                        lineError += cDiff
-                        pxCount += 1
-                    currpx += img.width - 0.5
-                if pxCount:
-                    lineError /= pxCount
-                    if(lineError > 200):
-                        concurrent += 1
-                        if concurrent > img.height / 5:
-                            lastL = x - concurrent - int(lastBack - img.height * 0.42) * 2 / 3
-                    else:
-                        concurrent = 0
-                else:
-                    concurrent = 0
-        #END BAD CODE
-        if lastL:
-            left = find_lines(pxls, img.width, (0, int(img.height * 0.42), int(lastL / 2), lastBack), [primeBack], 100, 2, 1, False, False)
-            if len(left) == 1:
-                apImg = img.crop((left[0], int(img.height * 0.42), lastL, lastBack))
-                ap = pytesseract.image_to_string(apImg, config='-psm 7 -c tessedit_char_whitelist="0123456789AP.,"').replace(" ", "").replace(".", "").replace(",", "")
-                backs = find_lines(pxls, img.width, (img.width - img.height * 2, 0, img.width - int(img.height / 2), img.height), [primeBack], 20, 13, 0, True, False)
-                top = find_lines(pxls, img.width, (backs[len(backs)-1] - 5, 0, int(img.width * 0.95), int(img.height / 2)), [primeBack], 40, 1, 0, False)
-                if len(top):
-                    lvlImg = img.crop((backs[len(backs)-1] - 5, top[len(top)-1], int(img.width * 0.97), img.height))
-                    pixels = lvlImg.getdata()
-                    avg_color = numpy.average(numpy.average(lvlImg, axis=0), axis=0)
-                    # fraction = (avg_color[1] > avg_color[2]) ? "G" : "B"
-                    fraction = "e" if (avg_color[1] > avg_color[2]) else "r"
-                    # print(avg_color)
-                    lvlImg.putdata([px if px[0] + px[1] + px[2] > 200 else (0,0,0) for px in pixels])
-                    level = pytesseract.image_to_string(doubled(lvlImg), config='-psm 7 -c tessedit_char_whitelist="0123456789"').replace(" ", "")
-                    if level == "":
-                        level = 0
-                else:
-                    level = 0
-                    fraction = ''
-                return [ap, level, fraction]
+    backs = find_lines(pxls, img.width, (0, 0, img.width, img.height), [(0, 0, 0)], 30, 5, 0)
+    if len(backs) == 2:
+        ap_img = img.crop((0, backs[0], img.width, backs[1] + 10))
+        pxls = tuple(ap_img.getdata())
+        dbacks = find_lines(pxls, ap_img.width, (0, 0, ap_img.width, ap_img.height), [(0, 0, 0)], 10, 10, 0, True, False)
+        if len(dbacks):
+            crop_width = int((ap_img.width - dbacks[len(dbacks) - 1]) * 0.4)
+            ap_img = ap_img.crop((crop_width, 0, ap_img.width - crop_width * 2, ap_img.height))
+            pxls = tuple(ap_img.getdata())
+            avg_color = numpy.average(numpy.average(ap_img, axis=0), axis=0)
+            # fraction = (avg_color[1] > avg_color[2]) ? "G" : "B"
+            fraction = "e" if (avg_color[1] > avg_color[2]) else "r"
+            ap_img.putdata([px if px[0] + px[1] + px[2] > 100 else (0, 0, 0) for px in pxls])
+            # psm 13 is much better ;)
+            ap = pytesseract.image_to_string(doubled(ap_img), config='-psm 13 -c tessedit_char_whitelist="0123456789AP.,/"').replace(".", "").replace(",", "").replace(" ", "")
+            # ap = pytesseract.image_to_string(doubled(ap_img), config='-psm 7 -c tessedit_char_whitelist="0123456789AP.,/"').replace(".", "").replace(",", "").replace(" ", "")
+            level = 1
+            try:
+                slash = ap.index("/")
+                (curr, lvlreq) = (ap[:slash], ap[slash + 1:len(ap)-2])
+                lvldiffs = {
+                    1:  (2500, 2600),
+                    2:  (17500, 17600),
+                    3:  (50000, 60000),
+                    4:  (80000, 30000),
+                    5:  (150000, 160000),
+                    6:  (300000, 800000),
+                    7:  (600000, 500000),
+                    8:  (1200000, 1200000),
+                    9:  (1600000, 1500000),
+                    10: (2000000, 2000000),
+                    11: (2400000, 2100000),
+                    12: (3600000, 3500000),
+                    13: (5000000, 6000000),
+                    14: (7000000, 1000000),
+                    15: (16000000, 11000000, 15000000),
+                }
+                currap = int(curr)
+                t = 0
+                for i in range(1, 16):
+                    if int(lvlreq) in lvldiffs[i]:
+                        break
+                    t += lvldiffs[i][0]
+                    level += 1
+                if level < 16:
+                    return [str(t + currap) + 'AP', level, fraction]
+            except ValueError:
+                if len(ap) in (10, 11, 12):
+                    level = 16
+                    return [ap, level, fraction]
     return []
-
-def parse_full(img:Image):
-    global MODES
-    strings = {}
-    strings["Explorer"] = "Unique Portals Visited"
-    strings["XM Collected"] = "XM Collected"
-    strings["Trekker"] = "Distance Walked"
-    strings["Builder"] = "Resonators Deployed"
-    strings["Connector"] = "Links Created"
-    strings["Mind Controller"] = "Control Fields Created"
-    strings["Illuminator"] = "Mind Units Captured"
-    strings["Recharger"] = "XM Recharged"
-    strings["Liberator"] = "Portals Captured"
-    strings["Pioneer"] = "Unique Portals Captured"
-    strings["Engineer"] = "Mods Deployed"
-    strings["Purifier"] = "Resonators Destroyed"
-    strings["Portal Destroy"] = "Portals Neutralized"
-    strings["Links Destroy"] = "Enemy Links Destroyed"
-    strings["Fields Destroy"] = "Enemy Fields Destroyed"
-    strings["SpecOps"] = "Unique Missions Completed"
-    strings["Hacker"] = "Hacks"
-    strings["Translator"] = "Glyph Hack Points"
-    wantStrings = {}
-    for mode in MODES:
-        wantStrings[strings[mode]] = mode
-    gotStrings = {}
-    apregexp = re.compile(r"[^0-9]?([0-9]+)AP")
-    numregexp = re.compile(r"^([0-9]+)$")
-    kmregexp = re.compile(r"([0-9]+)km")
-    xmregexp = re.compile(r"([0-9]+)XM")
-    muregexp = re.compile(r"([0-9]+)MUs")
-    pxls = tuple(img.getdata())
-    yellow = (255, 243, 148)
-    green = (0, 134, 123)
-    APLines = find_lines(pxls, img.width, (int(img.width * 0.3), 0, int(img.width * 0.9), int(img.height * 0.4)), [yellow, green], 30, 3, 1, False)
-    APLine = APLines[0] if len(APLines) else False
-    endLvl = APLine - 4
-    startLvl = find_lines(pxls, img.width, (int(img.width * 0.3), 0, int(img.width * 0.9), APLine), [(0, 0, 0)], 30, 2, 0, False)
-    if len(startLvl) > 1:
-        startLvl = startLvl[len(startLvl) - 2]
-        startAP = find_lines(pxls, img.width, (int(img.width * 0.3), APLine, int(img.width * 0.9), int(img.height * 0.4)), [(0, 0, 0)], 30, 3, 1, False)
-        if len(startAP):
-            startAP = startAP[0]
-        else:
-            return {"success": False}
-        endAP = startAP + endLvl - startLvl
-        left = int(img.width / 2)
-        currpx = img.width * APLine + left
-        while left > 0 and pxls[currpx][0] + pxls[currpx][1] + pxls[currpx][2] > 150:
-            currpx -= 1
-            left -= 1
-        apImg = img.crop((left, startAP, int(img.width * 0.9), endAP))
-        pixels = apImg.getdata()
-        apImg.putdata([px if px[0] > px[2] else (0,0,0) for px in pixels])
-        ap = pytesseract.image_to_string(apImg, config='-psm 7 -c tessedit_char_whitelist="0123456789AP.,"').replace(" ", "").replace(".", "").replace(",", "")
-        match = apregexp.match(ap)
-        if match: #Got AP!
-            gotStrings["AP"] = int(match.group(1))
-            lvlImg = img.crop((int(img.width * 0.21), startLvl, int(img.width * 0.9), endLvl))
-            pixels = lvlImg.getdata()
-            lvlImg.putdata([px if px[0] > px[2] else (0,0,0) for px in pixels])
-            level = pytesseract.image_to_string(lvlImg, config='-psm 7 -c tessedit_char_whitelist="0123456789YP.LV"').replace(" ", "").replace(".", " ").replace("L", "L ").replace("P", "P ").split(" ")
-            gotStrings["Level"] = 0
-            if len(level):
-                match = numregexp.match(level[len(level)-1])
-                if match:
-                    gotStrings["Level"] = int(level[len(level)-1])
-            yellowLine = find_lines(pxls, img.width, (int(img.width * 0.3), endAP, int(img.width * 0.7), int(img.height * 0.95)), [(58, 49, 25)], 70, 15, 1)
-            if len(yellowLine):
-                topLine = yellowLine[0]
-                statLines = find_lines(pxls, img.width, (int(img.width * 0.05), topLine, int(img.width * 0.9), img.height), [(0, 0, 0)], 30, 5, 0, False)
-                for i in range(len(statLines)):
-                    if len(wantStrings):
-                        bottomLine = statLines[i]
-                        blueImg = img.crop((0, topLine, int(img.width * 0.8), bottomLine))
-                        pixels = blueImg.getdata()
-                        blueImg.putdata([px if px[0] < px[2] else (0,0,0) for px in pixels])
-                        yellowImg = img.crop((int(img.width * 0.5), topLine, img.width, bottomLine))
-                        pixels = yellowImg.getdata()
-                        yellowImg.putdata([px if px[0] > px[2] else (0,0,0) for px in pixels])
-                        topLine = bottomLine + 2
-                        name = pytesseract.image_to_string(blueImg, config='-psm 7')
-                        for string in wantStrings.keys():
-                            if name[:len(string)] == string:
-                                stringName = wantStrings[string]
-                                val = pytesseract.image_to_string(yellowImg, config='-psm 7 -c tessedit_char_whitelist="0123456789.,XMUskm"').replace(" ", "").replace(".", "").replace(",", "")
-                                if stringName in ["Recharger", "XM"]:
-                                    match = xmregexp.match(val)
-                                elif stringName == "Trekker":
-                                    match = kmregexp.match(val)
-                                elif stringName == "Illuminator":
-                                    match = muregexp.match(val)
-                                else:
-                                    match = numregexp.match(val)
-                                if match:
-                                    gotStrings[stringName] = int(match.group(1))
-                                    del wantStrings[string]
-                                    break
-    if len(wantStrings) == 0:
-        gotStrings["mode"] = "Full"
-        gotStrings["Full"] = True
-        gotStrings["success"] = True
-        return gotStrings
-    return {"mode": "Full", "success": False}
