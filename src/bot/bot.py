@@ -62,7 +62,7 @@ def log_incoming(func):
             LOG.info(get_tg_nick(message) + ' <- ' + message.text)
             return func(message, *args, **kwargs)
         except Exception as e:
-            LOG.error('Exception: ' + str(e))
+            LOG.error('Exception: ' + str(e), exc_info=e)
     return wrapped
 
 
@@ -715,7 +715,14 @@ def process_prime_tab_separated_text(message):
         datakey = "pre"
 
     if not data["getStart"] and not data["getEnd"]:
-        txt = "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n" + str(decoded)
+        txt = "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
+        d = decoded
+        fraction = full_fraction_name(d['Fraction'])
+        txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n" % (
+            fraction, d["AP"], d["Level"])
+        for mode in MODES:
+            if mode in d.keys():
+                txt += "%s *%s*\n" % (mode, d[mode])
         bot.send_message(chatid, txt, parse_mode="Markdown")
         return
     data["counters"][agentname]['Nick'] = decoded['Nick']
