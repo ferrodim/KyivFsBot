@@ -11,8 +11,9 @@ def on_message(channel, method_frame, header_frame, body):
     msg = json.loads(body)
     img = Image.open('/Screens/' + msg['img'])
     try:
-        parse_result = parse_image(img)
-    except:
+        parse_result = parse_image(img, '')
+    except Exception as e:
+        LOG.error('Exception', exc_info=e)
         parse_result = {"filename": 'exception', "success": False}
     parse_result['msgid'] = msg['msgid']
     parse_result['chatid'] = msg['chatid']
