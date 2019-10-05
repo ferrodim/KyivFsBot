@@ -740,8 +740,8 @@ def parse_title(title):
     title = str(title).replace('Agent Faction', 'Fraction')
     title = str(title).replace('Date (yyyy-mm-dd)', 'Date')
     title = str(title).replace('Time (hh:mm:ss)', 'Time')
-    title = str(title).replace('Lifetime AP', 'AP')
-    title = str(title).replace('Current AP', 'CurrentAP')
+    title = str(title).replace('Lifetime AP', 'LifetimeAP')
+    title = str(title).replace('Current AP', 'AP')
     title = str(title).replace('Unique Portals Visited', 'Explorer')
     title = str(title).replace('Portals Discovered', 'PortalsDiscovered')
     title = str(title).replace('Seer Points', 'Seer')
@@ -794,12 +794,12 @@ def calc_level(parsed):
     m = 1000 * 1000
     levels_ap_required = [2500, 20*k, 70*k, 150*k, 0.3*m, 0.6*m, 1.2*m, 2.4*m, 4*m, 6*m, 8.4*m, 12*m, 17*m, 24*m, 40*m]
 
-    if not parsed['CurrentAP']:
+    if not parsed['AP']:
         return None
 
     level = 1
     for level_ap_needed in levels_ap_required:
-        if parsed['CurrentAP'] >= level_ap_needed:
+        if parsed['AP'] >= level_ap_needed:
             level += 1
 
     if 'Recursions' in parsed.keys() and parsed['Recursions'] > 0:
