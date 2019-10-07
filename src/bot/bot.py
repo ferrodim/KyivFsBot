@@ -783,6 +783,7 @@ def parse_title(title):
     title = str(title).replace('Clear Fields Events', 'ClearField')
     title = str(title).replace('Prime Challenges', 'PrimeChallenges')
     title = str(title).replace('Stealth Ops Missions', 'StealthOps')
+    title = str(title).replace('OPR Live Events', 'OPRLive')
     ans = title.split(' ')
     ans.pop()
     return ans
