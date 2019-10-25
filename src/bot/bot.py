@@ -487,6 +487,38 @@ def cmd_bestn(message):
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
+@bot.message_handler(commands=["bestabsolute"])
+@log_incoming
+def cmd_bestabsolute(message):
+    allowed_modes = ["AP", "Level"] + MODES
+    chunks = message.text.replace("  ", " ").split(" ")
+    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
+    amount = int(chunks[2]) if len(chunks) == 3 else 10
+    if not is_valid_query:
+        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                           "`/bestabsolute <category>`\n"
+                                           "где category принимает значения\n"
+                                           "" + ', '.join(allowed_modes)), parse_mode="Markdown")
+        return
+    mode = category_name_normalize(chunks[1])
+    bot.send_message(message.chat.id, "Вы запросили инфу по " + mode)
+    user_data = []
+    for agentname in data["counters"].keys():
+        if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
+            if mode in data["counters"][agentname]['start'] and mode in data["counters"][agentname]['end']:
+                value = max(data["counters"][agentname]['end'][mode], data["counters"][agentname]['start'][mode])
+                fraction = data["counters"][agentname].get('fraction', '-')
+                user_data.append({"agentname": agentname, "value": value, "fraction": fraction})
+    user_data.sort(key=itemgetter('value'), reverse=True)
+    txt = 'Best absolute %s:' % mode
+    for i in range(amount):
+        if i < len(user_data):
+            user = user_data[i]
+            img = fraction_icon(user['fraction'])
+            txt += "\n#%s %s*%s* - %s" % (i + 1, img, user['agentname'], user['value'])
+    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+
+
 @bot.message_handler(commands=["clearzero"])
 @restricted
 @log_incoming
