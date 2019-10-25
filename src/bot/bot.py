@@ -826,7 +826,10 @@ def process_photo(message):
     if message.forward_from:
         if (agentname in ADMINS) or (agentname == message.forward_from.username):
             agentname = message.forward_from.username
-    bot.send_message(message.chat.id, "\U000023F3 Подождите", parse_mode="Markdown")
+    bot.send_message(message.chat.id, "\U000023F3 Изображение поставлено в очередь\n\n"
+                                      "Пожалуйста, присылайте статистику текстом - это экономит и ваше время и время "
+                                      "организаторов, исправляющих неточности распознавания. Возможно в будущем, "
+                                      "парсинг статистики со скриншотов будет отключен", parse_mode="Markdown")
     user_save_chatid(agentname, message.chat.id)
     file_id = message.photo[-1].file_id
     file_info = bot.get_file(file_id)
