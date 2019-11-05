@@ -244,7 +244,7 @@ def cmd_night(message):
 @bot.message_handler(commands=["adminlist"])
 @log_incoming
 def cmd_adminlist(message):
-    msg = "Список админов:" + "\n\U00002600".join([''] + ADMINS)
+    msg = "Список админов:" + "\n\U00002600@".join([''] + ADMINS)
     bot.reply_to(message, msg)
 
 
