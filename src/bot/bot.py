@@ -78,7 +78,8 @@ def cmd_help(message):
     txt = "/me - View personal userinfo\n" \
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
           "/fraction %e_or_r% - Set your fraction\n" \
-          "/clearme - Delete you account\n"
+          "/clearme - Delete you account\n" \
+          "/adminlist - Actual admin list\n"
     if get_tg_nick(message) in ADMINS:
         txt += "== admin commands\n" \
                "@username or username - Get userinfo\n" \
@@ -238,6 +239,13 @@ def cmd_night(message):
         bot.reply_to(message, "Ночной режим включен")
     else:
         bot.reply_to(message, "Ночной режим выключен")
+
+
+@bot.message_handler(commands=["adminlist"])
+@log_incoming
+def cmd_adminlist(message):
+    msg = "Список админов:" + "\n\U00002600".join([''] + ADMINS)
+    bot.reply_to(message, msg)
 
 
 @bot.message_handler(commands=["agents"])
