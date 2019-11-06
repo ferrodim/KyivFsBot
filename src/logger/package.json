@@ -8,5 +8,6 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "amqplib": "^0.5.5"
   }
 }

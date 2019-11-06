@@ -29,3 +29,11 @@ services:
       - "./src/decoder:/app"
       - "./data/Screens:/Screens"
       - "./config.py:/app/config.py"
+  logger:
+    build: src/logger
+    volumes:
+      - "./src/logger:/app"
+    environment:
+      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
+    depends_on:
+      - rabbit

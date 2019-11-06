@@ -5,3 +5,4 @@ config.py
 venv
 base.txt
 result.csv
+node_modules
