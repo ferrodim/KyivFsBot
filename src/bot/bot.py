@@ -670,6 +670,15 @@ def process_msg(message):
     if message.chat.id < 0:
         return
     tg_name = get_tg_nick(message)
+    decode_query = {
+        "event": 'core.messageIn',
+        "text": message.text,
+        "msgid": message.message_id,
+        "chatid": message.chat.id,
+        "tg_name": tg_name
+    }
+    write_queue.put(json.dumps(decode_query))
+
     if len(message.text) > 100:
         return process_prime_tab_separated_text(message)
     if tg_name in ADMINS:
@@ -949,7 +958,9 @@ def rabbit_write_thread():
         if not write_queue.empty():
             msg = write_queue.get(timeout=1000)
             LOG.info('{Rabbit} => %s', msg)
-            channel_write.basic_publish('topic', 'parseRequest', msg)
+            ev = json.loads(msg)
+            event_route = ev['event'] if "event" in ev else 'parseRequest'
+            channel_write.basic_publish('topic', event_route, msg)
             write_queue.task_done()
         connection.process_data_events()
         connection.sleep(1)
