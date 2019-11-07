@@ -20,7 +20,7 @@ def on_message(channel, method_frame, header_frame, body):
     parse_result['datakey'] = msg['datakey']
     parse_result['agentname'] = msg['agentname']
     LOG.info(' => ' + json.dumps(parse_result))
-    channel.basic_publish('main', 'parseResult', json.dumps(parse_result))
+    channel.basic_publish('topic', 'parseResult', json.dumps(parse_result))
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
@@ -35,11 +35,9 @@ if __name__ == '__main__':
     channel = connection.channel()
     channel.basic_qos(prefetch_count=1)
 
-    channel.exchange_declare(exchange='main', exchange_type='direct', durable=True)
-    channel.queue_declare(queue='bot', durable=True)
+    channel.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
     channel.queue_declare(queue='decoders', durable=True)
-    channel.queue_bind('bot', 'main', 'parseResult')
-    channel.queue_bind('decoders', 'main', 'parseRequest')
+    channel.queue_bind('decoders', 'topic', 'parseRequest')
 
     channel.basic_consume('decoders', on_message)
 
