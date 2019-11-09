@@ -8,6 +8,7 @@ connect.then(con => {
     await ch.assertQueue(queueName);
     await ch.bindQueue(queueName, 'topic', 'parseResult');
     await ch.bindQueue(queueName, 'topic', 'core.*');
+    await ch.bindQueue(queueName, 'topic', 'call.*');
     ch.consume(queueName, function(msg) {
         if (msg !== null) {
             console.log(msg.content.toString());

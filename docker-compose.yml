@@ -37,3 +37,11 @@ services:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
       - rabbit
+  translator:
+    build: src/translator
+    volumes:
+      - "./src/translator:/app"
+    environment:
+      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
+    depends_on:
+      - rabbit

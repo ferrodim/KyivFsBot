@@ -685,11 +685,24 @@ def process_msg(message):
         user_tg_name = message.text.replace('@', '')
         if user_tg_name in data["counters"].keys():
             txt = user_info(user_tg_name)
-        else:
-            txt = "Такой пользователь не найден в базе"
-        bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+            bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+        elif user_tg_name[0] != '/':
+            send_localized_text('That user is not found in database', message.chat.id)
+            # txt = "Такой пользователь не найден в базе"
+            # bot.send_message(message.chat.id, txt, parse_mode="Markdown")
     else:
         bot.reply_to(message, WELCOME, parse_mode="Markdown")
+
+
+def send_localized_text(text, chatid):
+    decode_query = {
+        "event": 'call.translateAndSend',
+        "args": {
+            "chatId": chatid,
+            "text": text,
+        }
+    }
+    write_queue.put(json.dumps(decode_query))
 
 
 def process_prime_tab_separated_text(message):
@@ -884,6 +897,14 @@ def full_fraction_name(short_name):
 def on_message(channel, method_frame, header_frame, body):
     LOG.info('{Rabbit} <= %s', body)
     decoded = json.loads(body)
+    if 'event' in decoded.keys() and 'args' in decoded.keys():
+        args = decoded['args']
+        if decoded['event'] == 'call.telegramSend':
+            bot.send_message(args['chatId'], args['text'])
+        else:
+            LOG.warning('unknown event ' + decoded.event)
+        channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+        return
     msgid = decoded['msgid']
     chatid = decoded['chatid']
     datakey = decoded['datakey']
@@ -939,6 +960,7 @@ def rabbit_read_thread():
     channel_read.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
     channel_read.queue_declare(queue='bot', durable=True)
     channel_read.queue_bind('bot', 'topic', 'parseResult')
+    channel_read.queue_bind('bot', 'topic', 'call.telegramSend')
     channel_read.basic_consume('bot', on_message)
     try:
         channel_read.start_consuming()
