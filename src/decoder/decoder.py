@@ -9,6 +9,7 @@ from image_process import parse_image
 def on_message(channel, method_frame, header_frame, body):
     LOG.info(' <= %s', body)
     msg = json.loads(body)
+    send_localized_text(channel, 'Image retrieved', msg['chatid'])
     img = Image.open('/Screens/' + msg['img'])
     try:
         parse_result = parse_image(img, '')
@@ -19,9 +20,28 @@ def on_message(channel, method_frame, header_frame, body):
     parse_result['chatid'] = msg['chatid']
     parse_result['datakey'] = msg['datakey']
     parse_result['agentname'] = msg['agentname']
-    LOG.info(' => ' + json.dumps(parse_result))
-    channel.basic_publish('topic', 'parseResult', json.dumps(parse_result))
+    rabbit_send(channel, parse_result)
+    # LOG.info(' => ' + json.dumps(parse_result))
+    # channel.basic_publish('topic', 'parseResult', json.dumps(parse_result))
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+
+
+def send_localized_text(ch, text, chatid):
+    query = {
+        "event": 'call.translateAndSend',
+        "args": {
+            "chatId": chatid,
+            "text": text,
+        }
+    }
+    rabbit_send(ch, query)
+
+
+def rabbit_send(ch, ev):
+    msg_str = json.dumps(ev)
+    LOG.info('{Rabbit} => %s', msg_str)
+    route = ev['event'] if "event" in ev else 'parseResult'
+    ch.basic_publish('topic', route, msg_str)
 
 
 if __name__ == '__main__':
