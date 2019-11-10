@@ -282,6 +282,14 @@ def cmd_agents(message):
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
 
 
+def notify_users(text, curChatId):
+    if data["notify"]:
+        for agentname in data["counters"].keys():
+            send_localized_text(text, data["counters"][agentname]['chatid'])
+    else:
+        send_localized_text(text, curChatId)
+
+
 @bot.message_handler(commands=["startevent"])
 @restricted
 @log_incoming
@@ -289,11 +297,7 @@ def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
-    if data["notify"]:
-        for agentname in data["counters"].keys():
-            bot.send_message(data["counters"][agentname]['chatid'], "Принимаю стартовые скрины!")
-    else:
-        bot.send_message(message.chat.id, "Принимаю стартовые скрины!")
+    notify_users('Start agent stats are welcome!', message.chat.id)
 
 
 @bot.message_handler(commands=["endevent"])
@@ -303,11 +307,7 @@ def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
-    if data["notify"]:
-        for agentname in data["counters"].keys():
-            bot.send_message(data["counters"][agentname]['chatid'], "Принимаю финишные скрины!")
-    else:
-        bot.send_message(message.chat.id, "Принимаю финишные скрины!")
+    notify_users('Finish agent stats are welcome!', message.chat.id)
 
 
 @bot.message_handler(commands=["stop"])
@@ -317,11 +317,7 @@ def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
-    if data["notify"]:
-        for agentname in data["counters"].keys():
-            bot.send_message(data["counters"][agentname]['chatid'], "Прием скринов закончен.")
-    else:
-        bot.send_message(message.chat.id, "Прием скринов закончен.")
+    notify_users('No more agent stats!', message.chat.id)
 
 
 @bot.message_handler(commands=["result"])
