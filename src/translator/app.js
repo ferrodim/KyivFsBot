@@ -21,6 +21,9 @@ connect.then(con => {
             } else if (event.event == 'call.translateAndSend'){
                 // db.userLang
             } else if (event.event == 'core.messageIn'){
+                if (event.text == '/lang'){
+                    sendTxt(ch, event.chatid, 'Current language is "%s"', [getUserLang(event.chatid)]);
+                }
                 if (event.text.indexOf('/lang ') === 0){
                     let newLang = event.text.split(' ')[1];
                     if (allowedLangs[newLang]){
@@ -33,15 +36,17 @@ connect.then(con => {
             } else {
                 console.log('unknown event', event);
             }
-
-
             ch.ack(msg);
         }
     });
 });
 
+function getUserLang(chatId){
+    return db.userLang[chatId] || 'en';
+}
+
 function sendTxt(ch, chatId, text, placeholders){
-    let userLang = db.userLang[chatId] || 'en';
+    let userLang = getUserLang(chatId);
     let outcomeEvent = {
         event: 'call.telegramSend',
         args: {
@@ -66,6 +71,10 @@ var translateData = {
        en: '⏳ Image retreived\n\nPlease, send text statistic next time',
        ru: "⏳ Изображение поставлено в очередь\n\nПожалуйста, присылайте статистику текстом - это экономит и ваше время и время организаторов, исправляющих неточности распознавания. Возможно в будущем, парсинг статистики со скриншотов будет отключен",
        ua: "⏳ Зображення покладено в чергу\n\nБудь-ласка, надсилайте статистику текстом - це зберігае ваш час і час організаторів, що виправляють неточності розпізнавання. Можливо в майбутньому, статистика зі світлин не буде більше прийматися"
+   },
+   'Current language is "%s"':{
+       ru: 'Текущий язык "%s"',
+       ua: 'Використовується мова "%s"',
    }
 };
 
