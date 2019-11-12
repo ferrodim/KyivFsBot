@@ -28,7 +28,6 @@ services:
     volumes:
       - "./src/decoder:/app"
       - "./data/Screens:/Screens"
-      - "./config.py:/app/config.py"
   logger:
     build: src/logger
     volumes:
