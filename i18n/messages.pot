@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-12 01:16+0200\n"
+"POT-Creation-Date: 2019-11-12 02:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -239,17 +239,22 @@ msgstr ""
 msgid "Image retrieved"
 msgstr ""
 
-#: src/translator/app.js:29
+#: src/translator/app.js:36
 #, javascript-format
 msgid "Current language is \"%s\""
 msgstr ""
 
-#: src/translator/app.js:35
+#: src/translator/app.js:39
+#, javascript-format
+msgid "List of languages: %s"
+msgstr ""
+
+#: src/translator/app.js:45
 #, javascript-format
 msgid "Language changed to \"%s\""
 msgstr ""
 
-#: src/translator/app.js:37
+#: src/translator/app.js:47
 #, javascript-format
 msgid "Unknown language \"%s\""
 msgstr ""
