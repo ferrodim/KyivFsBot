@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-12 02:56+0200\n"
-"PO-Revision-Date: 2019-11-12 03:01+0200\n"
+"PO-Revision-Date: 2019-11-12 03:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk_UA\n"
@@ -60,27 +60,27 @@ msgstr ""
 
 #: src/bot/bot.py:222
 msgid "Уведомление агентов включено"
-msgstr "Нотіфікації для агентів ввімкнені"
+msgstr "Notifications turned on"
 
 #: src/bot/bot.py:224
 msgid "Уведомление агентов выключено"
-msgstr "Нотіфікації для агентів вимкнені"
+msgstr "Notifications turned off"
 
 #: src/bot/bot.py:234
 msgid "Нельзя включить ночной режим во время эвента"
-msgstr ""
+msgstr "Night mode can't  be enabled during event"
 
 #: src/bot/bot.py:239
 msgid "Ночной режим включен"
-msgstr "Ночний режим ввімкнено"
+msgstr "Night mode on"
 
 #: src/bot/bot.py:241
 msgid "Ночной режим выключен"
-msgstr "Ночний режим вимкнено"
+msgstr "Night mode off"
 
 #: src/bot/bot.py:247
 msgid "Список админов:"
-msgstr "Список адмінів"
+msgstr "List of admins:"
 
 #: src/bot/bot.py:255
 msgid "Зарегистрированные агенты"
@@ -88,15 +88,15 @@ msgstr "Зареестровані агенти"
 
 #: src/bot/bot.py:300
 msgid "Start agent stats are welcome!"
-msgstr "Приймаю стартові данні!"
+msgstr "Start agent stats are welcome!"
 
 #: src/bot/bot.py:310
 msgid "Finish agent stats are welcome!"
-msgstr "Приймаю фінішні данні!"
+msgstr "Finish agent stats are welcome!"
 
 #: src/bot/bot.py:320
 msgid "No more agent stats!"
-msgstr "Більше не приймаю статистику гравців!"
+msgstr "No more agent stats!"
 
 #: src/bot/bot.py:443 src/bot/bot.py:475 src/bot/bot.py:508
 #, python-format
@@ -106,7 +106,7 @@ msgstr "Ви запитали інформацію про %s"
 #: src/bot/bot.py:452
 #, python-format
 msgid "Best %s:"
-msgstr "Найкращі %s:"
+msgstr "Best %s"
 
 #: src/bot/bot.py:469 src/bot/bot.py:502
 msgid ""
@@ -141,7 +141,7 @@ msgstr ""
 
 #: src/bot/bot.py:584
 msgid "Ваши данные удалены"
-msgstr "Ваші дані видалені"
+msgstr "Your data removed"
 
 #: src/bot/bot.py:586
 msgid "Бот не располагает данными на вас"
@@ -183,7 +183,7 @@ msgstr ""
 
 #: src/bot/bot.py:687
 msgid "That user is not found in database"
-msgstr ""
+msgstr "That user is not found in database"
 
 #: src/bot/bot.py:711
 msgid ""

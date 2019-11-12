@@ -219,9 +219,9 @@ def cmd_notify(message):
     data["notify"] = not data["notify"]
     save_data()
     if data["notify"]:
-        bot.reply_to(message, _("Уведомление агентов включено"))
+        send_message(_("Уведомление агентов включено"), message.chat.id)
     else:
-        bot.reply_to(message, _("Уведомление агентов выключено"))
+        send_message(_("Уведомление агентов выключено"), message.chat.id)
 
 
 @bot.message_handler(commands=["night"])
@@ -231,21 +231,21 @@ def cmd_night(message):
     if "night" not in data.keys():
         data["night"] = False
     if not data["night"] and (data["getStart"] or data["getEnd"]):
-        bot.reply_to(message, _("Нельзя включить ночной режим во время эвента"))
+        send_message(_("Нельзя включить ночной режим во время эвента"), message.chat.id)
         return
     data["night"] = not data["night"]
     save_data()
     if data["night"]:
-        bot.reply_to(message, _("Ночной режим включен"))
+        send_message(_("Ночной режим включен"), message.chat.id)
     else:
-        bot.reply_to(message, _("Ночной режим выключен"))
+        send_message(_("Ночной режим выключен"), message.chat.id)
 
 
 @bot.message_handler(commands=["adminlist"])
 @log_incoming
 def cmd_adminlist(message):
     msg = _("Список админов:") + "\n\U00002600@".join([''] + ADMINS)
-    bot.reply_to(message, msg)
+    send_message(msg, message.chat.id)
 
 
 @bot.message_handler(commands=["agents"])
@@ -279,15 +279,15 @@ def cmd_agents(message):
         fraction = data["counters"][agentname].get("fraction", "-")
         img = fraction_icon(fraction)
         txt += "@%s %s `%s`" % (agentname.replace('_', '\\_'), img, nick.replace('_', '\\_'))
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    send_message(txt, message.chat.id)
 
 
 def notify_users(text, curChatId):
     if data["notify"]:
         for agentname in data["counters"].keys():
-            send_localized_text(text, data["counters"][agentname]['chatid'])
+            send_message(text, data["counters"][agentname]['chatid'])
     else:
-        send_localized_text(text, curChatId)
+        send_message(text, curChatId)
 
 
 @bot.message_handler(commands=["startevent"])
@@ -550,8 +550,8 @@ def cmd_clear(message):
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/clear telegram_nick`\n"), parse_mode="Markdown")
+        send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+                                       "`/clear telegram_nick`\n"), parse_mode="Markdown")
         return
     tg_name = chunks[1]
     if tg_name in data["counters"].keys():
@@ -684,14 +684,14 @@ def process_msg(message):
             txt = user_info(user_tg_name)
             bot.send_message(message.chat.id, txt, parse_mode="Markdown")
         elif user_tg_name[0] != '/':
-            send_localized_text(_('That user is not found in database'), message.chat.id)
+            send_message(_('That user is not found in database'), message.chat.id)
             # txt = "Такой пользователь не найден в базе"
             # bot.send_message(message.chat.id, txt, parse_mode="Markdown")
     else:
         bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
-def send_localized_text(text, chatid):
+def send_message(text, chatid):
     decode_query = {
         "event": 'call.translateAndSend',
         "args": {
