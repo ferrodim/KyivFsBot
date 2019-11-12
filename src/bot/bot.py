@@ -48,7 +48,7 @@ def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
         if message.from_user.username not in ADMINS:
-            bot.reply_to(message, "Доступ запрещён")
+            bot.reply_to(message, _("Доступ запрещён"))
             return
         return func(message, *args, **kwargs)
 
@@ -106,7 +106,7 @@ def cmd_help(message):
 @restricted
 @log_incoming
 def cmd_chatid(message):
-    bot.send_message(message.chat.id, "Айди этого чата: %s" % message.chat.id)
+    bot.send_message(message.chat.id, _("Айди этого чата: %s") % message.chat.id)
 
 
 @bot.message_handler(commands=["set"])
@@ -174,8 +174,8 @@ def cmd_send_all(message):
         chat_id = data["counters"][agentname].get('chatid', '')
         if chat_id:
             agents_received += 1
-            bot.send_message(chat_id, "Агент, вам сообщение от организаторов:\n\n" + text)
-    bot.reply_to(message, "Массовое сообщение доставленно %s/%s агентам" % (agents_received, agents_total))
+            bot.send_message(chat_id, _("Агент, вам сообщение от организаторов:\n\n%s") % text)
+    bot.reply_to(message, _("Массовое сообщение доставленно %1$d/%2$d агентам") % (agents_received, agents_total))
 
 
 @bot.message_handler(commands=["softreset"])
@@ -183,8 +183,8 @@ def cmd_send_all(message):
 @log_incoming
 def cmd_softreset(message):
     if message.text != '/softreset ok':
-        bot.reply_to(message, "Вы правда хотите очистить всю базу, кроме ников?\n\n"
-                              "Введите */softreset ok*, если да", parse_mode="Markdown")
+        bot.reply_to(message, _("Вы правда хотите очистить всю базу, кроме ников?\n\n"
+                                "Введите */softreset ok*, если да"), parse_mode="Markdown")
         return
     data["getStart"] = False
     data["getEnd"] = False
@@ -192,7 +192,7 @@ def cmd_softreset(message):
         data["counters"][agentname]['start'] = {}
         data["counters"][agentname]['end'] = {}
     save_data()
-    bot.reply_to(message, "База данных очищена")
+    bot.reply_to(message, _("База данных очищена"))
 
 
 @bot.message_handler(commands=["reset"])
@@ -200,8 +200,8 @@ def cmd_softreset(message):
 @log_incoming
 def cmd_reset(message):
     if message.text != '/reset ok':
-        bot.reply_to(message, "Вы правда хотите очистить всю базу?\n\n"
-                              "Введите */reset ok*, если да", parse_mode="Markdown")
+        bot.reply_to(message, _("Вы правда хотите очистить всю базу?\n\n"
+                                "Введите */reset ok*, если да"), parse_mode="Markdown")
         return
     data.clear()
     data["getStart"] = False
@@ -209,7 +209,7 @@ def cmd_reset(message):
     data["counters"] = {}
     data["notify"] = False
     save_data()
-    bot.reply_to(message, "База данных очищена")
+    bot.reply_to(message, _("База данных очищена"))
 
 
 @bot.message_handler(commands=["notify"])
@@ -219,9 +219,9 @@ def cmd_notify(message):
     data["notify"] = not data["notify"]
     save_data()
     if data["notify"]:
-        bot.reply_to(message, "Уведомление агентов включено")
+        bot.reply_to(message, _("Уведомление агентов включено"))
     else:
-        bot.reply_to(message, "Уведомление агентов выключено")
+        bot.reply_to(message, _("Уведомление агентов выключено"))
 
 
 @bot.message_handler(commands=["night"])
@@ -231,20 +231,20 @@ def cmd_night(message):
     if "night" not in data.keys():
         data["night"] = False
     if not data["night"] and (data["getStart"] or data["getEnd"]):
-        bot.reply_to(message, "Нельзя включить ночной режим во время эвента")
+        bot.reply_to(message, _("Нельзя включить ночной режим во время эвента"))
         return
     data["night"] = not data["night"]
     save_data()
     if data["night"]:
-        bot.reply_to(message, "Ночной режим включен")
+        bot.reply_to(message, _("Ночной режим включен"))
     else:
-        bot.reply_to(message, "Ночной режим выключен")
+        bot.reply_to(message, _("Ночной режим выключен"))
 
 
 @bot.message_handler(commands=["adminlist"])
 @log_incoming
 def cmd_adminlist(message):
-    msg = "Список админов:" + "\n\U00002600@".join([''] + ADMINS)
+    msg = _("Список админов:") + "\n\U00002600@".join([''] + ADMINS)
     bot.reply_to(message, msg)
 
 
@@ -252,7 +252,7 @@ def cmd_adminlist(message):
 @restricted
 @log_incoming
 def cmd_agents(message):
-    txt = "Зарегистрированные агенты"
+    txt = _("Зарегистрированные агенты")
     agents_total = 0
     agents_enl = 0
     agents_res = 0
@@ -276,7 +276,7 @@ def cmd_agents(message):
     for agentname in data["counters"].keys():
         txt += "\n"
         nick = data["counters"][agentname].get("Nick", "-")
-        fraction = data["counters"][agentname].get("fraction", "-")  # \U0001F438 Frog  \U0001F41F Fish
+        fraction = data["counters"][agentname].get("fraction", "-")
         img = fraction_icon(fraction)
         txt += "@%s %s `%s`" % (agentname.replace('_', '\\_'), img, nick.replace('_', '\\_'))
     bot.send_message(message.chat.id, txt, parse_mode="Markdown")
@@ -297,7 +297,7 @@ def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
-    notify_users('Start agent stats are welcome!', message.chat.id)
+    notify_users(_('Start agent stats are welcome!'), message.chat.id)
 
 
 @bot.message_handler(commands=["endevent"])
@@ -307,7 +307,7 @@ def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
-    notify_users('Finish agent stats are welcome!', message.chat.id)
+    notify_users(_('Finish agent stats are welcome!'), message.chat.id)
 
 
 @bot.message_handler(commands=["stop"])
@@ -317,7 +317,7 @@ def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
-    notify_users('No more agent stats!', message.chat.id)
+    notify_users(_('No more agent stats!'), message.chat.id)
 
 
 @bot.message_handler(commands=["result"])
@@ -440,7 +440,7 @@ def cmd_best(message):
                                            "" + ', '.join(allowed_modes)), parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    bot.send_message(message.chat.id, "Вы запросили инфу по " + mode)
+    bot.send_message(message.chat.id, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -449,7 +449,7 @@ def cmd_best(message):
                 fraction = data["counters"][agentname].get('fraction', '-')
                 user_data.append({"agentname": agentname, "delta": delta, "fraction": fraction})
     user_data.sort(key=itemgetter('delta'), reverse=True)
-    txt = 'Best %s:' % mode
+    txt = _('Best %s:') % mode
     for i in range(amount):
         if i < len(user_data):
             user = user_data[i]
@@ -466,13 +466,13 @@ def cmd_bestn(message):
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/best <category>`\n"
-                                           "где category принимает значения\n"
-                                           "" + ', '.join(allowed_modes)), parse_mode="Markdown")
+        bot.send_message(message.chat.id, (_("Неверный формат запроса. Нужно писать:\n"
+                                             "`%1$s`\n"
+                                             "где параметр принимает значения\n%2$s")
+                                           % ("/best <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    bot.send_message(message.chat.id, "Вы запросили инфу по " + mode)
+    bot.send_message(message.chat.id, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -499,13 +499,13 @@ def cmd_bestabsolute(message):
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/bestabsolute <category>`\n"
-                                           "где category принимает значения\n"
-                                           "" + ', '.join(allowed_modes)), parse_mode="Markdown")
+        bot.send_message(message.chat.id, (_("Неверный формат запроса. Нужно писать:\n"
+                                             "`%1$s`\n"
+                                             "где параметр принимает значения\n%2$s")
+                                           % ("/bestabsolute <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    bot.send_message(message.chat.id, "Вы запросили инфу по " + mode)
+    bot.send_message(message.chat.id, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -528,8 +528,8 @@ def cmd_bestabsolute(message):
 @log_incoming
 def cmd_clearzero(message):
     if message.text != '/clearzero ok':
-        bot.reply_to(message, "Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
-                              "Введите */clearzero ok*, если да", parse_mode="Markdown")
+        bot.reply_to(message, _("Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
+                                "Введите *%s*, если да") % "/clearzero ok", parse_mode="Markdown")
         return
     agents_to_delete = {}
     for agentname in data["counters"].keys():
@@ -540,7 +540,7 @@ def cmd_clearzero(message):
     for agentname in agents_to_delete:
         del data["counters"][agentname]
     save_data()
-    bot.reply_to(message, "Удалено %d записей с нулевой стартовой статистикой" % len(agents_to_delete))
+    bot.reply_to(message, _("Удалено %d записей с нулевой стартовой статистикой") % len(agents_to_delete))
 
 
 @bot.message_handler(commands=["clear"])
@@ -557,9 +557,9 @@ def cmd_clear(message):
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
         save_data()
-        bot.reply_to(message, "Данные @%s удалены" % tg_name)
+        bot.reply_to(message, _("Данные @%s удалены") % tg_name)
     else:
-        bot.reply_to(message, "Бот не располагает данными на @%s" % tg_name)
+        bot.reply_to(message, _("Бот не располагает данными на @%s") % tg_name)
 
 
 @bot.message_handler(commands=["me"])
@@ -581,9 +581,9 @@ def cmd_clearme(message):
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
         save_data()
-        bot.reply_to(message, "Ваши данные удалены")
+        bot.reply_to(message, _("Ваши данные удалены"))
     else:
-        bot.reply_to(message, "Бот не располагает данными на вас")
+        bot.reply_to(message, _("Бот не располагает данными на вас"))
 
 
 @bot.message_handler(commands=["fraction"])
@@ -612,8 +612,8 @@ def cmd_nick(message):
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/nick my_game_nick`\n"), parse_mode="Markdown")
+        bot.send_message(message.chat.id, (_("Неверный формат запроса. Нужно писать:\n"
+                                           "`%s`\n") % '/nick my_game_nick'), parse_mode="Markdown")
         return
     tg_name = get_tg_nick(message)
     game_nick = chunks[1]
@@ -629,21 +629,22 @@ def cmd_nick(message):
 def user_info(username):
     allowed_modes = ["AP", "Level"] + MODES
     if username not in data["counters"].keys():
-        return 'Бот ничего не знает по вам'
+        return _('Бот ничего не знает по вам')
     user_data = data["counters"][username]
-    txt = "Ник телеги: @%s\n" % username.replace('_', '\\_')
+    txt = _("Ник телеги: @%s\n") % username.replace('_', '\\_')
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-':
-        txt += "Ник в игре: %s\n" % game_nick.replace('_', '\\_')
+        txt += _("Ник в игре: %s\n") % game_nick.replace('_', '\\_')
     fraction = user_data.get("fraction", "")
     if fraction:
-        txt += "Фракция: %s\n" % full_fraction_name(fraction)
-    txt += "== Стартовые показатели:"
+        txt += _("Фракция: %s\n") % full_fraction_name(fraction)
+    txt += "== " + _("Стартовые показатели:")
     for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
         txt += "\n_%s:_ *%s*" % (mode, value)
     if "end" in user_data.keys() and len(user_data['end'].keys()) > 0:
-        txt += "\n== Финишные показатели:"
+        txt += "\n=="
+        txt += _("Финишные показатели:")
         for mode in allowed_modes:
             value = user_data["end"].get(mode, "-")
             txt += "\n_%s_: *%s*" % (mode, value)
@@ -683,7 +684,7 @@ def process_msg(message):
             txt = user_info(user_tg_name)
             bot.send_message(message.chat.id, txt, parse_mode="Markdown")
         elif user_tg_name[0] != '/':
-            send_localized_text('That user is not found in database', message.chat.id)
+            send_localized_text(_('That user is not found in database'), message.chat.id)
             # txt = "Такой пользователь не найден в базе"
             # bot.send_message(message.chat.id, txt, parse_mode="Markdown")
     else:
@@ -707,7 +708,7 @@ def process_prime_tab_separated_text(message):
 
     chunks = message.text.split("\n")
     if len(chunks) != 2:
-        bot.send_message(chatid, "Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?")
+        bot.send_message(chatid, _("Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"))
         return
     title = chunks[0]
     titles = parse_title(title)
@@ -718,7 +719,7 @@ def process_prime_tab_separated_text(message):
 
     if not found:
         bot.forward_message(CHAT_FAIL, chatid, msgid)
-        bot.send_message(chatid, "Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой")
+        bot.send_message(chatid, _("Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"))
         return
 
     time_span = found[1]
@@ -730,22 +731,22 @@ def process_prime_tab_separated_text(message):
     rest2 = [time_span, nick, fraction, date, time] + rest
 
     if time_span in ['ЗА МЕСЯЦ', 'MONTH']:
-        bot.send_message(chatid, 'Вы прислали месячную стату. А нужно "за всё время"')
+        bot.send_message(chatid, _('Вы прислали месячную стату. А нужно "за всё время"'))
         return
 
     if time_span in ['ЗА НЕДЕЛЮ', 'WEEK']:
-        bot.send_message(chatid, 'Вы прислали недельную стату. А нужно "за всё время"')
+        bot.send_message(chatid, _('Вы прислали недельную стату. А нужно "за всё время"'))
         return
 
     if time_span in ['СЕЙЧАС', 'NOW'] or 'ActivePortalsOwned' in titles:
-        bot.send_message(chatid, 'Вы прислали дневную стату. А нужно "за всё время"')
+        bot.send_message(chatid, _('Вы прислали дневную стату. А нужно "за всё время"'))
         return
 
     if len(titles) != len(rest2):
         LOG.info(titles)
         LOG.info(rest2)
         bot.forward_message(CHAT_FAIL, chatid, msgid)
-        bot.send_message(chatid, "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой")
+        bot.send_message(chatid, _("Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой"))
         return
 
     decoded = {}
@@ -772,7 +773,7 @@ def process_prime_tab_separated_text(message):
         datakey = "pre"
 
     if not data["getStart"] and not data["getEnd"]:
-        txt = "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
+        txt = _("Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n")
         d = decoded
         fraction = full_fraction_name(d['Fraction'])
         txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n" % (
@@ -886,6 +887,10 @@ def full_fraction_name(short_name):
         return 'Unknown'
 
 
+def _(str):
+    return str
+
+
 def on_message(channel, method_frame, header_frame, body):
     LOG.info('{Rabbit} <= %s', body)
     decoded = json.loads(body)
@@ -902,7 +907,7 @@ def on_message(channel, method_frame, header_frame, body):
     datakey = decoded['datakey']
     agentname = decoded['agentname']
     if not data["getStart"] and not data["getEnd"]:
-        txt = "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
+        txt = _("Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n")
         if decoded["success"]:
             # txt += "\n_%s_: *%s*" % (mode, value)
             d = decoded
@@ -910,7 +915,7 @@ def on_message(channel, method_frame, header_frame, body):
             txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (
                 fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
         else:
-            txt += "Данные с изображения распарсить не удалось"
+            txt += _("Данные с изображения распарсить не удалось")
         bot.send_message(chatid, txt, parse_mode="Markdown")
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
@@ -925,11 +930,11 @@ def on_message(channel, method_frame, header_frame, body):
             bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (
                 agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
         else:
-            bot.send_message(chatid, "Вы прислали скрин из неактивной категории *%s*. Пришлите вместо него *%s*" %
+            bot.send_message(chatid, _("Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*") %
                              (decoded.get('mode'), ', '.join(MODES)), parse_mode="Markdown")
     else:
         bot.forward_message(CHAT_FAIL, chatid, msgid)
-        bot.send_message(chatid, "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную")
+        bot.send_message(chatid, _("Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную"))
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 

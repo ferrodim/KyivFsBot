@@ -1,0 +1,1 @@
+xgettext -o i18n/messages.pot --from-code utf-8 src/bot/bot.py src/decoder/decoder.py src/translator/app.js

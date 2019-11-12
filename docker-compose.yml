@@ -41,6 +41,7 @@ services:
     build: src/translator
     volumes:
       - "./src/translator:/app"
+      - "./i18n/:/i18n"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:

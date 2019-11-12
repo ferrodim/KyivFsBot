@@ -8,6 +8,8 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "amqplib": "^0.5.5"
+    "amqplib": "^0.5.5",
+    "gettext-parser": "^4.0.2",
+    "node-gettext": "^2.0.0"
   }
 }

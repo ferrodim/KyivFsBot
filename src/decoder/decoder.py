@@ -6,10 +6,14 @@ from time import sleep
 from image_process import parse_image
 
 
+def _(msg):
+    return msg
+
+
 def on_message(channel, method_frame, header_frame, body):
     LOG.info(' <= %s', body)
     msg = json.loads(body)
-    send_localized_text(channel, 'Image retrieved', msg['chatid'])
+    send_localized_text(channel, _('Image retrieved'), msg['chatid'])
     img = Image.open('/Screens/' + msg['img'])
     try:
         parse_result = parse_image(img, '')

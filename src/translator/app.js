@@ -1,8 +1,19 @@
 let connect = require('amqplib').connect(process.env.RABBIT_URL);
 let queueName = 'translator';
 let db = {userLang: {}};
-let allowedLangs = {"en": true, "ru": true, "ua": true};
-const DEFAULT_LANG = 'en';
+
+const fs = require('fs');
+const Gettext = require('node-gettext');
+const po = require('gettext-parser').po;
+const locales = ['en', 'ru', 'ua']
+const DEFAULT_LANG = locales[0];
+const gt = new Gettext()
+
+locales.forEach((locale) => {
+    const translationsContent = fs.readFileSync('/i18n/'+ locale + '.po', 'utf8');
+    const parsedTranslations = po.parse(translationsContent);
+    gt.addTranslations(locale, 'messages', parsedTranslations);
+})
 
 connect.then(con => {
     console.log('connection ready');
@@ -22,15 +33,15 @@ connect.then(con => {
                 // db.userLang
             } else if (event.event == 'core.messageIn'){
                 if (event.text == '/lang'){
-                    sendTxt(ch, event.chatid, 'Current language is "%s"', [getUserLang(event.chatid)]);
+                    sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
                 }
                 if (event.text.indexOf('/lang ') === 0){
                     let newLang = event.text.split(' ')[1];
-                    if (allowedLangs[newLang]){
+                    if (locales.includes(newLang)){
                         db.userLang[event.chatid] = newLang;
-                        sendTxt(ch, event.chatid, 'Language changed to "%s"', [newLang]);
+                        sendTxt(ch, event.chatid, _('Language changed to "%s"'), [newLang]);
                     } else {
-                        sendTxt(ch, event.chatid, 'Unknown language "%s"', [newLang]);
+                        sendTxt(ch, event.chatid, _('Unknown language "%s"'), [newLang]);
                     }
                 }
             } else {
@@ -42,7 +53,7 @@ connect.then(con => {
 });
 
 function getUserLang(chatId){
-    return db.userLang[chatId] || 'en';
+    return db.userLang[chatId] || DEFAULT_LANG;
 }
 
 function sendTxt(ch, chatId, text, placeholders){
@@ -59,51 +70,21 @@ function sendTxt(ch, chatId, text, placeholders){
     ch.publish('topic', outcomeEvent.event, Buffer.from(outStr, 'utf8'));
 }
 
-var translateData = {
-   "hello": {ru: "привет", ua: "привіт"},
-   'Language changed to "%s"': {ru: 'Язык изменён на "%s"', ua: 'Мову змінено на "%s"'},
-   'Unknown language "%s"': {ru: 'Неизвестный язык "%s"', ua: 'Невідома мова "%s"'},
-   'That user is not found in database': {
-       ru: 'Такой пользователь не найден в базе',
-       ua: 'Такий користувач не знайдений в базі'
-   },
-   'Image retrieved': {
-       en: '⏳ Image retreived\n\nPlease, send text statistic next time',
-       ru: "⏳ Изображение поставлено в очередь\n\nПожалуйста, присылайте статистику текстом - это экономит и ваше время и время организаторов, исправляющих неточности распознавания. Возможно в будущем, парсинг статистики со скриншотов будет отключен",
-       ua: "⏳ Зображення покладено в чергу\n\nБудь-ласка, надсилайте статистику текстом - це зберігае ваш час і час організаторів, що виправляють неточності розпізнавання. Можливо в майбутньому, статистика зі світлин не буде більше прийматися"
-   },
-   'Current language is "%s"':{
-       ru: 'Текущий язык "%s"',
-       ua: 'Використовується мова "%s"',
-   },
-   'Finish agent stats are welcome!': {
-       ru: 'Принимаю финишные данные!',
-       ua: 'Приймаю фінішні данні!',
-   },
-   'Start agent stats are welcome!': {
-       ru: 'Принимаю стартовые данные!',
-       ua: 'Приймаю стартові данні!'
-   },
-   'No more agent stats!':{
-       ru: 'Прием игровой статистики завершен!',
-       ua: 'Більше не приймаю статистику гравців!'
-   }
-};
-
-
 function translate(text, lang, placeholders){
     if (!lang){
-        lang = 'en';
+        lang = DEFAULT_LANG;
     }
-    if (translateData[text] && translateData[text][lang]){
-        text = translateData[text][lang];
-    } else if (lang !== DEFAULT_LANG){
-        text = '['+ lang + '] ' + text;
-    }
+    gt.setLocale(lang);
+    text = gt.gettext(text);
+
     if (Array.isArray(placeholders)){
         for (let placeholder of placeholders){
             text = text.replace('%s', placeholder);
         }
     }
     return text;
+}
+
+function _(msg){
+    return msg;
 }
