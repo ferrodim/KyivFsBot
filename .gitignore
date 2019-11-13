@@ -6,3 +6,4 @@ venv
 base.txt
 result.csv
 node_modules
+data/mongo

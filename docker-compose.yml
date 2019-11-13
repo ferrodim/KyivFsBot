@@ -45,3 +45,18 @@ services:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
       - rabbit
+  store:
+    build: src/store
+    volumes:
+      - "./src/store:/app"
+      - "./i18n/:/i18n"
+    environment:
+      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
+    depends_on:
+      - rabbit
+  mongo:
+    image: 'mongo'
+    volumes:
+      - "./data/mongo:/data/db"
+    ports:
+      - '27017:27017'
