@@ -52,8 +52,8 @@ async function storeIncrement(ch, event){
 
 async function storeRead(ch, event){
     let counter = await db.collection('demo').findOne({id: 'counter'});
-    let value = counter ? counter.value : 0;
-    sendTxt(ch, event.chatid, _('Counter in db: %s'), [counter]);
+    let value = counter ? counter.val : 0;
+    sendTxt(ch, event.chatid, _('Counter in db: %s'), [value]);
 }
 
 function sendTxt(ch, chatId, text, placeholders){

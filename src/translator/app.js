@@ -28,7 +28,7 @@ connect.then(con => {
             let event = JSON.parse(msg.content.toString());
             console.log('{Rabbit} <= ' + JSON.stringify(event));
             if (event.event == 'call.translateAndSend'){
-                sendTxt(ch, event.args.chatId, event.args.text);
+                sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders);
             } else if (event.event == 'core.messageIn'){
                 if (event.text == '/lang'){
                     sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
