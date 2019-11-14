@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-12 02:56+0200\n"
+"POT-Creation-Date: 2019-11-15 01:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,78 +183,83 @@ msgstr ""
 msgid "That user is not found in database"
 msgstr ""
 
-#: src/bot/bot.py:711
+#: src/bot/bot.py:712
 msgid ""
 "Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"
 msgstr ""
 
-#: src/bot/bot.py:722
+#: src/bot/bot.py:723
 msgid "Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"
 msgstr ""
 
-#: src/bot/bot.py:734
+#: src/bot/bot.py:735
 msgid "Вы прислали месячную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:738
+#: src/bot/bot.py:739
 msgid "Вы прислали недельную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:742
+#: src/bot/bot.py:743
 msgid "Вы прислали дневную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:749
+#: src/bot/bot.py:750
 msgid ""
 "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте "
 "пожалуйста скрин картинкой"
 msgstr ""
 
-#: src/bot/bot.py:776
+#: src/bot/bot.py:777
 msgid ""
 "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:910
+#: src/bot/bot.py:903 src/decoder/decoder.py:18 src/translator/app.js:37
+#, python-format, javascript-format
+msgid "Pong from %s"
+msgstr ""
+
+#: src/bot/bot.py:913
 msgid ""
 "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:918
+#: src/bot/bot.py:921
 msgid "Данные с изображения распарсить не удалось"
 msgstr ""
 
-#: src/bot/bot.py:933
+#: src/bot/bot.py:936
 msgid ""
 "Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*"
 msgstr ""
 
-#: src/bot/bot.py:937
+#: src/bot/bot.py:940
 msgid ""
 "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов "
 "вручную"
 msgstr ""
 
-#: src/decoder/decoder.py:16
+#: src/decoder/decoder.py:21
 msgid "Image retrieved"
 msgstr ""
 
-#: src/translator/app.js:36
+#: src/translator/app.js:34
 #, javascript-format
 msgid "Current language is \"%s\""
 msgstr ""
 
-#: src/translator/app.js:39
+#: src/translator/app.js:40
 #, javascript-format
 msgid "List of languages: %s"
 msgstr ""
 
-#: src/translator/app.js:45
+#: src/translator/app.js:46
 #, javascript-format
 msgid "Language changed to \"%s\""
 msgstr ""
 
-#: src/translator/app.js:47
+#: src/translator/app.js:48
 #, javascript-format
 msgid "Unknown language \"%s\""
 msgstr ""

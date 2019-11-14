@@ -691,12 +691,13 @@ def process_msg(message):
         bot.reply_to(message, WELCOME, parse_mode="Markdown")
 
 
-def send_message(text, chatid):
+def send_message(text, chatid, placeholders=None):
     decode_query = {
         "event": 'call.translateAndSend',
         "args": {
             "chatId": chatid,
             "text": text,
+            "placeholders": placeholders,
         }
     }
     write_queue.put(json.dumps(decode_query))
@@ -894,12 +895,14 @@ def _(str):
 def on_message(channel, method_frame, header_frame, body):
     LOG.info('{Rabbit} <= %s', body)
     decoded = json.loads(body)
-    if 'event' in decoded.keys() and 'args' in decoded.keys():
-        args = decoded['args']
+    if 'event' in decoded.keys():
         if decoded['event'] == 'call.telegramSend':
+            args = decoded['args']
             bot.send_message(args['chatId'], args['text'])
+        elif decoded['event'] == 'core.messageIn' and decoded['text'] == '/ping':
+            send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
         else:
-            LOG.warning('unknown event ' + decoded.event)
+            LOG.warning('unknown event ' + decoded['event'])
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
     msgid = decoded['msgid']
@@ -958,6 +961,7 @@ def rabbit_read_thread():
     channel_read.queue_declare(queue='bot', durable=True)
     channel_read.queue_bind('bot', 'topic', 'parseResult')
     channel_read.queue_bind('bot', 'topic', 'call.telegramSend')
+    channel_read.queue_bind('bot', 'topic', 'core.messageIn')
     channel_read.basic_consume('bot', on_message)
     try:
         channel_read.start_consuming()

@@ -13,6 +13,11 @@ def _(msg):
 def on_message(channel, method_frame, header_frame, body):
     LOG.info(' <= %s', body)
     msg = json.loads(body)
+    if msg['event'] == 'core.messageIn':
+        if msg['text'] == '/ping':
+            send_localized_text(channel, _('Pong from %s'), msg['chatid'], ['decoder'])
+        channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+        return
     send_localized_text(channel, _('Image retrieved'), msg['chatid'])
     img = Image.open('/Screens/' + msg['img'])
     try:
@@ -30,12 +35,13 @@ def on_message(channel, method_frame, header_frame, body):
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
-def send_localized_text(ch, text, chatid):
+def send_localized_text(ch, text, chatid, placeholders = None):
     query = {
         "event": 'call.translateAndSend',
         "args": {
             "chatId": chatid,
             "text": text,
+            "placeholders": placeholders,
         }
     }
     rabbit_send(ch, query)
@@ -62,6 +68,7 @@ if __name__ == '__main__':
     channel.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
     channel.queue_declare(queue='decoders', durable=True)
     channel.queue_bind('decoders', 'topic', 'parseRequest')
+    channel.queue_bind('decoders', 'topic', 'core.messageIn')
 
     channel.basic_consume('decoders', on_message)
 

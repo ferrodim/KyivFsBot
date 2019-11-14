@@ -5,15 +5,15 @@ let db = {userLang: {}};
 const fs = require('fs');
 const Gettext = require('node-gettext');
 const po = require('gettext-parser').po;
-const locales = ['en', 'ru', 'ua']
+const locales = ['en', 'ru', 'ua'];
 const DEFAULT_LANG = locales[0];
-const gt = new Gettext()
+const gt = new Gettext();
 
 locales.forEach((locale) => {
     const translationsContent = fs.readFileSync('/i18n/'+ locale + '.po', 'utf8');
     const parsedTranslations = po.parse(translationsContent);
     gt.addTranslations(locale, 'messages', parsedTranslations);
-})
+});
 
 connect.then(con => {
     console.log('connection ready');
@@ -27,11 +27,14 @@ connect.then(con => {
         if (msg !== null) {
             let event = JSON.parse(msg.content.toString());
             console.log('{Rabbit} <= ' + JSON.stringify(event));
-            if (event.event == 'call.translateAndSend'){
+            if (event.event === 'call.translateAndSend'){
                 sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders);
-            } else if (event.event == 'core.messageIn'){
-                if (event.text == '/lang'){
+            } else if (event.event === 'core.messageIn'){
+                if (event.text === '/lang'){
                     sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
+                }
+                if (event.text === '/ping'){
+                    sendTxt(ch, event.chatid, _('Pong from %s'), ["translator"]);
                 }
                 if (event.text === '/langlist'){
                     sendTxt(ch, event.chatid, _('List of languages: %s'), [locales.join()]);

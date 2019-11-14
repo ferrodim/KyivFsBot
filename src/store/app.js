@@ -28,6 +28,8 @@ connect.then(con => {
                     storeIncrement(ch, event);
                 } else if (event.text === '/store_read'){
                     storeRead(ch, event);
+                } else if (event.text === '/ping'){
+                    sendTxt(ch, event.chatid, _('Pong from %s'), ["store"]);
                 }
             } else {
                 console.log('unknown event', event);
