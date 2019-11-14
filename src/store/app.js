@@ -9,7 +9,6 @@ var db = null;
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err, client) {
   console.log("Connected successfully to db server");
   db = client.db();
-  // client.close();
 });
 
 connect.then(con => {
@@ -22,12 +21,12 @@ connect.then(con => {
         if (msg !== null) {
             let event = JSON.parse(msg.content.toString());
             console.log('{Rabbit} <= ' + JSON.stringify(event));
-            if (event.event == 'core.messageIn'){
-                if (event.text == '/store_info'){
+            if (event.event === 'core.messageIn'){
+                if (event.text === '/store_info'){
                     sendTxt(ch, event.chatid, _('Here will be info about storage'), []);
-                } else if (event.text == '/store_increment'){
+                } else if (event.text === '/store_increment'){
                     storeIncrement(ch, event);
-                } else if (event.text == '/store_read'){
+                } else if (event.text === '/store_read'){
                     storeRead(ch, event);
                 }
             } else {
