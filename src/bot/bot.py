@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from functools import wraps
-import telebot
+# import telebot
 import json
-import random
-import string
+# import random
+# import string
 import re
 import pika
 import logging
@@ -16,7 +16,7 @@ from queue import Queue
 
 print("restart")
 
-bot = telebot.TeleBot(API_TOKEN, threaded=False)
+# bot = telebot.TeleBot(API_TOKEN, threaded=False)
 try:
     datafile = open("base.txt", "r")
     data = json.load(datafile)
@@ -47,33 +47,19 @@ def save_data():
 def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
-        if message.from_user.username not in ADMINS:
-            bot.reply_to(message, _("Доступ запрещён"))
+        if message['from']['username'] not in ADMINS:
+            # bot.reply_to(message, _("Доступ запрещён"))
+            send_message(_("Доступ запрещён"), message['chat']['id'])
             return
         return func(message, *args, **kwargs)
 
     return wrapped
 
 
-def log_incoming(func):
-    @wraps(func)
-    def wrapped(message, *args, **kwargs):
-        try:
-            LOG.info(get_tg_nick(message) + ' <- ' + message.text)
-            return func(message, *args, **kwargs)
-        except Exception as e:
-            LOG.error('Exception: ' + str(e), exc_info=e)
-    return wrapped
-
-
-@bot.message_handler(commands=["start"])
-@log_incoming
 def cmd_start(message):
-    bot.reply_to(message, WELCOME, parse_mode="Markdown")
+    reply_to(message, WELCOME, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["help"])
-@log_incoming
 def cmd_help(message):
     txt = "/me - View personal userinfo\n" \
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
@@ -99,19 +85,15 @@ def cmd_help(message):
                "/set tg_nick start Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick end Param Value - Set start value (AP, Level...)\n" \
                "/set tg_nick Nick ingame_nick - Set ingame nick for selected user"
-    bot.reply_to(message, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["chatid"])
 @restricted
-@log_incoming
 def cmd_chatid(message):
-    bot.send_message(message.chat.id, _("Айди этого чата: %s") % message.chat.id)
+    send_message(_("Айди этого чата: %s"), message['chat']['id'], [message['chat']['id']])
 
 
-@bot.message_handler(commands=["set"])
 @restricted
-@log_incoming
 def cmd_set(message):
     allowed_modes = ["AP", "Level"] + MODES
     modes_lowercased = {}
@@ -124,7 +106,7 @@ def cmd_set(message):
     if len(chunks) == 4 and chunks[2] == 'fraction' and not chunks[3] in ['e', 'r', '']:
         is_valid_query = False
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+        reply_to(message, ("Неверный формат запроса. Нужно писать:\n"
                                            "`/set telegram_nick start Param value`\n"
                                            "`/set telegram_nick end Param value`\n"
                                            "`/set telegram_nick fraction e/r`\n"
@@ -147,7 +129,7 @@ def cmd_set(message):
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
-    bot.reply_to(message, "Done\n" + user_info(agentname), parse_mode="Markdown")
+    reply_to(message, "Done\n" + user_info(agentname), parse_mode="Markdown")
     if message.from_user.username != agentname:
         user_inform(agentname)
 
@@ -160,10 +142,9 @@ def user_inform(agentname):
         chatid = data["counters"][agentname].get('chatid')
         if chatid is not None:
             txt = 'Данные по вам изменились:\n' + user_info(agentname)
-            bot.send_message(chatid, txt, parse_mode="Markdown")
+            send_message(txt, chatid, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["sendall"])
 @restricted
 def cmd_send_all(message):
     agents_total = 0
@@ -174,16 +155,14 @@ def cmd_send_all(message):
         chat_id = data["counters"][agentname].get('chatid', '')
         if chat_id:
             agents_received += 1
-            bot.send_message(chat_id, _("Агент, вам сообщение от организаторов:\n\n%s") % text)
-    bot.reply_to(message, _("Массовое сообщение доставленно %1$d/%2$d агентам") % (agents_received, agents_total))
+            send_message(_("Агент, вам сообщение от организаторов:\n\n%s"), chat_id, [text])
+    reply_to(message, _("Массовое сообщение доставленно %1$d/%2$d агентам") % (agents_received, agents_total))
 
 
-@bot.message_handler(commands=["softreset"])
 @restricted
-@log_incoming
 def cmd_softreset(message):
     if message.text != '/softreset ok':
-        bot.reply_to(message, _("Вы правда хотите очистить всю базу, кроме ников?\n\n"
+        reply_to(message, _("Вы правда хотите очистить всю базу, кроме ников?\n\n"
                                 "Введите */softreset ok*, если да"), parse_mode="Markdown")
         return
     data["getStart"] = False
@@ -192,15 +171,13 @@ def cmd_softreset(message):
         data["counters"][agentname]['start'] = {}
         data["counters"][agentname]['end'] = {}
     save_data()
-    bot.reply_to(message, _("База данных очищена"))
+    reply_to(message, _("База данных очищена"))
 
 
-@bot.message_handler(commands=["reset"])
 @restricted
-@log_incoming
 def cmd_reset(message):
     if message.text != '/reset ok':
-        bot.reply_to(message, _("Вы правда хотите очистить всю базу?\n\n"
+        reply_to(message, _("Вы правда хотите очистить всю базу?\n\n"
                                 "Введите */reset ok*, если да"), parse_mode="Markdown")
         return
     data.clear()
@@ -209,48 +186,40 @@ def cmd_reset(message):
     data["counters"] = {}
     data["notify"] = False
     save_data()
-    bot.reply_to(message, _("База данных очищена"))
+    reply_to(message, _("База данных очищена"))
 
 
-@bot.message_handler(commands=["notify"])
 @restricted
-@log_incoming
 def cmd_notify(message):
     data["notify"] = not data["notify"]
     save_data()
     if data["notify"]:
-        send_message(_("Уведомление агентов включено"), message.chat.id)
+        reply_to(message, _("Уведомление агентов включено"))
     else:
-        send_message(_("Уведомление агентов выключено"), message.chat.id)
+        reply_to(message, _("Уведомление агентов выключено"))
 
 
-@bot.message_handler(commands=["night"])
 @restricted
-@log_incoming
 def cmd_night(message):
     if "night" not in data.keys():
         data["night"] = False
     if not data["night"] and (data["getStart"] or data["getEnd"]):
-        send_message(_("Нельзя включить ночной режим во время эвента"), message.chat.id)
+        send_message(_("Нельзя включить ночной режим во время эвента"), message['chat']['id'])
         return
     data["night"] = not data["night"]
     save_data()
     if data["night"]:
-        send_message(_("Ночной режим включен"), message.chat.id)
+        send_message(_("Ночной режим включен"), message['chat']['id'])
     else:
-        send_message(_("Ночной режим выключен"), message.chat.id)
+        send_message(_("Ночной режим выключен"), message['chat']['id'])
 
 
-@bot.message_handler(commands=["adminlist"])
-@log_incoming
 def cmd_adminlist(message):
     msg = _("Список админов:") + "\n\U00002600@".join([''] + ADMINS)
-    send_message(msg, message.chat.id)
+    send_message(msg, message['chat']['id'])
 
 
-@bot.message_handler(commands=["agents"])
 @restricted
-@log_incoming
 def cmd_agents(message):
     txt = _("Зарегистрированные агенты")
     agents_total = 0
@@ -279,7 +248,7 @@ def cmd_agents(message):
         fraction = data["counters"][agentname].get("fraction", "-")
         img = fraction_icon(fraction)
         txt += "@%s %s `%s`" % (agentname.replace('_', '\\_'), img, nick.replace('_', '\\_'))
-    send_message(txt, message.chat.id)
+    send_message(txt, message['chat']['id'])
 
 
 def notify_users(text, curChatId):
@@ -290,39 +259,31 @@ def notify_users(text, curChatId):
         send_message(text, curChatId)
 
 
-@bot.message_handler(commands=["startevent"])
 @restricted
-@log_incoming
 def cmd_startevent(message):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
-    notify_users(_('Start agent stats are welcome!'), message.chat.id)
+    notify_users(_('Start agent stats are welcome!'), message['chat']['id'])
 
 
-@bot.message_handler(commands=["endevent"])
 @restricted
-@log_incoming
 def cmd_endevent(message):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
-    notify_users(_('Finish agent stats are welcome!'), message.chat.id)
+    notify_users(_('Finish agent stats are welcome!'), message['chat']['id'])
 
 
-@bot.message_handler(commands=["stop"])
 @restricted
-@log_incoming
 def cmd_stop(message):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
-    notify_users(_('No more agent stats!'), message.chat.id)
+    notify_users(_('No more agent stats!'), message['chat']['id'])
 
 
-@bot.message_handler(commands=["result"])
 @restricted
-@log_incoming
 def cmd_result(message):
     delimiter = message.text[len("/result "):len("/result ") + 1]
     if delimiter == '':
@@ -356,13 +317,11 @@ def cmd_result(message):
     resultfile.write(txt)
     resultfile.close()
     resultfile = open("result.csv", "rb")
-    bot.send_document(message.chat.id, resultfile)
+    # bot.send_document(message['chat']['id'], resultfile)
     resultfile.close()
 
 
-@bot.message_handler(commands=["resultfev"])
 @restricted
-@log_incoming
 def cmd_resultfev(message):
     delimiter = message.text[len("/resultfev "):len("/resultfev ") + 1]
     if delimiter == '':
@@ -401,7 +360,7 @@ def cmd_resultfev(message):
     resultfile.write(txt)
     resultfile.close()
     resultfile = open("resultfev.csv", "rb")
-    bot.send_document(message.chat.id, resultfile)
+    # bot.send_document(message['chat']['id'], resultfile)
     resultfile.close()
 
 
@@ -426,21 +385,19 @@ def fraction_icon(fraction):
         return ""
 
 
-@bot.message_handler(commands=["best"])
-@log_incoming
 def cmd_best(message):
     allowed_modes = ["AP", "Level"] + MODES
     chunks = message.text.replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/best <category>`\n"
-                                           "где category принимает значения\n"
-                                           "" + ', '.join(allowed_modes)), parse_mode="Markdown")
+        send_message(("Неверный формат запроса. Нужно писать:\n"
+                      "`/best <category>`\n"
+                      "где category принимает значения\n"
+                      "" + ', '.join(allowed_modes)), message['chat']['id'], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    bot.send_message(message.chat.id, _("Вы запросили инфу по %s") % mode)
+    reply_to(message, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -455,24 +412,22 @@ def cmd_best(message):
             user = user_data[i]
             img = fraction_icon(user['fraction'])
             txt += "\n#%s %s*%s* - %s" % (i + 1, img, user['agentname'], user['delta'])
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["bestn"])
-@log_incoming
 def cmd_bestn(message):
     allowed_modes = ["AP", "Level"] + MODES
     chunks = message.text.replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        bot.send_message(message.chat.id, (_("Неверный формат запроса. Нужно писать:\n"
+        reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
                                              "`%1$s`\n"
                                              "где параметр принимает значения\n%2$s")
                                            % ("/best <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    bot.send_message(message.chat.id, _("Вы запросили инфу по %s") % mode)
+    reply_to(message, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -488,24 +443,22 @@ def cmd_bestn(message):
             user = user_data[i]
             img = fraction_icon(user['fraction'])
             txt += "\n#%s %s*%s* - %s" % (i + 1, img, user['agent_nick'], user['delta'])
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["bestabsolute"])
-@log_incoming
 def cmd_bestabsolute(message):
     allowed_modes = ["AP", "Level"] + MODES
     chunks = message.text.replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        bot.send_message(message.chat.id, (_("Неверный формат запроса. Нужно писать:\n"
+        reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
                                              "`%1$s`\n"
                                              "где параметр принимает значения\n%2$s")
                                            % ("/bestabsolute <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    bot.send_message(message.chat.id, _("Вы запросили инфу по %s") % mode)
+    reply_to(message, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -520,15 +473,13 @@ def cmd_bestabsolute(message):
             user = user_data[i]
             img = fraction_icon(user['fraction'])
             txt += "\n#%s %s*%s* - %s" % (i + 1, img, user['agentname'], user['value'])
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["clearzero"])
 @restricted
-@log_incoming
 def cmd_clearzero(message):
     if message.text != '/clearzero ok':
-        bot.reply_to(message, _("Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
+        reply_to(message, _("Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
                                 "Введите *%s*, если да") % "/clearzero ok", parse_mode="Markdown")
         return
     agents_to_delete = {}
@@ -540,60 +491,52 @@ def cmd_clearzero(message):
     for agentname in agents_to_delete:
         del data["counters"][agentname]
     save_data()
-    bot.reply_to(message, _("Удалено %d записей с нулевой стартовой статистикой") % len(agents_to_delete))
+    reply_to(message, _("Удалено %d записей с нулевой стартовой статистикой") % len(agents_to_delete))
 
 
-@bot.message_handler(commands=["clear"])
 @restricted
-@log_incoming
 def cmd_clear(message):
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
-        send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
+        send_message(message['chat']['id'], ("Неверный формат запроса. Нужно писать:\n"
                                        "`/clear telegram_nick`\n"), parse_mode="Markdown")
         return
     tg_name = chunks[1]
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
         save_data()
-        bot.reply_to(message, _("Данные @%s удалены") % tg_name)
+        reply_to(message, _("Данные @%s удалены") % tg_name)
     else:
-        bot.reply_to(message, _("Бот не располагает данными на @%s") % tg_name)
+        reply_to(message, _("Бот не располагает данными на @%s") % tg_name)
 
 
-@bot.message_handler(commands=["me"])
-@log_incoming
 def cmd_me(message):
     tg_name = get_tg_nick(message)
     txt = user_info(tg_name)
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["clearme"])
-@log_incoming
 def cmd_clearme(message):
     if message.text != '/clearme ok':
-        bot.reply_to(message, "Вы правда хотите удалить свои данные?\n\n"
+        reply_to(message, "Вы правда хотите удалить свои данные?\n\n"
                               "Введите */clearme ok*, если да", parse_mode="Markdown")
         return
     tg_name = get_tg_nick(message)
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
         save_data()
-        bot.reply_to(message, _("Ваши данные удалены"))
+        reply_to(message, _("Ваши данные удалены"))
     else:
-        bot.reply_to(message, _("Бот не располагает данными на вас"))
+        reply_to(message, _("Бот не располагает данными на вас"))
 
 
-@bot.message_handler(commands=["fraction"])
-@log_incoming
 def cmd_fraction(message):
     chunks = message.text.replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
     if not is_valid_query:
-        bot.send_message(message.chat.id, ("Неверный формат запроса. Нужно писать:\n"
-                                           "`/fraction e`\n`/fraction r`"), parse_mode="Markdown")
+        reply_to(message, ("Неверный формат запроса. Нужно писать:\n"
+                           "`/fraction e`\n`/fraction r`"), parse_mode="Markdown")
         return
     tg_name = get_tg_nick(message)
     fraction = chunks[1]
@@ -601,19 +544,17 @@ def cmd_fraction(message):
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['fraction'] = fraction
     save_data()
-    user_save_chatid(tg_name, message.chat.id)
+    user_save_chatid(tg_name, message['chat']['id'])
     txt = user_info(tg_name)
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
-@bot.message_handler(commands=["nick"])
-@log_incoming
 def cmd_nick(message):
     chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
-        bot.send_message(message.chat.id, (_("Неверный формат запроса. Нужно писать:\n"
-                                           "`%s`\n") % '/nick my_game_nick'), parse_mode="Markdown")
+        reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
+                           "`%s`\n") % '/nick my_game_nick'), parse_mode="Markdown")
         return
     tg_name = get_tg_nick(message)
     game_nick = chunks[1]
@@ -621,9 +562,9 @@ def cmd_nick(message):
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['Nick'] = game_nick
     save_data()
-    user_save_chatid(tg_name, message.chat.id)
+    user_save_chatid(tg_name, message['chat']['id'])
     txt = user_info(tg_name)
-    bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+    reply_to(message, txt, parse_mode="Markdown")
 
 
 def user_info(username):
@@ -655,43 +596,42 @@ def user_info(username):
 
 
 def get_tg_nick(message):
-    tg_nick = message.chat.username
+    tg_nick = message['from']['username']
     if tg_nick is None:
-        tg_nick = '#' + str(message.chat.id)
+        tg_nick = '#' + str(message['chat']['id'])
     return tg_nick
 
 
-@bot.message_handler(func=lambda message: True, content_types=["text"])
-@log_incoming
+# @message_handler(func=lambda message: True, content_types=["text"])
 def process_msg(message):
-    if message.chat.id < 0:
+    if message['chat']['id'] < 0:
         return
     tg_name = get_tg_nick(message)
-    decode_query = {
-        "event": 'core.messageIn',
-        "text": message.text,
-        "msgid": message.message_id,
-        "chatid": message.chat.id,
-        "tg_name": tg_name
-    }
-    write_queue.put(json.dumps(decode_query))
+    # decode_query = {
+    #     "event": 'core.messageIn',
+    #     "text": message.text,
+    #     "msgid": message.message_id,
+    #     "chatid": message['chat']['id'],
+    #     "tg_name": tg_name
+    # }
+    # write_queue.put(json.dumps(decode_query))
 
-    if len(message.text) > 100:
+    if len(message['text']) > 100:
         return process_prime_tab_separated_text(message)
     if tg_name in ADMINS:
-        user_tg_name = message.text.replace('@', '')
+        user_tg_name = message['text'].replace('@', '')
         if user_tg_name in data["counters"].keys():
             txt = user_info(user_tg_name)
-            bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+            reply_to(message, txt, parse_mode="Markdown")
         elif user_tg_name[0] != '/':
-            send_message(_('That user is not found in database'), message.chat.id)
+            send_message(_('That user is not found in database'), message['chat']['id'])
             # txt = "Такой пользователь не найден в базе"
-            # bot.send_message(message.chat.id, txt, parse_mode="Markdown")
+            # bot.send_message(message['chat']['id'], txt, parse_mode="Markdown")
     else:
-        bot.reply_to(message, WELCOME, parse_mode="Markdown")
+        reply_to(message, WELCOME, parse_mode="Markdown")
 
 
-def send_message(text, chatid, placeholders=None):
+def send_message(text, chatid, placeholders=None, parse_mode=None):
     decode_query = {
         "event": 'call.translateAndSend',
         "args": {
@@ -704,12 +644,12 @@ def send_message(text, chatid, placeholders=None):
 
 
 def process_prime_tab_separated_text(message):
-    msgid = message.message_id
-    chatid = message.chat.id
+    msgid = message['message_id']
+    chatid = message['chat']['id']
 
     chunks = message.text.split("\n")
     if len(chunks) != 2:
-        bot.send_message(chatid, _("Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"))
+        reply_to(message, _("Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"))
         return
     title = chunks[0]
     titles = parse_title(title)
@@ -719,8 +659,8 @@ def process_prime_tab_separated_text(message):
     found = re.fullmatch(regexp, values)
 
     if not found:
-        bot.forward_message(CHAT_FAIL, chatid, msgid)
-        bot.send_message(chatid, _("Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"))
+        # bot.forward_message(CHAT_FAIL, chatid, msgid)
+        reply_to(message, _("Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"))
         return
 
     time_span = found[1]
@@ -732,22 +672,22 @@ def process_prime_tab_separated_text(message):
     rest2 = [time_span, nick, fraction, date, time] + rest
 
     if time_span in ['ЗА МЕСЯЦ', 'MONTH']:
-        bot.send_message(chatid, _('Вы прислали месячную стату. А нужно "за всё время"'))
+        reply_to(message, _('Вы прислали месячную стату. А нужно "за всё время"'))
         return
 
     if time_span in ['ЗА НЕДЕЛЮ', 'WEEK']:
-        bot.send_message(chatid, _('Вы прислали недельную стату. А нужно "за всё время"'))
+        reply_to(message, _('Вы прислали недельную стату. А нужно "за всё время"'))
         return
 
     if time_span in ['СЕЙЧАС', 'NOW'] or 'ActivePortalsOwned' in titles:
-        bot.send_message(chatid, _('Вы прислали дневную стату. А нужно "за всё время"'))
+        reply_to(message, _('Вы прислали дневную стату. А нужно "за всё время"'))
         return
 
     if len(titles) != len(rest2):
         LOG.info(titles)
         LOG.info(rest2)
-        bot.forward_message(CHAT_FAIL, chatid, msgid)
-        bot.send_message(chatid, _("Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой"))
+        # bot.forward_message(CHAT_FAIL, chatid, msgid)
+        reply_to(message, _("Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой"))
         return
 
     decoded = {}
@@ -764,7 +704,7 @@ def process_prime_tab_separated_text(message):
         if (agentname in ADMINS) or (agentname == message.forward_from.username):
             agentname = message.forward_from.username
     else:
-        user_save_chatid(agentname, message.chat.id)
+        user_save_chatid(agentname, message['chat']['id'])
 
     if data["getStart"]:
         datakey = "start"
@@ -782,15 +722,19 @@ def process_prime_tab_separated_text(message):
         for mode in MODES:
             if mode in d.keys():
                 txt += "%s *%s*\n" % (mode, d[mode])
-        bot.send_message(chatid, txt, parse_mode="Markdown")
+        reply_to(message, txt, parse_mode="Markdown")
         return
     data["counters"][agentname]['Nick'] = decoded['Nick']
     data["counters"][agentname]['fraction'] = decoded['Fraction']
     data["counters"][agentname][datakey].update(decoded)
     save_data()
     user_inform(agentname)
-    bot.forward_message(CHAT_OK, chatid, msgid)
-    bot.send_message(CHAT_OK, "Parsed: " + str(decoded))
+    # bot.forward_message(CHAT_OK, chatid, msgid)
+    # bot.send_message(CHAT_OK, "Parsed: " + str(decoded))
+
+
+def reply_to(msg, text, placeholders=None, parse_mode=None):
+    send_message(text, msg['chat']['id'], placeholders)
 
 
 def parse_title(title):
@@ -848,35 +792,36 @@ def parse_title(title):
     return ans
 
 
-@bot.message_handler(func=lambda message: True, content_types=["photo"])
-def process_photo(message):
-    agentname = get_tg_nick(message)
-    if message.forward_from:
-        if (agentname in ADMINS) or (agentname == message.forward_from.username):
-            agentname = message.forward_from.username
-    user_save_chatid(agentname, message.chat.id)
-    file_id = message.photo[-1].file_id
-    file_info = bot.get_file(file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-    filename = agentname + "_"
-    if data["getStart"]:
-        datakey = "start"
-    elif data["getEnd"]:
-        datakey = "end"
-    else:
-        datakey = "pre"
-    postfix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-    filename += datakey + "_" + str(postfix) + ".jpg"
-    LOG.info(agentname + ' <- IMG ' + filename)
-    with open("/Screens/" + filename, "wb") as new_file:
-        new_file.write(downloaded_file)
-    decode_query = {}
-    decode_query['img'] = filename
-    decode_query['msgid'] = message.message_id
-    decode_query['chatid'] = message.chat.id
-    decode_query['datakey'] = datakey
-    decode_query['agentname'] = agentname
-    write_queue.put(json.dumps(decode_query))
+# @message_handler(func=lambda message: True, content_types=["photo"])
+# def process_photo(message):
+#     return
+    # agentname = get_tg_nick(message)
+    # if message.forward_from:
+    #     if (agentname in ADMINS) or (agentname == message.forward_from.username):
+    #         agentname = message.forward_from.username
+    # user_save_chatid(agentname, message['chat']['id'])
+    # file_id = message.photo[-1].file_id
+    # file_info = bot.get_file(file_id)
+    # downloaded_file = bot.download_file(file_info.file_path)
+    # filename = agentname + "_"
+    # if data["getStart"]:
+    #     datakey = "start"
+    # elif data["getEnd"]:
+    #     datakey = "end"
+    # else:
+    #     datakey = "pre"
+    # postfix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    # filename += datakey + "_" + str(postfix) + ".jpg"
+    # LOG.info(agentname + ' <- IMG ' + filename)
+    # with open("/Screens/" + filename, "wb") as new_file:
+    #     new_file.write(downloaded_file)
+    # decode_query = {}
+    # decode_query['img'] = filename
+    # decode_query['msgid'] = message.message_id
+    # decode_query['chatid'] = message['chat']['id']
+    # decode_query['datakey'] = datakey
+    # decode_query['agentname'] = agentname
+    # write_queue.put(json.dumps(decode_query))
 
 
 def full_fraction_name(short_name):
@@ -893,51 +838,106 @@ def _(str):
 
 
 def on_message(channel, method_frame, header_frame, body):
-    LOG.info('{Rabbit} <= %s', body)
-    decoded = json.loads(body)
-    if 'event' in decoded.keys():
-        if decoded['event'] == 'call.telegramSend':
-            args = decoded['args']
-            bot.send_message(args['chatId'], args['text'])
-        elif decoded['event'] == 'core.messageIn' and decoded['text'] == '/ping':
-            send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
+    try:
+        LOG.info('{Rabbit} <= %s', body)
+        decoded = json.loads(body)
+        if 'event' in decoded.keys():
+            # if decoded['event'] == 'call.telegramSend':
+                # args = decoded['args']
+                # bot.send_message(args['chatId'], args['text'])
+            if decoded['event'] == 'core.messageIn':
+                raw_msg = decoded['rawMsg']
+                if decoded['text'] == '/ping':
+                    send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
+                elif decoded['text'] == '/adminlist':
+                    cmd_adminlist(raw_msg)
+                elif decoded['text'] == '/best':
+                    cmd_best(raw_msg)
+                elif decoded['text'] == '/bestabsolute':
+                    cmd_bestabsolute(raw_msg)
+                elif decoded['text'] == '/bestn':
+                    cmd_bestn(raw_msg)
+                elif decoded['text'] == '/chatid':
+                    cmd_chatid(raw_msg)
+                elif decoded['text'] == '/clear':
+                    cmd_clear(raw_msg)
+                elif decoded['text'] == '/clearme':
+                    cmd_clearme(raw_msg)
+                elif decoded['text'] == '/clearzero':
+                    cmd_clearzero(raw_msg)
+                elif decoded['text'] == '/endevent':
+                    cmd_endevent(raw_msg)
+                elif decoded['text'] == '/fraction':
+                    cmd_fraction(raw_msg)
+                elif decoded['text'] == '/help':
+                    cmd_help(raw_msg)
+                elif decoded['text'] == '/me':
+                    cmd_me(raw_msg)
+                elif decoded['text'] == '/nick':
+                    cmd_nick(raw_msg)
+                elif decoded['text'] == '/night':
+                    cmd_night(raw_msg)
+                elif decoded['text'] == '/notify':
+                    cmd_notify(raw_msg)
+                elif decoded['text'] == '/reset':
+                    cmd_reset(raw_msg)
+                elif decoded['text'] == '/result':
+                    cmd_result(raw_msg)
+                elif decoded['text'] == '/resultfev':
+                    cmd_resultfev(raw_msg)
+                elif decoded['text'] == '/send_all':
+                    cmd_send_all(raw_msg)
+                elif decoded['text'] == '/set':
+                    cmd_set(raw_msg)
+                elif decoded['text'] == '/softreset':
+                    cmd_softreset(raw_msg)
+                elif decoded['text'] == '/start':
+                    cmd_start(raw_msg)
+                elif decoded['text'] == '/startevent':
+                    cmd_startevent(raw_msg)
+                elif decoded['text'] == '/stop':
+                    cmd_stop(raw_msg)
+                else:
+                    process_msg(raw_msg)
+            else:
+                LOG.warning('unknown event ' + decoded['event'])
+            channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+            return
+        msgid = decoded['msgid']
+        chatid = decoded['chatid']
+        datakey = decoded['datakey']
+        agentname = decoded['agentname']
+        if not data["getStart"] and not data["getEnd"]:
+            txt = _("Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n")
+            if decoded["success"]:
+                # txt += "\n_%s_: *%s*" % (mode, value)
+                d = decoded
+                fraction = full_fraction_name(d['fraction'])
+                txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (
+                    fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
+            else:
+                txt += _("Данные с изображения распарсить не удалось")
+            send_message(txt, chatid, parse_mode="Markdown")
+            channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+            return
+        if "success" in decoded.keys() and decoded["success"]:
+            if decoded.get('mode') in MODES:
+                if decoded['fraction']:
+                    data["counters"][agentname]['fraction'] = decoded['fraction']
+                data["counters"][agentname][datakey].update(decoded)
+                save_data()
+                user_inform(agentname)
+                # bot.forward_message(CHAT_OK, chatid, msgid)
+                send_message("Агент %s, AP %s, %s %s" % (
+                    agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]), CHAT_OK)
+            else:
+                send_message(_("Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*") %
+                             (decoded.get('mode'), ', '.join(MODES)), chatid, parse_mode="Markdown")
         else:
-            LOG.warning('unknown event ' + decoded['event'])
-        channel.basic_ack(delivery_tag=method_frame.delivery_tag)
-        return
-    msgid = decoded['msgid']
-    chatid = decoded['chatid']
-    datakey = decoded['datakey']
-    agentname = decoded['agentname']
-    if not data["getStart"] and not data["getEnd"]:
-        txt = _("Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n")
-        if decoded["success"]:
-            # txt += "\n_%s_: *%s*" % (mode, value)
-            d = decoded
-            fraction = full_fraction_name(d['fraction'])
-            txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n%s *%s*" % (
-                fraction, d["AP"], d["Level"], d["mode"], d[d["mode"]])
-        else:
-            txt += _("Данные с изображения распарсить не удалось")
-        bot.send_message(chatid, txt, parse_mode="Markdown")
-        channel.basic_ack(delivery_tag=method_frame.delivery_tag)
-        return
-    if "success" in decoded.keys() and decoded["success"]:
-        if decoded.get('mode') in MODES:
-            if decoded['fraction']:
-                data["counters"][agentname]['fraction'] = decoded['fraction']
-            data["counters"][agentname][datakey].update(decoded)
-            save_data()
-            user_inform(agentname)
-            bot.forward_message(CHAT_OK, chatid, msgid)
-            bot.send_message(CHAT_OK, "Агент %s, AP %s, %s %s" % (
-                agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]))
-        else:
-            bot.send_message(chatid, _("Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*") %
-                             (decoded.get('mode'), ', '.join(MODES)), parse_mode="Markdown")
-    else:
-        bot.forward_message(CHAT_FAIL, chatid, msgid)
-        bot.send_message(chatid, _("Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную"))
+            # bot.forward_message(CHAT_FAIL, chatid, msgid)
+            send_message(_("Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную"), chatid)
+    except Exception as e:
+        LOG.error('Exception: ' + str(e), exc_info=e)
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
 
@@ -960,7 +960,7 @@ def rabbit_read_thread():
     channel_read.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
     channel_read.queue_declare(queue='bot', durable=True)
     channel_read.queue_bind('bot', 'topic', 'parseResult')
-    channel_read.queue_bind('bot', 'topic', 'call.telegramSend')
+    # channel_read.queue_bind('bot', 'topic', 'call.telegramSend')
     channel_read.queue_bind('bot', 'topic', 'core.messageIn')
     channel_read.basic_consume('bot', on_message)
     try:
@@ -989,10 +989,11 @@ def rabbit_write_thread():
         connection.sleep(1)
 
 
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger(__name__)
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    LOG = logging.getLogger(__name__)
+    # LOG = logging.getLogger(__name__)
     write_queue = Queue()
     threading.Thread(target=rabbit_read_thread, args=()).start()
     threading.Thread(target=rabbit_write_thread, args=()).start()
-    bot.infinity_polling(timeout=5, interval=1, none_stop=True)
+    # bot.infinity_polling(timeout=5, interval=1, none_stop=True)

@@ -2,6 +2,7 @@ Screens/
 __pycache__
 config.py
 .idea
+.env
 venv
 base.txt
 result.csv
