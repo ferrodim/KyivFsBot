@@ -1,6 +1,6 @@
 let connect = require('amqplib').connect(process.env.RABBIT_URL);
 let queueName = 'store';
-let mongo = require('./framework').mongo;
+let {mongo} = require('./framework');
 
 mongo.configure({url: process.env.MONGO_URL});
 
