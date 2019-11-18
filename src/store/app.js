@@ -1,14 +1,8 @@
 let connect = require('amqplib').connect(process.env.RABBIT_URL);
 let queueName = 'store';
-const MongoClient = require('mongodb').MongoClient;
+let mongo = require('./framework').mongo;
 
-// Connection URL
-let db = null;
-
-MongoClient.connect(process.env.MONGO_URL, {useUnifiedTopology: true}, function(err, client) {
-  console.log("Connected successfully to db server");
-  db = client.db();
-});
+mongo.configure({url: process.env.MONGO_URL});
 
 connect.then(con => {
     console.log('connection ready');
@@ -16,6 +10,7 @@ connect.then(con => {
 }).then(async ch => {
     await ch.assertQueue(queueName);
     await ch.bindQueue(queueName, 'topic', 'core.messageIn');
+    await mongo.ready;
     ch.consume(queueName, function(msg) {
         if (msg !== null) {
             let event = JSON.parse(msg.content.toString());
@@ -39,7 +34,7 @@ connect.then(con => {
 });
 
 async function storeIncrement(ch, event){
-    await db.collection('demo').findOneAndUpdate({
+    await mongo.collection('demo').findOneAndUpdate({
             id: 'counter',
         },{
             $inc: {val: 1}
@@ -51,7 +46,7 @@ async function storeIncrement(ch, event){
 }
 
 async function storeRead(ch, event){
-    let counter = await db.collection('demo').findOne({id: 'counter'});
+    let counter = await mongo.collection('demo').findOne({id: 'counter'});
     let value = counter ? counter.val : 0;
     sendTxt(ch, event.chatid, _('Counter in db: %s'), [value]);
 }
