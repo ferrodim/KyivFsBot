@@ -49,7 +49,6 @@ services:
     build: src/store
     volumes:
       - "./src/store:/app"
-      - "./i18n/:/i18n"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
@@ -59,7 +58,6 @@ services:
     env_file: .env
     volumes:
       - "./src/front:/app"
-      - "./i18n/:/i18n"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
