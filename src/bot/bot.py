@@ -2,21 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from functools import wraps
-# import telebot
 import json
 # import random
 # import string
 import re
 import pika
 import logging
-import threading
 from operator import itemgetter
-from config import ADMINS, MODES, API_TOKEN, WELCOME, CHAT_OK, CHAT_FAIL
-from queue import Queue
+from config import ADMINS, MODES, WELCOME, CHAT_OK, CHAT_FAIL
 
 print("restart")
 
-# bot = telebot.TeleBot(API_TOKEN, threaded=False)
 try:
     datafile = open("base.txt", "r")
     data = json.load(datafile)
@@ -614,7 +610,7 @@ def process_msg(message):
     #     "chatid": message['chat']['id'],
     #     "tg_name": tg_name
     # }
-    # write_queue.put(json.dumps(decode_query))
+    # rabbit_send(json.dumps(decode_query))
 
     if len(message['text']) > 100:
         return process_prime_tab_separated_text(message)
@@ -640,7 +636,7 @@ def send_message(text, chatid, placeholders=None, parse_mode=None):
             "placeholders": placeholders,
         }
     }
-    write_queue.put(json.dumps(decode_query))
+    rabbit_send(json.dumps(decode_query))
 
 
 def process_prime_tab_separated_text(message):
@@ -821,7 +817,7 @@ def parse_title(title):
     # decode_query['chatid'] = message['chat']['id']
     # decode_query['datakey'] = datakey
     # decode_query['agentname'] = agentname
-    # write_queue.put(json.dumps(decode_query))
+    # rabbit_send(json.dumps(decode_query))
 
 
 def full_fraction_name(short_name):
@@ -951,49 +947,29 @@ def user_save_chatid(agentname, chatid):
             save_data()
 
 
-def rabbit_read_thread():
-    credentials2 = pika.PlainCredentials('rabbitmq', 'rabbitmq')
-    parameters2 = pika.ConnectionParameters("rabbit", 5672, '/', credentials2, frame_max=20000)
-    connection2 = pika.BlockingConnection(parameters2)
-    channel_read = connection2.channel()
-    channel_read.basic_qos(prefetch_count=1)
-    channel_read.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
-    channel_read.queue_declare(queue='bot', durable=True)
-    channel_read.queue_bind('bot', 'topic', 'parseResult')
-    # channel_read.queue_bind('bot', 'topic', 'call.telegramSend')
-    channel_read.queue_bind('bot', 'topic', 'core.messageIn')
-    channel_read.basic_consume('bot', on_message)
-    try:
-        channel_read.start_consuming()
-    except KeyboardInterrupt:
-        channel_read.stop_consuming()
+def rabbit_send(msg):
+    LOG.info('{Rabbit} => %s', msg)
+    ev = json.loads(msg)
+    event_route = ev['event'] if "event" in ev else 'parseRequest'
+    rabbit_channel.basic_publish('topic', event_route, msg)
+    connection.process_data_events()
+    connection.sleep(1)
 
 
-def rabbit_write_thread():
-    credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
-    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials, heartbeat=None)
-    connection = pika.BlockingConnection(parameters)
-    channel_write = connection.channel()
-    channel_write.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
-    channel_write.queue_declare(queue='bot', durable=True)
-    channel_write.queue_bind('bot', 'topic', 'parseResult')
-    while True:
-        if not write_queue.empty():
-            msg = write_queue.get(timeout=1000)
-            LOG.info('{Rabbit} => %s', msg)
-            ev = json.loads(msg)
-            event_route = ev['event'] if "event" in ev else 'parseRequest'
-            channel_write.basic_publish('topic', event_route, msg)
-            write_queue.task_done()
-        connection.process_data_events()
-        connection.sleep(1)
-
-
-logging.basicConfig(level=logging.INFO)
-LOG = logging.getLogger(__name__)
 if __name__ == "__main__":
-    # LOG = logging.getLogger(__name__)
-    write_queue = Queue()
-    threading.Thread(target=rabbit_read_thread, args=()).start()
-    threading.Thread(target=rabbit_write_thread, args=()).start()
-    # bot.infinity_polling(timeout=5, interval=1, none_stop=True)
+    logging.basicConfig(level=logging.INFO)
+    LOG = logging.getLogger(__name__)
+    credentials = pika.PlainCredentials('rabbitmq', 'rabbitmq')
+    parameters = pika.ConnectionParameters("rabbit", 5672, '/', credentials, heartbeat=None, frame_max=20000)
+    connection = pika.BlockingConnection(parameters)
+    rabbit_channel = connection.channel()
+    rabbit_channel.basic_qos(prefetch_count=1)
+    rabbit_channel.exchange_declare(exchange='topic', exchange_type='topic', durable=True)
+    rabbit_channel.queue_declare(queue='bot', durable=True)
+    rabbit_channel.queue_bind('bot', 'topic', 'parseResult')
+    rabbit_channel.queue_bind('bot', 'topic', 'core.messageIn')
+    rabbit_channel.basic_consume('bot', on_message)
+    try:
+        rabbit_channel.start_consuming()
+    except KeyboardInterrupt:
+        rabbit_channel.stop_consuming()
