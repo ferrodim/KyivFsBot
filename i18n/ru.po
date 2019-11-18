@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 01:45+0200\n"
+"POT-Creation-Date: 2019-11-18 02:25+0200\n"
 "PO-Revision-Date: 2019-11-15 01:46+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,16 +19,16 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 
-#: src/bot/bot.py:51
+#: src/bot/bot.py:52
 msgid "Доступ запрещён"
 msgstr ""
 
-#: src/bot/bot.py:109
+#: src/bot/bot.py:93
 #, python-format
 msgid "Айди этого чата: %s"
 msgstr ""
 
-#: src/bot/bot.py:177
+#: src/bot/bot.py:158
 #, python-format
 msgid ""
 "Агент, вам сообщение от организаторов:\n"
@@ -36,79 +36,79 @@ msgid ""
 "%s"
 msgstr ""
 
-#: src/bot/bot.py:178
+#: src/bot/bot.py:159
 msgid "Массовое сообщение доставленно %1$d/%2$d агентам"
 msgstr ""
 
-#: src/bot/bot.py:186
+#: src/bot/bot.py:165
 msgid ""
 "Вы правда хотите очистить всю базу, кроме ников?\n"
 "\n"
 "Введите */softreset ok*, если да"
 msgstr ""
 
-#: src/bot/bot.py:195 src/bot/bot.py:212
+#: src/bot/bot.py:174 src/bot/bot.py:189
 msgid "База данных очищена"
 msgstr ""
 
-#: src/bot/bot.py:203
+#: src/bot/bot.py:180
 msgid ""
 "Вы правда хотите очистить всю базу?\n"
 "\n"
 "Введите */reset ok*, если да"
 msgstr ""
 
-#: src/bot/bot.py:222
+#: src/bot/bot.py:197
 msgid "Уведомление агентов включено"
 msgstr ""
 
-#: src/bot/bot.py:224
+#: src/bot/bot.py:199
 msgid "Уведомление агентов выключено"
 msgstr ""
 
-#: src/bot/bot.py:234
+#: src/bot/bot.py:207
 msgid "Нельзя включить ночной режим во время эвента"
 msgstr ""
 
-#: src/bot/bot.py:239
+#: src/bot/bot.py:212
 msgid "Ночной режим включен"
 msgstr ""
 
-#: src/bot/bot.py:241
+#: src/bot/bot.py:214
 msgid "Ночной режим выключен"
 msgstr ""
 
-#: src/bot/bot.py:247
+#: src/bot/bot.py:218
 msgid "Список админов:"
 msgstr ""
 
-#: src/bot/bot.py:255
+#: src/bot/bot.py:224
 msgid "Зарегистрированные агенты"
 msgstr ""
 
-#: src/bot/bot.py:300
+#: src/bot/bot.py:267
 msgid "Start agent stats are welcome!"
 msgstr ""
 
-#: src/bot/bot.py:310
+#: src/bot/bot.py:275
 msgid "Finish agent stats are welcome!"
 msgstr ""
 
-#: src/bot/bot.py:320
+#: src/bot/bot.py:283
 msgid "No more agent stats!"
 msgstr ""
 
-#: src/bot/bot.py:443 src/bot/bot.py:475 src/bot/bot.py:508
+#: src/bot/bot.py:400 src/bot/bot.py:430 src/bot/bot.py:461
 #, python-format
 msgid "Вы запросили инфу по %s"
 msgstr ""
 
-#: src/bot/bot.py:452
+#: src/bot/bot.py:409
 #, python-format
 msgid "Best %s:"
 msgstr "Лучшие %s:"
 
-#: src/bot/bot.py:469 src/bot/bot.py:502
+#: src/bot/bot.py:424 src/bot/bot.py:455
 msgid ""
 "Неверный формат запроса. Нужно писать:\n"
 "`%1$s`\n"
@@ -116,7 +116,7 @@ msgid ""
 "%2$s"
 msgstr ""
 
-#: src/bot/bot.py:531
+#: src/bot/bot.py:482
 #, python-format
 msgid ""
 "Вы правда хотите удалить данные c нулевой стартовой статистикой?\n"
@@ -124,119 +124,120 @@ msgid ""
 "Введите *%s*, если да"
 msgstr ""
 
-#: src/bot/bot.py:543
+#: src/bot/bot.py:494
 #, python-format
 msgid "Удалено %d записей с нулевой стартовой статистикой"
 msgstr ""
 
-#: src/bot/bot.py:560
+#: src/bot/bot.py:509
 #, python-format
 msgid "Данные @%s удалены"
 msgstr ""
 
-#: src/bot/bot.py:562
+#: src/bot/bot.py:511
 #, python-format
 msgid "Бот не располагает данными на @%s"
 msgstr ""
 
-#: src/bot/bot.py:584
+#: src/bot/bot.py:529
 msgid "Ваши данные удалены"
 msgstr ""
 
-#: src/bot/bot.py:586
+#: src/bot/bot.py:531
 msgid "Бот не располагает данными на вас"
 msgstr ""
 
-#: src/bot/bot.py:615
+#: src/bot/bot.py:556
 #, python-format
 msgid ""
 "Неверный формат запроса. Нужно писать:\n"
 "`%s`\n"
 msgstr ""
 
-#: src/bot/bot.py:632
+#: src/bot/bot.py:573
 msgid "Бот ничего не знает по вам"
 msgstr ""
 
-#: src/bot/bot.py:634
+#: src/bot/bot.py:575
 #, python-format
 msgid "Ник телеги: @%s\n"
 msgstr ""
 
-#: src/bot/bot.py:637
+#: src/bot/bot.py:578
 #, python-format
 msgid "Ник в игре: %s\n"
 msgstr ""
 
-#: src/bot/bot.py:640
+#: src/bot/bot.py:581
 #, python-format
 msgid "Фракция: %s\n"
 msgstr ""
 
-#: src/bot/bot.py:641
+#: src/bot/bot.py:582
 msgid "Стартовые показатели:"
 msgstr ""
 
-#: src/bot/bot.py:647
+#: src/bot/bot.py:588
 msgid "Финишные показатели:"
 msgstr ""
 
-#: src/bot/bot.py:687
+#: src/bot/bot.py:627
 msgid "That user is not found in database"
 msgstr "Такой пользователь не найден в базе"
 
-#: src/bot/bot.py:712
+#: src/bot/bot.py:652
 msgid ""
 "Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"
 msgstr ""
 
-#: src/bot/bot.py:723
+#: src/bot/bot.py:663
 msgid "Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"
 msgstr ""
 
-#: src/bot/bot.py:735
+#: src/bot/bot.py:675
 msgid "Вы прислали месячную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:739
+#: src/bot/bot.py:679
 msgid "Вы прислали недельную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:743
+#: src/bot/bot.py:683
 msgid "Вы прислали дневную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:750
+#: src/bot/bot.py:690
 msgid ""
 "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте "
 "пожалуйста скрин картинкой"
 msgstr ""
 
-#: src/bot/bot.py:777
+#: src/bot/bot.py:717
 msgid ""
 "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:903 src/decoder/decoder.py:18 src/translator/app.js:37
+#: src/bot/bot.py:851 src/decoder/decoder.py:18 src/front/app.js:45
+#: src/logger/app.js:18 src/store/app.js:32 src/translator/app.js:37
 #, python-format, javascript-format
 msgid "Pong from %s"
 msgstr "Ответ от %s"
 
-#: src/bot/bot.py:913
+#: src/bot/bot.py:911
 msgid ""
 "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:921
+#: src/bot/bot.py:919
 msgid "Данные с изображения распарсить не удалось"
 msgstr ""
 
-#: src/bot/bot.py:936
+#: src/bot/bot.py:934
 msgid ""
 "Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*"
 msgstr ""
 
-#: src/bot/bot.py:940
+#: src/bot/bot.py:938
 msgid ""
 "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов "
 "вручную"
@@ -249,6 +250,19 @@ msgstr ""
 "текстом - это экономит и ваше время и время организаторов, исправляющих "
 "неточности распознавания. Возможно в будущем, парсинг статистики со "
 "скриншотов будет отключен"
+
+#: src/store/app.js:26
+msgid "Here will be info about storage"
+msgstr ""
+
+#: src/store/app.js:51
+msgid "Incremented"
+msgstr ""
+
+#: src/store/app.js:57
+#, javascript-format
+msgid "Counter in db: %s"
+msgstr ""
 
 #: src/translator/app.js:34
 #, javascript-format
