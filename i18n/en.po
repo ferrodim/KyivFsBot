@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-18 03:01+0200\n"
-"PO-Revision-Date: 2019-11-18 03:02+0200\n"
+"POT-Creation-Date: 2019-11-18 03:25+0200\n"
+"PO-Revision-Date: 2019-11-18 03:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk_UA\n"
@@ -102,12 +102,12 @@ msgstr "No more agent stats!"
 #: src/bot/bot.py:395 src/bot/bot.py:425 src/bot/bot.py:456
 #, python-format
 msgid "Вы запросили инфу по %s"
-msgstr "Ви запитали інформацію про %s"
+msgstr "You have asked info about %s"
 
-#: src/bot/bot.py:404
-#, python-format
-msgid "Best %s:"
-msgstr "Best %s"
+#: src/bot/bot.py:410
+#, fuzzy
+msgid "Best %1$s:%2$s"
+msgstr "Best %1$s:%2$s"
 
 #: src/bot/bot.py:419 src/bot/bot.py:450
 msgid ""
@@ -218,27 +218,27 @@ msgid ""
 "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:846 src/decoder/decoder.py:18 src/front/app.js:45
+#: src/bot/bot.py:847 src/decoder/decoder.py:18 src/front/app.js:45
 #: src/logger/app.js:18 src/store/app.js:32 src/translator/app.js:37
 #, python-format, javascript-format
 msgid "Pong from %s"
 msgstr ""
 
-#: src/bot/bot.py:906
+#: src/bot/bot.py:907
 msgid ""
 "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:914
+#: src/bot/bot.py:915
 msgid "Данные с изображения распарсить не удалось"
 msgstr ""
 
-#: src/bot/bot.py:929
+#: src/bot/bot.py:930
 msgid ""
 "Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*"
 msgstr ""
 
-#: src/bot/bot.py:933
+#: src/bot/bot.py:934
 msgid ""
 "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов "
 "вручную"

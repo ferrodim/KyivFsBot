@@ -382,7 +382,7 @@ def fraction_icon(fraction):
 
 def cmd_best(message):
     allowed_modes = ["AP", "Level"] + MODES
-    chunks = message.text.replace("  ", " ").split(" ")
+    chunks = message['text'].replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
@@ -392,7 +392,7 @@ def cmd_best(message):
                       "" + ', '.join(allowed_modes)), message['chat']['id'], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1])
-    reply_to(message, _("Вы запросили инфу по %s") % mode)
+    reply_to(message, _("Вы запросили инфу по %s"), [mode])
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -401,13 +401,13 @@ def cmd_best(message):
                 fraction = data["counters"][agentname].get('fraction', '-')
                 user_data.append({"agentname": agentname, "delta": delta, "fraction": fraction})
     user_data.sort(key=itemgetter('delta'), reverse=True)
-    txt = _('Best %s:') % mode
+    body = ''
     for i in range(amount):
         if i < len(user_data):
             user = user_data[i]
             img = fraction_icon(user['fraction'])
-            txt += "\n#%s %s*%s* - %s" % (i + 1, img, user['agentname'], user['delta'])
-    reply_to(message, txt, parse_mode="Markdown")
+            body += "\n#%s %s*%s* - %s" % (i + 1, img, user['agentname'], user['delta'])
+    reply_to(message, _('Best %1$s:%2$s'), [mode, body], parse_mode="Markdown")
 
 
 def cmd_bestn(message):
@@ -842,15 +842,17 @@ def on_message(channel, method_frame, header_frame, body):
                 # bot.send_message(args['chatId'], args['text'])
             if decoded['event'] == 'core.messageIn':
                 raw_msg = decoded['rawMsg']
+                chunks = raw_msg['text'].replace("  ", " ").split(" ")
+                cmd_name = raw_msg['text'].replace("  ", " ").split(" ")[0]
                 if decoded['text'] == '/ping':
                     send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
                 elif decoded['text'] == '/adminlist':
                     cmd_adminlist(raw_msg)
-                elif decoded['text'] == '/best':
+                elif cmd_name == '/best':
                     cmd_best(raw_msg)
-                elif decoded['text'] == '/bestabsolute':
+                elif cmd_name == '/bestabsolute':
                     cmd_bestabsolute(raw_msg)
-                elif decoded['text'] == '/bestn':
+                elif cmd_name == '/bestn':
                     cmd_bestn(raw_msg)
                 elif decoded['text'] == '/chatid':
                     cmd_chatid(raw_msg)
