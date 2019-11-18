@@ -211,8 +211,7 @@ def cmd_night(message):
 
 
 def cmd_adminlist(message):
-    msg = _("Список админов:") + "\n\U00002600@".join([''] + ADMINS)
-    send_message(msg, message['chat']['id'])
+    send_message(_("Список админов: %s"), message['chat']['id'], ["\n\U00002600@".join([''] + ADMINS)])
 
 
 @restricted
