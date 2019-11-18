@@ -3,10 +3,9 @@ let queueName = 'store';
 const MongoClient = require('mongodb').MongoClient;
 
 // Connection URL
-const url = 'mongodb://mongo:27017/fsbot';
-var db = null;
+let db = null;
 
-MongoClient.connect(url, {useUnifiedTopology: true}, function(err, client) {
+MongoClient.connect(process.env.MONGO_URL, {useUnifiedTopology: true}, function(err, client) {
   console.log("Connected successfully to db server");
   db = client.db();
 });

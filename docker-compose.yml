@@ -47,6 +47,7 @@ services:
       - rabbit
   store:
     build: src/store
+    env_file: .env
     volumes:
       - "./src/store:/app"
     environment:
