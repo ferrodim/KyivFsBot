@@ -3,7 +3,7 @@ function MongoService(){
     this._db = null;
     this.ready = new Promise((accept, reject) =>  {
         this.configure = function(args){
-            require('mongodb').MongoClient.connect(process.env.MONGO_URL, {useUnifiedTopology: true}, (err, client) => {
+            require('mongodb').MongoClient.connect(args.url, {useUnifiedTopology: true}, (err, client) => {
                 console.log("Connected successfully to db server");
                 this._db = client.db();
                 accept();
@@ -52,5 +52,5 @@ RabbitService.prototype.emit = function(event){
 module.exports = {
     mongo: new MongoService(),
     rabbit: new RabbitService(),
-    _: function (msg){return msg},
+    _:_=>_,
 };
