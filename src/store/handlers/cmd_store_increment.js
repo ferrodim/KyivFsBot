@@ -1,7 +1,7 @@
 const {mongo, _} = require('../framework');
 const sendText = require('../sendText');
 
-module.exports = async function storeRead(event){
+module.exports = async function (event){
     await mongo.collection('demo').findOneAndUpdate({
             id: 'counter',
         },{
