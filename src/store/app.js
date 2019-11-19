@@ -1,4 +1,4 @@
-const {mongo, rabbit, _} = require('./framework');
+const {mongo, rabbit} = require('./framework');
 const APP_NAME = 'store';
 
 Promise.all([
@@ -12,6 +12,8 @@ Promise.all([
     await rabbit.bind(APP_NAME, 'core.messageIn', function(event) {
         findCmdHandler(event.text)(event);
     });
+}, err=>{
+    console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
 });
 
 function findCmdHandler(cmd){
