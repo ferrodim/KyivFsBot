@@ -1,0 +1,12 @@
+const {mongo, _} = require('../framework');
+const sendText = require('../sendText');
+
+module.exports = async function (event){
+    let tgNick = event.text.split(' ')[1];
+
+    await mongo.collection('admin').insert({
+        tgNick: tgNick
+    });
+
+    sendText(event.chatid, _("Admin added: %s"), [tgNick]);
+};
