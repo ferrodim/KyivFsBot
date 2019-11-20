@@ -11,7 +11,7 @@ connect.then(con => {
     await ch.bindQueue(queueName, 'topic', 'call.*');
     ch.consume(queueName, function(msg) {
         if (msg !== null) {
-            console.log(msg.content.toString());
+            // console.log(msg.content.toString());
             let event = JSON.parse(msg.content.toString());
             console.log('{Rabbit} <= ' + JSON.stringify(event));
             if (event.text === '/ping'){
