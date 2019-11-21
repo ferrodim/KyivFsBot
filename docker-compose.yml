@@ -33,7 +33,7 @@ services:
     build: src/logger
     volumes:
       - "./src/logger:/app"
-      - "./src/framework.js:/app/framework.js"
+      - "./src/framework.js:/framework.js"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
@@ -42,7 +42,7 @@ services:
     build: src/translator
     volumes:
       - "./src/translator:/app"
-      - "./src/framework.js:/app/framework.js"
+      - "./src/framework.js:/framework.js"
       - "./i18n/:/i18n"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
@@ -53,7 +53,7 @@ services:
     env_file: .env
     volumes:
       - "./src/store:/app"
-      - "./src/framework.js:/app/framework.js"
+      - "./src/framework.js:/framework.js"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
@@ -63,7 +63,7 @@ services:
     env_file: .env
     volumes:
       - "./src/front:/app"
-      - "./src/framework.js:/app/framework.js"
+      - "./src/framework.js:/framework.js"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
@@ -72,5 +72,3 @@ services:
     image: 'mongo'
     volumes:
       - "./data/mongo:/data/db"
-    ports:
-      - '27017:27017'

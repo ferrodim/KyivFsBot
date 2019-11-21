@@ -1,3 +1,5 @@
+const {mongo, rabbit} = require('../framework');
+
 let connect = require('amqplib').connect(process.env.RABBIT_URL);
 let queueName = 'front';
 
