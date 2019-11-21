@@ -1,4 +1,4 @@
-const {rabbit} = require('./framework');
+const {rabbit} = require('../shared/framework');
 
 module.exports = function (chatId, text, placeholders){
     let outcomeEvent = {

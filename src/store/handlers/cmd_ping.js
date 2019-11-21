@@ -1,4 +1,4 @@
-const {_} = require('../framework');
+const {_} = require('../../shared/framework');
 const sendText = require('../sendText');
 
 module.exports = async function (event){
