@@ -61,6 +61,9 @@ RabbitService.prototype.emit = function(event){
     this.channel.publish('topic', event.event, Buffer.from(outStr, 'utf8'));
 };
 
+// const TelegramBot = require('node-telegram-bot-api');
+// const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: {interval: 1000}});
+
 module.exports = {
     mongo: new MongoService(),
     rabbit: new RabbitService(),

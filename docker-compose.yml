@@ -27,7 +27,7 @@ services:
     restart: always
     volumes:
       - "./src/decoder:/app"
-      - "./src/framework.js:/app/framework.js"
+      - "./src/shared:/shared"
       - "./data/Screens:/Screens"
   logger:
     build: src/logger
@@ -42,7 +42,7 @@ services:
     build: src/translator
     volumes:
       - "./src/translator:/app"
-      - "./src/framework.js:/framework.js"
+      - "./src/shared:/shared"
       - "./i18n/:/i18n"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
@@ -53,7 +53,7 @@ services:
     env_file: .env
     volumes:
       - "./src/store:/app"
-      - "./src/framework.js:/framework.js"
+      - "./src/shared:/shared"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
@@ -63,7 +63,7 @@ services:
     env_file: .env
     volumes:
       - "./src/front:/app"
-      - "./src/framework.js:/framework.js"
+      - "./src/shared:/shared"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:

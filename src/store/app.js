@@ -1,4 +1,4 @@
-const {mongo, rabbit} = require('../framework');
+const {mongo, rabbit} = require('../shared/framework');
 const APP_NAME = 'store';
 
 Promise.all([
