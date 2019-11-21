@@ -18,19 +18,21 @@ Promise.all([
             bot.sendMessage(args.chatId, args.text);
         }
     });
-    bot.on('message', function(msg){
+    bot.on('message', async function(msg){
         if (msg.chat.id < 0){
             return;
         }
 
         let tgName = get_tg_nick(msg);
+        let adminRecord = await mongo.collection('admin').findOne({tgNick: tgName});
         rabbit.emit({
             "event": 'core.messageIn',
             "text": msg.text,
             "msgid": msg.message_id,
             "chatid": msg.from.id,
             "rawMsg": msg,
-            "tg_name": tgName
+            "tg_name": tgName,
+            "isAdmin": adminRecord !== null,
         });
 
         console.log('msg.text', msg.text);
