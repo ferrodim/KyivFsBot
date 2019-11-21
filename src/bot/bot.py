@@ -9,7 +9,7 @@ import re
 import pika
 import logging
 from operator import itemgetter
-from config import ADMINS, MODES, WELCOME, CHAT_OK, CHAT_FAIL
+from config import MODES, WELCOME, CHAT_OK, CHAT_FAIL
 
 print("restart")
 
@@ -43,7 +43,7 @@ def save_data():
 def restricted(func):
     @wraps(func)
     def wrapped(message, *args, **kwargs):
-        if message['from']['username'] not in ADMINS:
+        if not message['isAdmin']:
             # bot.reply_to(message, _("Доступ запрещён"))
             send_message(_("Доступ запрещён"), message['chat']['id'])
             return
@@ -62,7 +62,7 @@ def cmd_help(message):
           "/fraction %e_or_r% - Set your fraction\n" \
           "/clearme - Delete you account\n" \
           "/adminlist - Actual admin list\n"
-    if get_tg_nick(message) in ADMINS:
+    if message['isAdmin']:
         txt += "== admin commands\n" \
                "@username or username - Get userinfo\n" \
                "/startevent - Begin taking start screenshots\n" \
@@ -208,10 +208,6 @@ def cmd_night(message):
         send_message(_("Ночной режим включен"), message['chat']['id'])
     else:
         send_message(_("Ночной режим выключен"), message['chat']['id'])
-
-
-def cmd_adminlist(message):
-    send_message(_("Список админов: %s"), message['chat']['id'], ["\n\U00002600@".join([''] + ADMINS)])
 
 
 @restricted
@@ -613,7 +609,7 @@ def process_msg(message):
 
     if len(message['text']) > 100:
         return process_prime_tab_separated_text(message)
-    if tg_name in ADMINS:
+    if message['isAdmin']:
         user_tg_name = message['text'].replace('@', '')
         if user_tg_name in data["counters"].keys():
             txt = user_info(user_tg_name)
@@ -696,7 +692,7 @@ def process_prime_tab_separated_text(message):
 
     agentname = get_tg_nick(message)
     if message.forward_from:
-        if (agentname in ADMINS) or (agentname == message.forward_from.username):
+        if message['isAdmin'] or (agentname == message.forward_from.username):
             agentname = message.forward_from.username
     else:
         user_save_chatid(agentname, message['chat']['id'])
@@ -792,7 +788,7 @@ def parse_title(title):
 #     return
     # agentname = get_tg_nick(message)
     # if message.forward_from:
-    #     if (agentname in ADMINS) or (agentname == message.forward_from.username):
+    #     if (message['isAdmin']) or (agentname == message.forward_from.username):
     #         agentname = message.forward_from.username
     # user_save_chatid(agentname, message['chat']['id'])
     # file_id = message.photo[-1].file_id
@@ -846,8 +842,6 @@ def on_message(channel, method_frame, header_frame, body):
                 cmd_name = raw_msg['text'].replace("  ", " ").split(" ")[0]
                 if decoded['text'] == '/ping':
                     send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
-                elif decoded['text'] == '/adminlist':
-                    cmd_adminlist(raw_msg)
                 elif cmd_name == '/best':
                     cmd_best(raw_msg)
                 elif cmd_name == '/bestabsolute':

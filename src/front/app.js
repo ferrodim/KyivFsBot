@@ -24,7 +24,7 @@ Promise.all([
         }
 
         let tgName = get_tg_nick(msg);
-        let adminRecord = await mongo.collection('admin').findOne({tgNick: tgName});
+        msg.isAdmin = !! await mongo.collection('admin').findOne({tgNick: tgName});
         rabbit.emit({
             "event": 'core.messageIn',
             "text": msg.text,
@@ -32,7 +32,6 @@ Promise.all([
             "chatid": msg.from.id,
             "rawMsg": msg,
             "tg_name": tgName,
-            "isAdmin": adminRecord !== null,
         });
 
         console.log('msg.text', msg.text);
