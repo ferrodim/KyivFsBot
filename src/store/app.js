@@ -27,6 +27,9 @@ function findCmdHandler(cmd){
         case '/admin_add': return require('./handlers/cmd_admin_add');
         case '/admin_list': return require('./handlers/cmd_admin_list');
         case '/admin_remove': return require('./handlers/cmd_admin_remove');
+        case '/modes_add': return require('./handlers/cmd_modes_add');
+        case '/modes_list': return require('./handlers/cmd_modes_list');
+        case '/modes_remove': return require('./handlers/cmd_modes_remove');
         default: return function(){};
     }
 }
