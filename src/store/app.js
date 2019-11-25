@@ -30,6 +30,8 @@ function findCmdHandler(cmd){
         case '/modes_add': return require('./handlers/cmd_modes_add');
         case '/modes_list': return require('./handlers/cmd_modes_list');
         case '/modes_remove': return require('./handlers/cmd_modes_remove');
+        case '/city_start_time': return require('./handlers/cmd_city_start_time');
+        case '/city_end_time': return require('./handlers/cmd_city_end_time');
         default: return function(){};
     }
 }

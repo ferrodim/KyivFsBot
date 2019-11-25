@@ -9,7 +9,7 @@ import re
 import pika
 import logging
 from operator import itemgetter
-from config import MODES, WELCOME, CHAT_OK, CHAT_FAIL
+from config import MODES, CHAT_OK, CHAT_FAIL
 
 print("restart")
 
@@ -50,10 +50,6 @@ def restricted(func):
         return func(message, *args, **kwargs)
 
     return wrapped
-
-
-def cmd_start(message):
-    reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 def cmd_help(message):
@@ -618,8 +614,6 @@ def process_msg(message):
             send_message(_('That user is not found in database'), message['chat']['id'])
             # txt = "Такой пользователь не найден в базе"
             # bot.send_message(message['chat']['id'], txt, parse_mode="Markdown")
-    else:
-        reply_to(message, WELCOME, parse_mode="Markdown")
 
 
 def send_message(text, chatid, placeholders=None, parse_mode=None):
@@ -882,8 +876,6 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_set(raw_msg)
                 elif decoded['text'] == '/softreset':
                     cmd_softreset(raw_msg)
-                elif decoded['text'] == '/start':
-                    cmd_start(raw_msg)
                 elif decoded['text'] == '/startevent':
                     cmd_startevent(raw_msg)
                 elif decoded['text'] == '/stop':
