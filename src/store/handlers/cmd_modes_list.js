@@ -1,9 +1,8 @@
 const {mongo, _} = require('../../shared/framework');
 const sendText = require('../sendText');
-const DEFAULT_CITY = 1;
 
 module.exports = async function (event){
-    let city = await mongo.collection('city').findOne({cityId: DEFAULT_CITY});
+    let city = await mongo.collection('city').findOne({cityId: event.cityId});
 
     if (city && Array.isArray(city.modes) && city.modes.length){
         sendText(event.chatid, _("Active modes:\n%s"), [city.modes.join()]);
