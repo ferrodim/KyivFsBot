@@ -66,7 +66,8 @@ function sendTxt(ch, chatId, text, placeholders){
         event: 'call.telegramSend',
         args: {
             chatId: chatId,
-            text: translate(text, userLang, placeholders)
+            text: translate(text, userLang, placeholders),
+            formatted: true
         }
     };
     let outStr = JSON.stringify(outcomeEvent);

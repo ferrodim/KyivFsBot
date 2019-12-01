@@ -16,7 +16,11 @@ Promise.all([
     await rabbit.bind(APP_NAME, 'call.telegramSend', function(event) {
         if (event.event === 'call.telegramSend'){
             let args = event.args;
-            bot.sendMessage(args.chatId, args.text);
+            let options  = {};
+            if (args.formatted){
+                options.parse_mode = 'Markdown';
+            }
+            bot.sendMessage(args.chatId, args.text, options);
         }
     });
     bot.on('message', async function(msg){
@@ -70,6 +74,7 @@ function sendTxt(chatId, text, placeholders){
             chatId: chatId,
             text: text,
             placeholders:  placeholders || [],
+            formatted: true,
         }
     };
     rabbit.emit(outcomeEvent);
