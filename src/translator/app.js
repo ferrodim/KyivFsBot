@@ -28,7 +28,7 @@ connect.then(con => {
             let event = JSON.parse(msg.content.toString());
             console.log('{Rabbit} <= ' + JSON.stringify(event));
             if (event.event === 'call.translateAndSend'){
-                sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders);
+                sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
             } else if (event.event === 'core.messageIn'){
                 if (event.text === '/lang'){
                     sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
@@ -60,14 +60,14 @@ function getUserLang(chatId){
     return db.userLang[chatId] || DEFAULT_LANG;
 }
 
-function sendTxt(ch, chatId, text, placeholders){
+function sendTxt(ch, chatId, text, placeholders, formatted){
     let userLang = getUserLang(chatId);
     let outcomeEvent = {
         event: 'call.telegramSend',
         args: {
             chatId: chatId,
             text: translate(text, userLang, placeholders),
-            formatted: true
+            formatted: !!formatted
         }
     };
     let outStr = JSON.stringify(outcomeEvent);
