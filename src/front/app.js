@@ -56,6 +56,8 @@ Promise.all([
 
         if (msg.text === '/ping'){
             sendTxt(msg.chat.id, _('Pong from %s'), ["front"]);
+        } else if (msg.text === '/chatid'){
+            sendTxt(msg.chat.id, _('Id of this chat is %s'), [msg.chat.id]);
         } else if (msg.text === '/start'){
             let startTime = city.startTime || 'not filled';
             let endTime = city.endTime || 'not filled';

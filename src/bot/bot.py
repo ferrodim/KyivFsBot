@@ -81,11 +81,6 @@ def cmd_help(message):
 
 
 @restricted
-def cmd_chatid(message):
-    send_message(_("Айди этого чата: %s"), message['chat']['id'], [message['chat']['id']])
-
-
-@restricted
 def cmd_set(message):
     allowed_modes = ["AP", "Level"] + MODES
     modes_lowercased = {}
@@ -842,8 +837,6 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_bestabsolute(raw_msg)
                 elif cmd_name == '/bestn':
                     cmd_bestn(raw_msg)
-                elif decoded['text'] == '/chatid':
-                    cmd_chatid(raw_msg)
                 elif decoded['text'] == '/clear':
                     cmd_clear(raw_msg)
                 elif decoded['text'] == '/clearme':
