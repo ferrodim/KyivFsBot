@@ -2,6 +2,11 @@ const {mongo, _} = require('../../shared/framework');
 const sendText = require('../sendText');
 
 module.exports = async function (event){
+    if (!event.isAdmin){
+        sendText(event.chatid, _("This command allowed only for admins"));
+        return;
+    }
+
     let admins = await mongo.collection('admin').find({}).toArray() || [];
     let adminLogins = admins.map(a => a.tgNick);
 

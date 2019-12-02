@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-26 01:52+0200\n"
+"POT-Creation-Date: 2019-12-02 02:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -210,7 +210,7 @@ msgid ""
 "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:838 src/decoder/decoder.py:18 src/front/app.js:48
+#: src/bot/bot.py:838 src/decoder/decoder.py:18 src/front/app.js:54
 #: src/logger/app.js:18 src/translator/app.js:37
 #, python-format, javascript-format
 msgid "Pong from %s"
@@ -240,7 +240,7 @@ msgstr ""
 msgid "Image retrieved"
 msgstr ""
 
-#: src/front/app.js:53
+#: src/front/app.js:59
 #, javascript-format
 msgid ""
 "Welcome, export me your start data at *%s*, and finish data at *%s*. Active "

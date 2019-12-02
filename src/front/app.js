@@ -29,7 +29,7 @@ Promise.all([
         }
 
         let tgName = get_tg_nick(msg);
-        msg.isAdmin = !! await mongo.collection('admin').findOne({tgNick: tgName});
+
         let city = await mongo.collection('city').findOne({
                     cityId: DEFAULT_CITY,
                 }, {
@@ -44,6 +44,7 @@ Promise.all([
             "chatid": msg.from.id,
             "rawMsg": msg,
             "tg_name": tgName,
+            "isAdmin": await isAdmin(tgName),
             "cityId": city.cityId,
         });
 
@@ -62,6 +63,14 @@ Promise.all([
 }, err=>{
     console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
 });
+
+async function isAdmin(tgName){
+    if (process.env.SUPER_ADMIN === tgName){
+        return true;
+    } else {
+        return !! await mongo.collection('admin').findOne({tgNick: tgName});
+    }
+}
 
 function get_tg_nick(msg){
     return msg.from.username || ('#' + msg.from.id);
