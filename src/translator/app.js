@@ -5,6 +5,7 @@ let db = {userLang: {}};
 const fs = require('fs');
 const Gettext = require('node-gettext');
 const po = require('gettext-parser').po;
+const printf = require('printf');
 const locales = ['en', 'ru', 'ua'];
 const DEFAULT_LANG = locales[0];
 const gt = new Gettext();
@@ -83,9 +84,7 @@ function translate(text, lang, placeholders){
     text = gt.gettext(text);
 
     if (Array.isArray(placeholders)){
-        for (let placeholder of placeholders){
-            text = text.replace('%s', placeholder);
-        }
+        text = printf(text, ...placeholders);
     }
     return text;
 }
