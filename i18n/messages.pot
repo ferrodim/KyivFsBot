@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 02:52+0200\n"
+"POT-Creation-Date: 2019-12-02 03:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/bot/bot.py:48
 msgid "Доступ запрещён"
 msgstr ""
 
-#: src/bot/bot.py:85
-#, python-format
-msgid "Айди этого чата: %s"
-msgstr ""
-
-#: src/bot/bot.py:150
 #, python-format
 msgid ""
 "Агент, вам сообщение от организаторов:\n"
@@ -34,74 +27,58 @@ msgid ""
 "%s"
 msgstr ""
 
-#: src/bot/bot.py:151
 msgid "Массовое сообщение доставленно %1$d/%2$d агентам"
 msgstr ""
 
-#: src/bot/bot.py:157
 msgid ""
 "Вы правда хотите очистить всю базу, кроме ников?\n"
 "\n"
 "Введите */softreset ok*, если да"
 msgstr ""
 
-#: src/bot/bot.py:166 src/bot/bot.py:181
 msgid "База данных очищена"
 msgstr ""
 
-#: src/bot/bot.py:172
 msgid ""
 "Вы правда хотите очистить всю базу?\n"
 "\n"
 "Введите */reset ok*, если да"
 msgstr ""
 
-#: src/bot/bot.py:189
 msgid "Уведомление агентов включено"
 msgstr ""
 
-#: src/bot/bot.py:191
 msgid "Уведомление агентов выключено"
 msgstr ""
 
-#: src/bot/bot.py:199
 msgid "Нельзя включить ночной режим во время эвента"
 msgstr ""
 
-#: src/bot/bot.py:204
 msgid "Ночной режим включен"
 msgstr ""
 
-#: src/bot/bot.py:206
 msgid "Ночной режим выключен"
 msgstr ""
 
-#: src/bot/bot.py:211
 msgid "Зарегистрированные агенты"
 msgstr ""
 
-#: src/bot/bot.py:254
 msgid "Start agent stats are welcome!"
 msgstr ""
 
-#: src/bot/bot.py:262
 msgid "Finish agent stats are welcome!"
 msgstr ""
 
-#: src/bot/bot.py:270
 msgid "No more agent stats!"
 msgstr ""
 
-#: src/bot/bot.py:387 src/bot/bot.py:417 src/bot/bot.py:448
 #, python-format
 msgid "Вы запросили инфу по %s"
 msgstr ""
 
-#: src/bot/bot.py:402
 msgid "Best %1$s:%2$s"
 msgstr ""
 
-#: src/bot/bot.py:411 src/bot/bot.py:442
 msgid ""
 "Неверный формат запроса. Нужно писать:\n"
 "`%1$s`\n"
@@ -109,7 +86,6 @@ msgid ""
 "%2$s"
 msgstr ""
 
-#: src/bot/bot.py:469
 #, python-format
 msgid ""
 "Вы правда хотите удалить данные c нулевой стартовой статистикой?\n"
@@ -117,152 +93,124 @@ msgid ""
 "Введите *%s*, если да"
 msgstr ""
 
-#: src/bot/bot.py:481
 #, python-format
 msgid "Удалено %d записей с нулевой стартовой статистикой"
 msgstr ""
 
-#: src/bot/bot.py:496
 #, python-format
 msgid "Данные @%s удалены"
 msgstr ""
 
-#: src/bot/bot.py:498
 #, python-format
 msgid "Бот не располагает данными на @%s"
 msgstr ""
 
-#: src/bot/bot.py:516
 msgid "Ваши данные удалены"
 msgstr ""
 
-#: src/bot/bot.py:518
 msgid "Бот не располагает данными на вас"
 msgstr ""
 
-#: src/bot/bot.py:543
 #, python-format
 msgid ""
 "Неверный формат запроса. Нужно писать:\n"
 "`%s`\n"
 msgstr ""
 
-#: src/bot/bot.py:560
 msgid "Бот ничего не знает по вам"
 msgstr ""
 
-#: src/bot/bot.py:562
 #, python-format
 msgid "Ник телеги: @%s\n"
 msgstr ""
 
-#: src/bot/bot.py:565
 #, python-format
 msgid "Ник в игре: %s\n"
 msgstr ""
 
-#: src/bot/bot.py:568
 #, python-format
 msgid "Фракция: %s\n"
 msgstr ""
 
-#: src/bot/bot.py:569
 msgid "Стартовые показатели:"
 msgstr ""
 
-#: src/bot/bot.py:575
 msgid "Финишные показатели:"
 msgstr ""
 
-#: src/bot/bot.py:614
 msgid "That user is not found in database"
 msgstr ""
 
-#: src/bot/bot.py:637
 msgid ""
 "Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"
 msgstr ""
 
-#: src/bot/bot.py:648
 msgid "Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"
 msgstr ""
 
-#: src/bot/bot.py:660
 msgid "Вы прислали месячную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:664
 msgid "Вы прислали недельную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:668
 msgid "Вы прислали дневную стату. А нужно \"за всё время\""
 msgstr ""
 
-#: src/bot/bot.py:675
 msgid ""
 "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте "
 "пожалуйста скрин картинкой"
 msgstr ""
 
-#: src/bot/bot.py:702
 msgid ""
 "Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:838 src/decoder/decoder.py:18 src/front/app.js:54
-#: src/logger/app.js:18 src/translator/app.js:37
 #, python-format, javascript-format
 msgid "Pong from %s"
 msgstr ""
 
-#: src/bot/bot.py:894
 msgid ""
 "Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
 msgstr ""
 
-#: src/bot/bot.py:902
 msgid "Данные с изображения распарсить не удалось"
 msgstr ""
 
-#: src/bot/bot.py:917
 msgid ""
 "Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*"
 msgstr ""
 
-#: src/bot/bot.py:921
 msgid ""
 "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов "
 "вручную"
 msgstr ""
 
-#: src/decoder/decoder.py:21
 msgid "Image retrieved"
 msgstr ""
 
-#: src/front/app.js:59
+#, javascript-format
+msgid "Id of this chat is %s"
+msgstr ""
+
 #, javascript-format
 msgid ""
 "Welcome, export me your start data at *%s*, and finish data at *%s*. Active "
 "modes *%s*. Write /help for more info"
 msgstr ""
 
-#: src/translator/app.js:34
 #, javascript-format
 msgid "Current language is \"%s\""
 msgstr ""
 
-#: src/translator/app.js:40
 #, javascript-format
 msgid "List of languages: %s"
 msgstr ""
 
-#: src/translator/app.js:46
 #, javascript-format
 msgid "Language changed to \"%s\""
 msgstr ""
 
-#: src/translator/app.js:48
 #, javascript-format
 msgid "Unknown language \"%s\""
 msgstr ""
