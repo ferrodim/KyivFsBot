@@ -37,7 +37,7 @@ Promise.all([
                 }
             ) || {};
 
-        rabbit.emit({
+        let event = {
             "event": 'core.messageIn',
             "text": msg.text,
             "msgid": msg.message_id,
@@ -46,7 +46,11 @@ Promise.all([
             "tg_name": tgName,
             "isAdmin": await isAdmin(tgName),
             "cityId": city.cityId,
-        });
+        };
+
+        msg.isAdmin = event.isAdmin; // for legacy in module "bot"
+
+        rabbit.emit(event);
 
         console.log('msg.text', msg.text);
 
