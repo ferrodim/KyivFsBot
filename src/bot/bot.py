@@ -86,7 +86,7 @@ def cmd_set(message):
     modes_lowercased = {}
     for x in allowed_modes:
         modes_lowercased[x.lower()] = x
-    chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
+    chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 4 and chunks[2] in ['Nick', 'fraction']) or \
                      (len(chunks) == 5 and chunks[2] in ["start", "end"] and
                       (chunks[3] in allowed_modes or chunks[3] in modes_lowercased.keys()))
@@ -136,7 +136,7 @@ def user_inform(agentname):
 def cmd_send_all(message):
     agents_total = 0
     agents_received = 0
-    text = message.text[len('/sendall '):]
+    text = message['text'][len('/sendall '):]
     for agentname in data["counters"].keys():
         agents_total += 1
         chat_id = data["counters"][agentname].get('chatid', '')
@@ -148,7 +148,7 @@ def cmd_send_all(message):
 
 @restricted
 def cmd_softreset(message):
-    if message.text != '/softreset ok':
+    if message['text'] != '/softreset ok':
         reply_to(message, _("Вы правда хотите очистить всю базу, кроме ников?\n\n"
                                 "Введите */softreset ok*, если да"), parse_mode="Markdown")
         return
@@ -163,7 +163,7 @@ def cmd_softreset(message):
 
 @restricted
 def cmd_reset(message):
-    if message.text != '/reset ok':
+    if message['text'] != '/reset ok':
         reply_to(message, _("Вы правда хотите очистить всю базу?\n\n"
                                 "Введите */reset ok*, если да"), parse_mode="Markdown")
         return
@@ -405,7 +405,7 @@ def cmd_best(message):
 
 def cmd_bestn(message):
     allowed_modes = ["AP", "Level"] + MODES
-    chunks = message.text.replace("  ", " ").split(" ")
+    chunks = message['text'].replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
@@ -436,7 +436,7 @@ def cmd_bestn(message):
 
 def cmd_bestabsolute(message):
     allowed_modes = ["AP", "Level"] + MODES
-    chunks = message.text.replace("  ", " ").split(" ")
+    chunks = message['text'].replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
@@ -466,7 +466,7 @@ def cmd_bestabsolute(message):
 
 @restricted
 def cmd_clearzero(message):
-    if message.text != '/clearzero ok':
+    if message['text'] != '/clearzero ok':
         reply_to(message, _("Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
                                 "Введите *%s*, если да") % "/clearzero ok", parse_mode="Markdown")
         return
@@ -484,7 +484,7 @@ def cmd_clearzero(message):
 
 @restricted
 def cmd_clear(message):
-    chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
+    chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
         send_message(message['chat']['id'], ("Неверный формат запроса. Нужно писать:\n"
@@ -506,7 +506,7 @@ def cmd_me(message):
 
 
 def cmd_clearme(message):
-    if message.text != '/clearme ok':
+    if message['text'] != '/clearme ok':
         reply_to(message, "Вы правда хотите удалить свои данные?\n\n"
                               "Введите */clearme ok*, если да", parse_mode="Markdown")
         return
@@ -520,7 +520,7 @@ def cmd_clearme(message):
 
 
 def cmd_fraction(message):
-    chunks = message.text.replace("  ", " ").split(" ")
+    chunks = message['text'].replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
     if not is_valid_query:
         reply_to(message, ("Неверный формат запроса. Нужно писать:\n"
@@ -538,7 +538,7 @@ def cmd_fraction(message):
 
 
 def cmd_nick(message):
-    chunks = message.text.replace("@", "").replace("  ", " ").split(" ")
+    chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
         reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
@@ -597,7 +597,7 @@ def process_msg(message):
     tg_name = get_tg_nick(message)
     # decode_query = {
     #     "event": 'core.messageIn',
-    #     "text": message.text,
+    #     "text": message['text'],
     #     "msgid": message.message_id,
     #     "chatid": message['chat']['id'],
     #     "tg_name": tg_name
@@ -624,6 +624,7 @@ def send_message(text, chatid, placeholders=None, parse_mode=None):
             "chatId": chatid,
             "text": text,
             "placeholders": placeholders,
+            "formatted": (parse_mode is not None),
         }
     }
     rabbit_send(json.dumps(decode_query))
@@ -633,7 +634,7 @@ def process_prime_tab_separated_text(message):
     msgid = message['message_id']
     chatid = message['chat']['id']
 
-    chunks = message.text.split("\n")
+    chunks = message['text'].split("\n")
     if len(chunks) != 2:
         reply_to(message, _("Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"))
         return
@@ -686,9 +687,9 @@ def process_prime_tab_separated_text(message):
     LOG.info('decoded ' + str(decoded))
 
     agentname = get_tg_nick(message)
-    if message.forward_from:
-        if message['isAdmin'] or (agentname == message.forward_from.username):
-            agentname = message.forward_from.username
+    if 'forward_from' in message:
+        if message['isAdmin'] or (agentname == message['forward_from'].username):
+            agentname = message['forward_from'].username
     else:
         user_save_chatid(agentname, message['chat']['id'])
 
@@ -782,9 +783,9 @@ def parse_title(title):
 # def process_photo(message):
 #     return
     # agentname = get_tg_nick(message)
-    # if message.forward_from:
-    #     if (message['isAdmin']) or (agentname == message.forward_from.username):
-    #         agentname = message.forward_from.username
+    # if message['forward_from']:
+    #     if (message['isAdmin']) or (agentname == message['forward_from'].username):
+    #         agentname = message['forward_from'].username
     # user_save_chatid(agentname, message['chat']['id'])
     # file_id = message.photo[-1].file_id
     # file_info = bot.get_file(file_id)
