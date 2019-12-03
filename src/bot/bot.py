@@ -721,7 +721,7 @@ def process_prime_tab_separated_text(message):
 
 
 def reply_to(msg, text, placeholders=None, parse_mode=None):
-    send_message(text, msg['chat']['id'], placeholders)
+    send_message(text, msg['chat']['id'], placeholders, parse_mode=parse_mode)
 
 
 def parse_title(title):
