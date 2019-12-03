@@ -13,7 +13,7 @@ Promise.all([
         url: process.env.RABBIT_URL,
     }),
 ]).then(async () => {
-    await rabbit.bind(APP_NAME, 'call.telegramSend', function(event) {
+    await rabbit.bind(APP_NAME, ['call.telegramSend', 'call.sendRawFile'], function(event) {
         if (event.event === 'call.telegramSend'){
             let args = event.args;
             let options  = {};
@@ -21,8 +21,17 @@ Promise.all([
                 options.parse_mode = 'Markdown';
             }
             bot.sendMessage(args.chatId, args.text, options);
+        } else if (event.event === 'call.sendRawFile'){
+            let args = event.args;
+            let fileOptions = {
+                filename: args.filename,
+                contentType: 'text/csv',
+            };
+            let data = Buffer.from(args.body, 'utf8');
+            bot.sendDocument(args.chatId, data, {}, fileOptions);
         }
     });
+
     bot.on('message', async function(msg){
         if (msg.chat.id < 0){
             return;

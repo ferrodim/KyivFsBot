@@ -44,7 +44,14 @@ function RabbitService(){
 
 RabbitService.prototype.bind = async function(queueName, routeKey, callback){
     await this.channel.assertQueue(queueName);
-    await this.channel.bindQueue(queueName, 'topic', routeKey);
+    if (Array.isArray(routeKey)){
+        for (let route of routeKey){
+            await this.channel.bindQueue(queueName, 'topic', route);
+        }
+    } else {
+        await this.channel.bindQueue(queueName, 'topic', routeKey);
+    }
+
     this.channel.consume(queueName, async msg => {
         if (msg){
             let event = JSON.parse(msg.content.toString());

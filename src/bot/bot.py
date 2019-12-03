@@ -267,7 +267,7 @@ def cmd_stop(message):
 
 @restricted
 def cmd_result(message):
-    delimiter = message.text[len("/result "):len("/result ") + 1]
+    delimiter = message['text'][len("/result "):len("/result ") + 1]
     if delimiter == '':
         delimiter = ','
     txt = "TG_nick;Game_nick;Fraction"
@@ -295,17 +295,20 @@ def cmd_result(message):
             txt += ";%s;%s;%s" % (agentdata["start"][mode], agentdata["end"][mode], delta)
         txt += "\n"
     txt = txt.replace(';', delimiter)
-    resultfile = open("result.csv", "w")
-    resultfile.write(txt)
-    resultfile.close()
-    resultfile = open("result.csv", "rb")
-    # bot.send_document(message['chat']['id'], resultfile)
-    resultfile.close()
+    decode_query = {
+        "event": 'call.sendRawFile',
+        "args": {
+            "chatId": message['chat']['id'],
+            "body": txt,
+            "filename": "result.csv",
+        }
+    }
+    rabbit_send(json.dumps(decode_query))
 
 
 @restricted
 def cmd_resultfev(message):
-    delimiter = message.text[len("/resultfev "):len("/resultfev ") + 1]
+    delimiter = message['text'][len("/resultfev "):len("/resultfev ") + 1]
     if delimiter == '':
         delimiter = ','
     txt = "TG_nick;Fraction;Game_nick;Start_Level;Start_AP,Start_Trekker;End_Level;End_AP;End_Trekker"
@@ -338,12 +341,15 @@ def cmd_resultfev(message):
     for row in user_data:
         txt += '"%s";"%s";"%s";%s;%s;%s;%s;%s;%s\n' % row
     txt = txt.replace(';', delimiter)
-    resultfile = open("resultfev.csv", "w")
-    resultfile.write(txt)
-    resultfile.close()
-    resultfile = open("resultfev.csv", "rb")
-    # bot.send_document(message['chat']['id'], resultfile)
-    resultfile.close()
+    decode_query = {
+        "event": 'call.sendRawFile',
+        "args": {
+            "chatId": message['chat']['id'],
+            "body": txt,
+            "filename": "resultfev.csv",
+        }
+    }
+    rabbit_send(json.dumps(decode_query))
 
 
 def category_name_normalize(name):
@@ -859,9 +865,9 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_notify(raw_msg)
                 elif decoded['text'] == '/reset':
                     cmd_reset(raw_msg)
-                elif decoded['text'] == '/result':
+                elif cmd_name == '/result':
                     cmd_result(raw_msg)
-                elif decoded['text'] == '/resultfev':
+                elif cmd_name == '/resultfev':
                     cmd_resultfev(raw_msg)
                 elif decoded['text'] == '/send_all':
                     cmd_send_all(raw_msg)
