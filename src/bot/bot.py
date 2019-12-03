@@ -9,7 +9,7 @@ import re
 import pika
 import logging
 from operator import itemgetter
-from config import MODES, CHAT_OK, CHAT_FAIL
+from config import MODES
 
 print("restart")
 
@@ -911,8 +911,8 @@ def on_message(channel, method_frame, header_frame, body):
                 save_data()
                 user_inform(agentname)
                 # bot.forward_message(CHAT_OK, chatid, msgid)
-                send_message("Агент %s, AP %s, %s %s" % (
-                    agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]), CHAT_OK)
+                # send_message("Агент %s, AP %s, %s %s" % (
+                #    agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]), CHAT_OK)
             else:
                 send_message(_("Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*") %
                              (decoded.get('mode'), ', '.join(MODES)), chatid, parse_mode="Markdown")
