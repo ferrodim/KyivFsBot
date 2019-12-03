@@ -55,6 +55,7 @@ Promise.all([
             "tg_name": tgName,
             "isAdmin": await isAdmin(tgName),
             "cityId": city.cityId,
+            "city": city,
         };
 
         msg.isAdmin = event.isAdmin; // for legacy in module "bot"

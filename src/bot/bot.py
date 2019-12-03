@@ -499,9 +499,9 @@ def cmd_clear(message):
         reply_to(message, _("Бот не располагает данными на @%s") % tg_name)
 
 
-def cmd_me(message):
+def cmd_me(message, city):
     tg_name = get_tg_nick(message)
-    txt = user_info(tg_name)
+    txt = user_info(tg_name, city['modes'])
     reply_to(message, txt, parse_mode="Markdown")
 
 
@@ -555,8 +555,8 @@ def cmd_nick(message):
     reply_to(message, txt, parse_mode="Markdown")
 
 
-def user_info(username):
-    allowed_modes = ["AP", "Level"] + MODES
+def user_info(username, modes):
+    allowed_modes = ["AP", "Level"] + modes
     if username not in data["counters"].keys():
         return _('Бот ничего не знает по вам')
     user_data = data["counters"][username]
@@ -836,6 +836,7 @@ def on_message(channel, method_frame, header_frame, body):
                 raw_msg = decoded['rawMsg']
                 chunks = raw_msg['text'].replace("  ", " ").split(" ")
                 cmd_name = raw_msg['text'].replace("  ", " ").split(" ")[0]
+                city = decoded['city']
                 if decoded['text'] == '/ping':
                     send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
                 elif cmd_name == '/best':
@@ -857,7 +858,7 @@ def on_message(channel, method_frame, header_frame, body):
                 elif decoded['text'] == '/help':
                     cmd_help(raw_msg)
                 elif decoded['text'] == '/me':
-                    cmd_me(raw_msg)
+                    cmd_me(raw_msg, city)
                 elif decoded['text'] == '/nick':
                     cmd_nick(raw_msg)
                 elif decoded['text'] == '/night':
