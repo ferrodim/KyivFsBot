@@ -6,7 +6,6 @@ services:
     volumes:
       - "./src/bot:/app"
       - "./data/Screens:/Screens"
-      - "./config.py:/app/config.py"
     depends_on:
       - rabbit
   rabbit:
@@ -27,7 +26,6 @@ services:
     restart: always
     volumes:
       - "./src/decoder:/app"
-      - "./src/shared:/shared"
       - "./data/Screens:/Screens"
   logger:
     build: src/logger
@@ -55,6 +53,7 @@ services:
       - "./src/store:/app"
       - "./src/shared:/shared"
     environment:
+      MONGO_URL: "mongodb://mongo:27017/fsbot"
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
       - rabbit
@@ -65,6 +64,7 @@ services:
       - "./src/front:/app"
       - "./src/shared:/shared"
     environment:
+      MONGO_URL: "mongodb://mongo:27017/fsbot"
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
       - rabbit

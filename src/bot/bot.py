@@ -9,7 +9,6 @@ import re
 import pika
 import logging
 from operator import itemgetter
-from config import MODES
 
 print("restart")
 
@@ -52,7 +51,7 @@ def restricted(func):
     return wrapped
 
 
-def cmd_help(message):
+def cmd_help(message, city):
     txt = "/me - View personal userinfo\n" \
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
           "/fraction %e_or_r% - Set your fraction\n" \
@@ -81,8 +80,8 @@ def cmd_help(message):
 
 
 @restricted
-def cmd_set(message):
-    allowed_modes = ["AP", "Level"] + MODES
+def cmd_set(message, city):
+    allowed_modes = ["AP", "Level"] + city['modes']
     modes_lowercased = {}
     for x in allowed_modes:
         modes_lowercased[x.lower()] = x
@@ -116,24 +115,24 @@ def cmd_set(message):
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
-    reply_to(message, "Done\n" + user_info(agentname), parse_mode="Markdown")
-    if message.from_user.username != agentname:
-        user_inform(agentname)
+    reply_to(message, "Done\n" + user_info(agentname, city), parse_mode="Markdown")
+    # if message['from_user']['username'] != agentname:
+    #     user_inform(agentname, city)
 
 
-def user_inform(agentname):
+def user_inform(agentname, city):
     if "night" in data.keys() and data["night"]:
         # don't send notifications during night
         return
     if agentname in data["counters"]:
         chatid = data["counters"][agentname].get('chatid')
         if chatid is not None:
-            txt = 'Данные по вам изменились:\n' + user_info(agentname)
+            txt = 'Данные по вам изменились:\n' + user_info(agentname, city)
             send_message(txt, chatid, parse_mode="Markdown")
 
 
 @restricted
-def cmd_send_all(message):
+def cmd_send_all(message, city):
     agents_total = 0
     agents_received = 0
     text = message['text'][len('/sendall '):]
@@ -147,7 +146,7 @@ def cmd_send_all(message):
 
 
 @restricted
-def cmd_softreset(message):
+def cmd_softreset(message, city):
     if message['text'] != '/softreset ok':
         reply_to(message, _("Вы правда хотите очистить всю базу, кроме ников?\n\n"
                                 "Введите */softreset ok*, если да"), parse_mode="Markdown")
@@ -162,7 +161,7 @@ def cmd_softreset(message):
 
 
 @restricted
-def cmd_reset(message):
+def cmd_reset(message, city):
     if message['text'] != '/reset ok':
         reply_to(message, _("Вы правда хотите очистить всю базу?\n\n"
                                 "Введите */reset ok*, если да"), parse_mode="Markdown")
@@ -177,7 +176,7 @@ def cmd_reset(message):
 
 
 @restricted
-def cmd_notify(message):
+def cmd_notify(message, city):
     data["notify"] = not data["notify"]
     save_data()
     if data["notify"]:
@@ -187,7 +186,7 @@ def cmd_notify(message):
 
 
 @restricted
-def cmd_night(message):
+def cmd_night(message, city):
     if "night" not in data.keys():
         data["night"] = False
     if not data["night"] and (data["getStart"] or data["getEnd"]):
@@ -202,7 +201,7 @@ def cmd_night(message):
 
 
 @restricted
-def cmd_agents(message):
+def cmd_agents(message, city):
     txt = _("Зарегистрированные агенты")
     agents_total = 0
     agents_enl = 0
@@ -242,7 +241,7 @@ def notify_users(text, curChatId):
 
 
 @restricted
-def cmd_startevent(message):
+def cmd_startevent(message, city):
     data["getStart"] = True
     data["getEnd"] = False
     save_data()
@@ -250,7 +249,7 @@ def cmd_startevent(message):
 
 
 @restricted
-def cmd_endevent(message):
+def cmd_endevent(message, city):
     data["getStart"] = False
     data["getEnd"] = True
     save_data()
@@ -258,7 +257,7 @@ def cmd_endevent(message):
 
 
 @restricted
-def cmd_stop(message):
+def cmd_stop(message, city):
     data["getStart"] = False
     data["getEnd"] = False
     save_data()
@@ -266,12 +265,12 @@ def cmd_stop(message):
 
 
 @restricted
-def cmd_result(message):
+def cmd_result(message, city):
     delimiter = message['text'][len("/result "):len("/result ") + 1]
     if delimiter == '':
         delimiter = ','
     txt = "TG_nick;Game_nick;Fraction"
-    allowed_modes = ["AP", "Level"] + MODES
+    allowed_modes = ["AP", "Level"] + city['modes']
     for mode in allowed_modes:
         txt += ";Start_%s;End_%s;Delta_%s" % (mode, mode, mode)
     txt += "\n"
@@ -307,7 +306,7 @@ def cmd_result(message):
 
 
 @restricted
-def cmd_resultfev(message):
+def cmd_resultfev(message, city):
     delimiter = message['text'][len("/resultfev "):len("/resultfev ") + 1]
     if delimiter == '':
         delimiter = ','
@@ -352,8 +351,8 @@ def cmd_resultfev(message):
     rabbit_send(json.dumps(decode_query))
 
 
-def category_name_normalize(name):
-    allowed_modes = ["AP", "Level"] + MODES
+def category_name_normalize(name, city):
+    allowed_modes = ["AP", "Level"] + city['modes']
     for mode in allowed_modes:
         if name.lower() == mode.lower():
             return mode
@@ -373,10 +372,10 @@ def fraction_icon(fraction):
         return ""
 
 
-def cmd_best(message):
-    allowed_modes = ["AP", "Level"] + MODES
+def cmd_best(message, city):
+    allowed_modes = ["AP", "Level"] + city['modes']
     chunks = message['text'].replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
+    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1], city) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
         send_message(("Неверный формат запроса. Нужно писать:\n"
@@ -384,7 +383,7 @@ def cmd_best(message):
                       "где category принимает значения\n"
                       "" + ', '.join(allowed_modes)), message['chat']['id'], parse_mode="Markdown")
         return
-    mode = category_name_normalize(chunks[1])
+    mode = category_name_normalize(chunks[1], city)
     reply_to(message, _("Вы запросили инфу по %s"), [mode])
     user_data = []
     for agentname in data["counters"].keys():
@@ -403,10 +402,10 @@ def cmd_best(message):
     reply_to(message, _('Best %1$s:%2$s'), [mode, body], parse_mode="Markdown")
 
 
-def cmd_bestn(message):
-    allowed_modes = ["AP", "Level"] + MODES
+def cmd_bestn(message, city):
+    allowed_modes = ["AP", "Level"] + city['modes']
     chunks = message['text'].replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
+    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1], city) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
         reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
@@ -414,7 +413,7 @@ def cmd_bestn(message):
                                              "где параметр принимает значения\n%2$s")
                                            % ("/best <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
         return
-    mode = category_name_normalize(chunks[1])
+    mode = category_name_normalize(chunks[1], city)
     reply_to(message, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
@@ -434,10 +433,10 @@ def cmd_bestn(message):
     reply_to(message, txt, parse_mode="Markdown")
 
 
-def cmd_bestabsolute(message):
-    allowed_modes = ["AP", "Level"] + MODES
+def cmd_bestabsolute(message, city):
+    allowed_modes = ["AP", "Level"] + city['modes']
     chunks = message['text'].replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1]) in allowed_modes))
+    is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1], city) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
         reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
@@ -445,7 +444,7 @@ def cmd_bestabsolute(message):
                                              "где параметр принимает значения\n%2$s")
                                            % ("/bestabsolute <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
         return
-    mode = category_name_normalize(chunks[1])
+    mode = category_name_normalize(chunks[1], city)
     reply_to(message, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
@@ -465,7 +464,7 @@ def cmd_bestabsolute(message):
 
 
 @restricted
-def cmd_clearzero(message):
+def cmd_clearzero(message, city):
     if message['text'] != '/clearzero ok':
         reply_to(message, _("Вы правда хотите удалить данные c нулевой стартовой статистикой?\n\n"
                                 "Введите *%s*, если да") % "/clearzero ok", parse_mode="Markdown")
@@ -483,7 +482,7 @@ def cmd_clearzero(message):
 
 
 @restricted
-def cmd_clear(message):
+def cmd_clear(message, city):
     chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
@@ -500,17 +499,17 @@ def cmd_clear(message):
 
 
 def cmd_me(message, city):
-    tg_name = get_tg_nick(message)
-    txt = user_info(tg_name, city['modes'])
+    tg_name = get_tg_nick(message, city)
+    txt = user_info(tg_name, city)
     reply_to(message, txt, parse_mode="Markdown")
 
 
-def cmd_clearme(message):
+def cmd_clearme(message, city):
     if message['text'] != '/clearme ok':
         reply_to(message, "Вы правда хотите удалить свои данные?\n\n"
                               "Введите */clearme ok*, если да", parse_mode="Markdown")
         return
-    tg_name = get_tg_nick(message)
+    tg_name = get_tg_nick(message, city)
     if tg_name in data["counters"].keys():
         del data["counters"][tg_name]
         save_data()
@@ -519,44 +518,44 @@ def cmd_clearme(message):
         reply_to(message, _("Бот не располагает данными на вас"))
 
 
-def cmd_fraction(message):
+def cmd_fraction(message, city):
     chunks = message['text'].replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
     if not is_valid_query:
         reply_to(message, ("Неверный формат запроса. Нужно писать:\n"
                            "`/fraction e`\n`/fraction r`"), parse_mode="Markdown")
         return
-    tg_name = get_tg_nick(message)
+    tg_name = get_tg_nick(message, city)
     fraction = chunks[1]
     if tg_name not in data["counters"].keys():
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['fraction'] = fraction
     save_data()
     user_save_chatid(tg_name, message['chat']['id'])
-    txt = user_info(tg_name)
+    txt = user_info(tg_name, city)
     reply_to(message, txt, parse_mode="Markdown")
 
 
-def cmd_nick(message):
+def cmd_nick(message, city):
     chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
     if not is_valid_query:
         reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
                            "`%s`\n") % '/nick my_game_nick'), parse_mode="Markdown")
         return
-    tg_name = get_tg_nick(message)
+    tg_name = get_tg_nick(message, city)
     game_nick = chunks[1]
     if tg_name not in data["counters"].keys():
         data["counters"][tg_name] = {"start": {}, "end": {}}
     data["counters"][tg_name]['Nick'] = game_nick
     save_data()
     user_save_chatid(tg_name, message['chat']['id'])
-    txt = user_info(tg_name)
+    txt = user_info(tg_name, city)
     reply_to(message, txt, parse_mode="Markdown")
 
 
-def user_info(username, modes):
-    allowed_modes = ["AP", "Level"] + modes
+def user_info(username, city):
+    allowed_modes = ["AP", "Level"] + city['modes']
     if username not in data["counters"].keys():
         return _('Бот ничего не знает по вам')
     user_data = data["counters"][username]
@@ -583,7 +582,7 @@ def user_info(username, modes):
     return txt
 
 
-def get_tg_nick(message):
+def get_tg_nick(message, city):
     tg_nick = message['from']['username']
     if tg_nick is None:
         tg_nick = '#' + str(message['chat']['id'])
@@ -591,10 +590,10 @@ def get_tg_nick(message):
 
 
 # @message_handler(func=lambda message: True, content_types=["text"])
-def process_msg(message):
+def process_msg(message, city):
     if message['chat']['id'] < 0:
         return
-    tg_name = get_tg_nick(message)
+    tg_name = get_tg_nick(message, city)
     # decode_query = {
     #     "event": 'core.messageIn',
     #     "text": message['text'],
@@ -605,11 +604,11 @@ def process_msg(message):
     # rabbit_send(json.dumps(decode_query))
 
     if len(message['text']) > 100:
-        return process_prime_tab_separated_text(message)
+        return process_prime_tab_separated_text(message, city)
     if message['isAdmin']:
         user_tg_name = message['text'].replace('@', '')
         if user_tg_name in data["counters"].keys():
-            txt = user_info(user_tg_name)
+            txt = user_info(user_tg_name, city)
             reply_to(message, txt, parse_mode="Markdown")
         elif user_tg_name[0] != '/':
             send_message(_('That user is not found in database'), message['chat']['id'])
@@ -630,7 +629,7 @@ def send_message(text, chatid, placeholders=None, parse_mode=None):
     rabbit_send(json.dumps(decode_query))
 
 
-def process_prime_tab_separated_text(message):
+def process_prime_tab_separated_text(message, city):
     msgid = message['message_id']
     chatid = message['chat']['id']
 
@@ -686,7 +685,7 @@ def process_prime_tab_separated_text(message):
 
     LOG.info('decoded ' + str(decoded))
 
-    agentname = get_tg_nick(message)
+    agentname = get_tg_nick(message, city)
     if 'forward_from' in message:
         if message['isAdmin'] or (agentname == message['forward_from'].username):
             agentname = message['forward_from'].username
@@ -706,7 +705,7 @@ def process_prime_tab_separated_text(message):
         fraction = full_fraction_name(d['Fraction'])
         txt += "Fraction *%s*\nAP *%s*\nLvl *%s*\n" % (
             fraction, d["AP"], d["Level"])
-        for mode in MODES:
+        for mode in city['modes']:
             if mode in d.keys():
                 txt += "%s *%s*\n" % (mode, d[mode])
         reply_to(message, txt, parse_mode="Markdown")
@@ -715,7 +714,7 @@ def process_prime_tab_separated_text(message):
     data["counters"][agentname]['fraction'] = decoded['Fraction']
     data["counters"][agentname][datakey].update(decoded)
     save_data()
-    user_inform(agentname)
+    user_inform(agentname, city)
     # bot.forward_message(CHAT_OK, chatid, msgid)
     # bot.send_message(CHAT_OK, "Parsed: " + str(decoded))
 
@@ -780,7 +779,7 @@ def parse_title(title):
 
 
 # @message_handler(func=lambda message: True, content_types=["photo"])
-# def process_photo(message):
+# def process_photo(message, city):
 #     return
     # agentname = get_tg_nick(message)
     # if message['forward_from']:
@@ -837,52 +836,52 @@ def on_message(channel, method_frame, header_frame, body):
                 chunks = raw_msg['text'].replace("  ", " ").split(" ")
                 cmd_name = raw_msg['text'].replace("  ", " ").split(" ")[0]
                 city = decoded['city']
-                if decoded['text'] == '/ping':
+                if cmd_name == '/ping':
                     send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
                 elif cmd_name == '/best':
-                    cmd_best(raw_msg)
+                    cmd_best(raw_msg, city)
                 elif cmd_name == '/bestabsolute':
-                    cmd_bestabsolute(raw_msg)
+                    cmd_bestabsolute(raw_msg, city)
                 elif cmd_name == '/bestn':
-                    cmd_bestn(raw_msg)
-                elif decoded['text'] == '/clear':
-                    cmd_clear(raw_msg)
-                elif decoded['text'] == '/clearme':
-                    cmd_clearme(raw_msg)
-                elif decoded['text'] == '/clearzero':
-                    cmd_clearzero(raw_msg)
-                elif decoded['text'] == '/endevent':
-                    cmd_endevent(raw_msg)
-                elif decoded['text'] == '/fraction':
-                    cmd_fraction(raw_msg)
-                elif decoded['text'] == '/help':
-                    cmd_help(raw_msg)
-                elif decoded['text'] == '/me':
+                    cmd_bestn(raw_msg, city)
+                elif cmd_name == '/clear':
+                    cmd_clear(raw_msg, city)
+                elif cmd_name == '/clearme':
+                    cmd_clearme(raw_msg, city)
+                elif cmd_name == '/clearzero':
+                    cmd_clearzero(raw_msg, city)
+                elif cmd_name == '/endevent':
+                    cmd_endevent(raw_msg, city)
+                elif cmd_name == '/fraction':
+                    cmd_fraction(raw_msg, city)
+                elif cmd_name == '/help':
+                    cmd_help(raw_msg, city)
+                elif cmd_name == '/me':
                     cmd_me(raw_msg, city)
-                elif decoded['text'] == '/nick':
-                    cmd_nick(raw_msg)
-                elif decoded['text'] == '/night':
-                    cmd_night(raw_msg)
-                elif decoded['text'] == '/notify':
-                    cmd_notify(raw_msg)
-                elif decoded['text'] == '/reset':
-                    cmd_reset(raw_msg)
+                elif cmd_name == '/nick':
+                    cmd_nick(raw_msg, city)
+                elif cmd_name == '/night':
+                    cmd_night(raw_msg, city)
+                elif cmd_name == '/notify':
+                    cmd_notify(raw_msg, city)
+                elif cmd_name == '/reset':
+                    cmd_reset(raw_msg, city)
                 elif cmd_name == '/result':
-                    cmd_result(raw_msg)
+                    cmd_result(raw_msg, city)
                 elif cmd_name == '/resultfev':
-                    cmd_resultfev(raw_msg)
-                elif decoded['text'] == '/send_all':
-                    cmd_send_all(raw_msg)
-                elif decoded['text'] == '/set':
-                    cmd_set(raw_msg)
-                elif decoded['text'] == '/softreset':
-                    cmd_softreset(raw_msg)
-                elif decoded['text'] == '/startevent':
-                    cmd_startevent(raw_msg)
-                elif decoded['text'] == '/stop':
-                    cmd_stop(raw_msg)
+                    cmd_resultfev(raw_msg, city)
+                elif cmd_name == '/send_all':
+                    cmd_send_all(raw_msg, city)
+                elif cmd_name == '/set':
+                    cmd_set(raw_msg, city)
+                elif cmd_name == '/softreset':
+                    cmd_softreset(raw_msg, city)
+                elif cmd_name == '/startevent':
+                    cmd_startevent(raw_msg, city)
+                elif cmd_name == '/stop':
+                    cmd_stop(raw_msg, city)
                 else:
-                    process_msg(raw_msg)
+                    process_msg(raw_msg, city)
             else:
                 LOG.warning('unknown event ' + decoded['event'])
             channel.basic_ack(delivery_tag=method_frame.delivery_tag)
@@ -905,18 +904,18 @@ def on_message(channel, method_frame, header_frame, body):
             channel.basic_ack(delivery_tag=method_frame.delivery_tag)
             return
         if "success" in decoded.keys() and decoded["success"]:
-            if decoded.get('mode') in MODES:
+            # if decoded.get('mode') in MODES:
                 if decoded['fraction']:
                     data["counters"][agentname]['fraction'] = decoded['fraction']
                 data["counters"][agentname][datakey].update(decoded)
                 save_data()
-                user_inform(agentname)
+                # user_inform(agentname, city)
                 # bot.forward_message(CHAT_OK, chatid, msgid)
                 # send_message("Агент %s, AP %s, %s %s" % (
                 #    agentname, decoded["AP"], decoded["mode"], decoded[decoded["mode"]]), CHAT_OK)
-            else:
-                send_message(_("Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*") %
-                             (decoded.get('mode'), ', '.join(MODES)), chatid, parse_mode="Markdown")
+            # else:
+            #     send_message(_("Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*") %
+            #                  (decoded.get('mode'), ', '.join(MODES)), chatid, parse_mode="Markdown")
         else:
             # bot.forward_message(CHAT_FAIL, chatid, msgid)
             send_message(_("Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов вручную"), chatid)

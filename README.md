@@ -6,17 +6,10 @@ Manual installation
 -----------------------------------
 * register you own telegramm bot via https://telegram.me/botfather and save Token for future use (API_TOKEN)
 * download the sources
-* copy config.sample.py -> config.py
-* inside config.py fill API_TOKEN - value, obtained from BotFather
-* inside config.py fill ADMINS - telegram nicks of users, that can manage bot
-* inside config.py fill MODES - what screens you bot will count (Trekker/Builder/Purifier is default. Change if you wish)
-* inside config.py fill WELCOME - new users will see it, on conversation start
+* copy sample.env -> .env
+* inside .env fill TELEGRAM_TOKEN - value, obtained from BotFather
+* inside .env fill SUPER_ADMIN - your telegram nick
 * start your bot by "docker-compose up -d" (it will take nearly 10 minutes)
-* create two telegram chats (Supergroups is better), and add your new bot to them. First group for good screens, and second - for bad screens
-* write "/chatid" in them, and detect its ID
-* edit your config.py one more time and:
-* inside config.py fill CHAT_OK - id of chat, where bot will forward good screens
-* inside config.py fill CHAT_FAIL - id of chat, where bot will forward bad screens (that it cant to recognize)
 * restart bot with "docker-compose restart"
 * test you bot with /help or /me command. Or send some screenshots to it
 
