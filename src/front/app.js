@@ -54,7 +54,7 @@ Promise.all([
             "rawMsg": msg,
             "tg_name": tgName,
             "isAdmin": await isAdmin(tgName),
-            "cityId": city.cityId,
+            "cityId": city.cityId || DEFAULT_CITY,
             "city": city,
         };
 
