@@ -5,7 +5,6 @@ services:
     restart: always
     volumes:
       - "./src/bot:/app"
-      - "./data/Screens:/Screens"
     depends_on:
       - rabbit
   rabbit:
@@ -19,14 +18,14 @@ services:
 #      - "15672:15672"
     expose:
       - 5672
-  decoder:
-    build: src/decoder
-    depends_on:
-      - rabbit
-    restart: always
-    volumes:
-      - "./src/decoder:/app"
-      - "./data/Screens:/Screens"
+#  decoder:
+#    build: src/decoder
+#    depends_on:
+#      - rabbit
+#    restart: always
+#    volumes:
+#      - "./src/decoder:/app"
+#      - "./data/Screens:/Screens"
   logger:
     build: src/logger
     volumes:
