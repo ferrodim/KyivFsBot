@@ -6,7 +6,7 @@ const fs = require('fs');
 const Gettext = require('node-gettext');
 const po = require('gettext-parser').po;
 const printf = require('printf');
-const locales = ['en', 'ru', 'ua'];
+const locales = ['ua', 'ru', 'en'];
 const DEFAULT_LANG = locales[0];
 const gt = new Gettext();
 
