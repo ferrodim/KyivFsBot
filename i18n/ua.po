@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-07 10:25+0200\n"
-"PO-Revision-Date: 2019-12-07 11:10+0200\n"
+"POT-Creation-Date: 2019-12-07 13:29+0200\n"
+"PO-Revision-Date: 2019-12-07 13:20+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk_UA\n"
@@ -21,6 +21,12 @@ msgstr ""
 
 msgid "Доступ запрещён"
 msgstr "Доступ заборонено"
+
+msgid "Done"
+msgstr ""
+
+msgid "Данные по вам изменились:"
+msgstr "Дані по вам змінились:"
 
 #, python-format
 msgid ""
@@ -134,22 +140,31 @@ msgid "Бот ничего не знает по вам"
 msgstr "Бот не знае нічого про вас"
 
 #, python-format
-msgid "Ник телеги: @%s\n"
-msgstr "Нік телеграмму: @%s\n"
+msgid ""
+"Ник телеги: @%s\n"
+"Ник в игре: %s\n"
+"Фракция: %s\n"
+"== Стартовые показатели:%s\n"
+"== Финишные показатели:%s"
+msgstr ""
+"Нік телегаму: @%s\n"
+"Нік в грі: %s\n"
+"Фракція: %s\n"
+"== Стартові показники:%s\n"
+"== Финішні показники:%s"
 
 #, python-format
-msgid "Ник в игре: %s\n"
-msgstr "Нік в грі: %s\n"
-
-#, python-format
-msgid "Фракция: %s\n"
-msgstr "Фракція: %s\n"
-
-msgid "Стартовые показатели:"
-msgstr "Стартові показники:"
-
-msgid "Финишные показатели:"
-msgstr "Фінішні показники:"
+msgid ""
+"Ник телеги: @%s\n"
+"Ник в игре: %s\n"
+"Фракция: %s\n"
+"== Стартовые показатели:\n"
+"%s"
+msgstr ""
+"Нік телегаму: @%s\n"
+"Нік в грі: %s\n"
+"Фракція: %s\n"
+"== Стартові показники:%s"
 
 msgid "That user is not found in database"
 msgstr "Такий користувач не знайдений в базі"
@@ -239,6 +254,21 @@ msgstr "Язик змінений на \"%s\""
 #, javascript-format
 msgid "Unknown language \"%s\""
 msgstr "Невідомий язик \"%s\""
+
+#~ msgid "Ник телеги: @%s\n"
+#~ msgstr "Нік телеграмму: @%s\n"
+
+#~ msgid "Ник в игре: %s\n"
+#~ msgstr "Нік в грі: %s\n"
+
+#~ msgid "Фракция: %s\n"
+#~ msgstr "Фракція: %s\n"
+
+#~ msgid "Стартовые показатели:"
+#~ msgstr "Стартові показники:"
+
+#~ msgid "Финишные показатели:"
+#~ msgstr "Фінішні показники:"
 
 #~ msgid ""
 #~ "Неверный формат запроса. Нужно писать:\n"

@@ -53,6 +53,7 @@ def restricted(func):
 
 def cmd_help(message, city):
     txt = "/me - View personal userinfo\n" \
+          "/lang - Change language to ua/ru/en\n" \
           "/start - See general info\n" \
           "/best <category> Get best results\n" \
           "/bestn <category> Get best results\n"\
@@ -115,7 +116,8 @@ def cmd_set(message, city):
         value = int(chunks[4])
         data["counters"][agentname][step][counter] = value
     save_data()
-    reply_to(message, "Done\n" + user_info(agentname, city), parse_mode="Markdown")
+    reply_to(message, _("Done"), parse_mode="Markdown")
+    reply_user_info(message['chat']['id'], agentname, city)
     # if message['from_user']['username'] != agentname:
     #     user_inform(agentname, city)
 
@@ -127,8 +129,8 @@ def user_inform(agentname, city):
     if agentname in data["counters"]:
         chatid = data["counters"][agentname].get('chatid')
         if chatid is not None:
-            txt = 'Данные по вам изменились:\n' + user_info(agentname, city)
-            send_message(txt, chatid, parse_mode="Markdown")
+            send_message(_('Данные по вам изменились:'), chatid, parse_mode="Markdown")
+            reply_user_info(chatid, agentname, city)
 
 
 @restricted
@@ -500,8 +502,7 @@ def cmd_clear(message, city):
 
 def cmd_me(message, city):
     tg_name = get_tg_nick(message, city)
-    txt = user_info(tg_name, city)
-    reply_to(message, txt, parse_mode="Markdown")
+    reply_user_info(message['chat']['id'], tg_name, city)
 
 
 def cmd_clearme(message, city):
@@ -554,32 +555,54 @@ def cmd_clearme(message, city):
 #     reply_to(message, txt, parse_mode="Markdown")
 
 
-def user_info(username, city):
+def reply_user_info(chatId, username, city):
     allowed_modes = ["AP", "Level"] + city['modes']
     if username not in data["counters"].keys():
-        return _('Бот ничего не знает по вам')
+        send_message(_('Бот ничего не знает по вам'), chatId, parse_mode="Markdown")
+        return
+
     user_data = data["counters"][username]
-    txt = _("Ник телеги: @%s\n") % username.replace('_', '\\_')
+    placeholders = [
+        username.replace('_', '\\_'),
+    ]
+
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-':
-        txt += _("Ник в игре: %s\n") % game_nick.replace('_', '\\_')
+        placeholders.append(game_nick.replace('_', '\\_'))
     fraction = user_data.get("fraction", "")
-    if fraction:
-        txt += _("Фракция: %s\n") % full_fraction_name(fraction)
-    txt += "== " + _("Стартовые показатели:")
+    placeholders.append(full_fraction_name(fraction))
+
+    start_values = ''
+    end_values = ''
     for mode in allowed_modes:
         value = user_data["start"].get(mode, "-")
-        txt += "\n_%s:_ *%s*" % (mode, value)
+        start_values += "\n_%s:_ *%s*" % (mode, value)
+    placeholders.append(start_values)
     if "end" in user_data.keys() and len(user_data['end'].keys()) > 0:
-        txt += "\n=="
-        txt += _("Финишные показатели:")
         for mode in allowed_modes:
             value = user_data["end"].get(mode, "-")
-            txt += "\n_%s_: *%s*" % (mode, value)
+            end_values += "\n_%s_: *%s*" % (mode, value)
             if mode in user_data["start"].keys() and mode in user_data["end"].keys():
                 delta = (user_data["end"][mode] - user_data["start"][mode])
-                txt += " (+%s)" % delta
-    return txt
+                end_values += " (+%s)" % delta
+
+    if end_values:
+        txt = _("Ник телеги: @%s\n"
+                "Ник в игре: %s\n"
+                "Фракция: %s\n"
+                "== Стартовые показатели:" 
+                "%s\n"
+                "== Финишные показатели:"
+                "%s")
+        placeholders.append(end_values)
+    else:
+        txt = _("Ник телеги: @%s\n"
+                "Ник в игре: %s\n"
+                "Фракция: %s\n"
+                "== Стартовые показатели:\n"
+                "%s")
+    send_message(txt, chatId, placeholders, parse_mode="Markdown")
+    # reply_to(message, txt, parse_mode="Markdown")
 
 
 def get_tg_nick(message, city):
@@ -608,8 +631,8 @@ def process_msg(message, city):
     if message['isAdmin']:
         user_tg_name = message['text'].replace('@', '')
         if user_tg_name in data["counters"].keys():
-            txt = user_info(user_tg_name, city)
-            reply_to(message, txt, parse_mode="Markdown")
+            reply_user_info(message['chat']['id'], user_tg_name, city)
+            # reply_to(message, txt, parse_mode="Markdown")
         elif user_tg_name[0] != '/':
             send_message(_('That user is not found in database'), message['chat']['id'])
             # txt = "Такой пользователь не найден в базе"
