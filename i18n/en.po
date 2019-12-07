@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 03:55+0200\n"
+"POT-Creation-Date: 2019-12-07 10:25+0200\n"
 "PO-Revision-Date: 2019-11-18 03:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -114,12 +114,6 @@ msgstr "Your data removed"
 msgid "Бот не располагает данными на вас"
 msgstr ""
 
-#, python-format
-msgid ""
-"Неверный формат запроса. Нужно писать:\n"
-"`%s`\n"
-msgstr ""
-
 msgid "Бот ничего не знает по вам"
 msgstr ""
 
@@ -181,10 +175,6 @@ msgid "Данные с изображения распарсить не удал
 msgstr ""
 
 msgid ""
-"Вы прислали скрин из неактивной категории *%1$s*. Пришлите вместо него *%2$s*"
-msgstr ""
-
-msgid ""
 "Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов "
 "вручную"
 msgstr ""
@@ -202,8 +192,8 @@ msgstr ""
 
 #, javascript-format
 msgid ""
-"Welcome, export me your start data at *%s*, and finish data at *%s*. Active "
-"modes *%s*. Write /help for more info"
+"Welcome, export me your start data at *%s*, and finish data at *%s*. Write /"
+"help for more info"
 msgstr ""
 
 #, javascript-format

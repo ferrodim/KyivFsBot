@@ -71,9 +71,9 @@ Promise.all([
         } else if (msg.text === '/start'){
             let startTime = city.startTime || 'not filled';
             let endTime = city.endTime || 'not filled';
-            let modes = city.modes || [];
-            let template = _('Welcome, export me your start data at *%s*, and finish data at *%s*. Active modes *%s*. Write /help for more info');
-            sendTxt(msg.chat.id, template, [startTime, endTime, modes.join()]);
+            // let modes = city.modes || [];
+            let template = _('Welcome, export me your start data at *%s*, and finish data at *%s*. Write /help for more info');
+            sendTxt(msg.chat.id, template, [startTime, endTime]);
         }
     });
 }, err=>{
