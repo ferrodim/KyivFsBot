@@ -606,7 +606,7 @@ def reply_user_info(chatId, username, city):
 
 
 def get_tg_nick(message, city):
-    tg_nick = message['from']['username']
+    tg_nick = message['from'].get('username', None)
     if tg_nick is None:
         tg_nick = '#' + str(message['chat']['id'])
     return tg_nick
