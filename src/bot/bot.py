@@ -53,10 +53,13 @@ def restricted(func):
 
 def cmd_help(message, city):
     txt = "/me - View personal userinfo\n" \
+          "/start - See general info\n" \
+          "/best <category> Get best results\n" \
+          "/bestn <category> Get best results\n"\
+          "/bestabsolute <category> Get best results\n" \
           "/nick %your_in_game_nick% - Set your in_game nick\n" \
           "/fraction %e_or_r% - Set your fraction\n" \
-          "/clearme - Delete you account\n" \
-          "/adminlist - Actual admin list\n"
+          "/clearme - Delete you account\n"
     if message['isAdmin']:
         txt += "== admin commands\n" \
                "@username or username - Get userinfo\n" \
@@ -68,7 +71,6 @@ def cmd_help(message, city):
                "/agents - Get agents table\n" \
                "/result - Get result table file\n" \
                "/resultfev - Get result table file in FEV style\n" \
-               "/best <category> Get best results\n" \
                "/clear <tg_nick> Clear by tg_nick\n" \
                "/clearzero Clear agents by zero results\n" \
                "/softreset - Clear everything exept nick and fraciton\n" \
