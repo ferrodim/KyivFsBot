@@ -57,7 +57,6 @@ def cmd_help(message, city):
           "/best <category> Get best results\n" \
           "/bestn <category> Get best results\n"\
           "/bestabsolute <category> Get best results\n" \
-          "/nick %your_in_game_nick% - Set your in_game nick\n" \
           "/fraction %e_or_r% - Set your fraction\n" \
           "/clearme - Delete you account\n"
     if message['isAdmin']:
@@ -538,22 +537,22 @@ def cmd_fraction(message, city):
     reply_to(message, txt, parse_mode="Markdown")
 
 
-def cmd_nick(message, city):
-    chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
-    if not is_valid_query:
-        reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
-                           "`%s`\n") % '/nick my_game_nick'), parse_mode="Markdown")
-        return
-    tg_name = get_tg_nick(message, city)
-    game_nick = chunks[1]
-    if tg_name not in data["counters"].keys():
-        data["counters"][tg_name] = {"start": {}, "end": {}}
-    data["counters"][tg_name]['Nick'] = game_nick
-    save_data()
-    user_save_chatid(tg_name, message['chat']['id'])
-    txt = user_info(tg_name, city)
-    reply_to(message, txt, parse_mode="Markdown")
+# def cmd_nick(message, city):
+#     chunks = message['text'].replace("@", "").replace("  ", " ").split(" ")
+#     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[a-zA-Z0-9\-_]+', chunks[1]))
+#     if not is_valid_query:
+#         reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
+#                            "`%s`\n") % '/nick my_game_nick'), parse_mode="Markdown")
+#         return
+#     tg_name = get_tg_nick(message, city)
+#     game_nick = chunks[1]
+#     if tg_name not in data["counters"].keys():
+#         data["counters"][tg_name] = {"start": {}, "end": {}}
+#     data["counters"][tg_name]['Nick'] = game_nick
+#     save_data()
+#     user_save_chatid(tg_name, message['chat']['id'])
+#     txt = user_info(tg_name, city)
+#     reply_to(message, txt, parse_mode="Markdown")
 
 
 def user_info(username, city):
@@ -860,8 +859,8 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_help(raw_msg, city)
                 elif cmd_name == '/me':
                     cmd_me(raw_msg, city)
-                elif cmd_name == '/nick':
-                    cmd_nick(raw_msg, city)
+                # elif cmd_name == '/nick':
+                #     cmd_nick(raw_msg, city)
                 elif cmd_name == '/night':
                     cmd_night(raw_msg, city)
                 elif cmd_name == '/notify':
