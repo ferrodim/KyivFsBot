@@ -64,11 +64,12 @@ Promise.all([
 
         console.log('msg.text', msg.text);
 
+        let isDummyRequest = msg.text[0] !== '/' && msg.text.length < 50 && !event.isAdmin;
         if (msg.text === '/ping'){
             sendTxt(msg.chat.id, _('Pong from %s'), ["front"]);
         } else if (msg.text === '/chatid'){
             sendTxt(msg.chat.id, _('Id of this chat is %s'), [msg.chat.id]);
-        } else if (msg.text === '/start'){
+        } else if (msg.text === '/start' || isDummyRequest){
             let startTime = city.startTime || 'not filled';
             let endTime = city.endTime || 'not filled';
             // let modes = city.modes || [];
