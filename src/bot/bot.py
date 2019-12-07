@@ -57,7 +57,6 @@ def cmd_help(message, city):
           "/best <category> Get best results\n" \
           "/bestn <category> Get best results\n"\
           "/bestabsolute <category> Get best results\n" \
-          "/fraction %e_or_r% - Set your fraction\n" \
           "/clearme - Delete you account\n"
     if message['isAdmin']:
         txt += "== admin commands\n" \
@@ -519,22 +518,22 @@ def cmd_clearme(message, city):
         reply_to(message, _("Бот не располагает данными на вас"))
 
 
-def cmd_fraction(message, city):
-    chunks = message['text'].replace("  ", " ").split(" ")
-    is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
-    if not is_valid_query:
-        reply_to(message, ("Неверный формат запроса. Нужно писать:\n"
-                           "`/fraction e`\n`/fraction r`"), parse_mode="Markdown")
-        return
-    tg_name = get_tg_nick(message, city)
-    fraction = chunks[1]
-    if tg_name not in data["counters"].keys():
-        data["counters"][tg_name] = {"start": {}, "end": {}}
-    data["counters"][tg_name]['fraction'] = fraction
-    save_data()
-    user_save_chatid(tg_name, message['chat']['id'])
-    txt = user_info(tg_name, city)
-    reply_to(message, txt, parse_mode="Markdown")
+# def cmd_fraction(message, city):
+#     chunks = message['text'].replace("  ", " ").split(" ")
+#     is_valid_query = (len(chunks) == 2 and re.fullmatch(r'[er]', chunks[1]))
+#     if not is_valid_query:
+#         reply_to(message, ("Неверный формат запроса. Нужно писать:\n"
+#                            "`/fraction e`\n`/fraction r`"), parse_mode="Markdown")
+#         return
+#     tg_name = get_tg_nick(message, city)
+#     fraction = chunks[1]
+#     if tg_name not in data["counters"].keys():
+#         data["counters"][tg_name] = {"start": {}, "end": {}}
+#     data["counters"][tg_name]['fraction'] = fraction
+#     save_data()
+#     user_save_chatid(tg_name, message['chat']['id'])
+#     txt = user_info(tg_name, city)
+#     reply_to(message, txt, parse_mode="Markdown")
 
 
 # def cmd_nick(message, city):
@@ -853,8 +852,8 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_clearzero(raw_msg, city)
                 elif cmd_name == '/endevent':
                     cmd_endevent(raw_msg, city)
-                elif cmd_name == '/fraction':
-                    cmd_fraction(raw_msg, city)
+                # elif cmd_name == '/fraction':
+                #     cmd_fraction(raw_msg, city)
                 elif cmd_name == '/help':
                     cmd_help(raw_msg, city)
                 elif cmd_name == '/me':
