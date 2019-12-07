@@ -31,6 +31,9 @@ connect.then(con => {
             if (event.event === 'call.translateAndSend'){
                 sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
             } else if (event.event === 'core.messageIn'){
+                if (!event.text){
+                    return;
+                }
                 if (event.text === '/lang'){
                     sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
                 }
