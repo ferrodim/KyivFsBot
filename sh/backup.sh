@@ -2,7 +2,6 @@
 apt install -y p7zip-full
 docker-compose stop
 mkdir out
-cp -rp Screens/ out
 docker-compose logs -t > out/docker.log
 cp data/base.txt out/
 cp config.py out/

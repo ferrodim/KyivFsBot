@@ -1,5 +1,4 @@
 #!/bin/bash
-mkdir -p /Screens
 
 while true; do
 	python3 /app/bot.py

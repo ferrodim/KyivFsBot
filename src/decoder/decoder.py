@@ -1,8 +1,10 @@
 import pika
 import logging
 import json
+import base64
 from PIL import Image
 from time import sleep
+from io import BytesIO
 from image_process import parse_image
 
 
@@ -19,7 +21,8 @@ def on_message(channel, method_frame, header_frame, body):
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return
     send_localized_text(channel, _('Image retrieved'), msg['chatid'])
-    img = Image.open('/Screens/' + msg['img'])
+    img = Image.open(BytesIO(base64.b64decode(msg['raw_img'])))
+    # img = Image.open('/Screens/' + msg['img'])
     try:
         parse_result = parse_image(img, '')
     except Exception as e:
@@ -27,9 +30,10 @@ def on_message(channel, method_frame, header_frame, body):
         parse_result = {"filename": 'exception', "success": False}
     parse_result['msgid'] = msg['msgid']
     parse_result['chatid'] = msg['chatid']
-    parse_result['datakey'] = msg['datakey']
-    parse_result['agentname'] = msg['agentname']
+    # parse_result['datakey'] = msg['datakey']
+    parse_result['tg_name'] = msg['tg_name']
     rabbit_send(channel, parse_result)
+    # TODO: send parse_result to "store"
     # LOG.info(' => ' + json.dumps(parse_result))
     # channel.basic_publish('topic', 'parseResult', json.dumps(parse_result))
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
@@ -69,6 +73,7 @@ if __name__ == '__main__':
     channel.queue_declare(queue='decoders', durable=True)
     channel.queue_bind('decoders', 'topic', 'parseRequest')
     channel.queue_bind('decoders', 'topic', 'core.messageIn')
+    channel.queue_bind('decoders', 'topic', 'core.photoIn')
 
     channel.basic_consume('decoders', on_message)
 
