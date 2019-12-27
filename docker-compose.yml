@@ -29,7 +29,7 @@ services:
     build: src/logger
     volumes:
       - "./src/logger:/app"
-      - "./src/framework.js:/framework.js"
+      - "./src/shared:/shared"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
