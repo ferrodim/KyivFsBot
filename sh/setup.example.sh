@@ -10,6 +10,6 @@ apt update -y
 apt install -y docker-ce docker-ce-cli containerd.io docker-compose git
 git clone https://github.com/ferrodim/KyivFsBot.git
 cd KyivFsBot/
-cp config.sample.py config.py
-vi config.py
+cp .env.sample .env.sample
+vi .env.sample
 docker-compose up -d

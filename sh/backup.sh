@@ -4,7 +4,7 @@ docker-compose stop
 mkdir out
 docker-compose logs -t > out/docker.log
 cp data/base.txt out/
-cp config.py out/
+cp .env out/
 history > out/bash.history.txt
 mv out `date +"fs-kyiv-%Y-%m"`
 7z a -mx=9 -mhe `date +"fs-kyiv-%Y-%m"`.7z `date +"fs-kyiv-%Y-%m"`
