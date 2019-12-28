@@ -85,7 +85,7 @@ Promise.all([
                 }, {
                     projection: {_id:0},
                 }
-            ) || {};
+            ) || {modes:[]};
 
         let event = {
             "event": 'core.messageIn',
