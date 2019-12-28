@@ -46,7 +46,7 @@ Promise.all([
             }, {
                 projection: {_id:0},
             }
-        ) || {};
+        ) || {modes:[]};
 
         const photo = msg.photo.pop();
         const fileId = photo.file_id;
