@@ -1,11 +1,11 @@
 {
-  "name": "logger",
+  "name": "translator",
   "version": "0.0.0",
   "description": "",
   "author": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "npm i && node app.js"
   },
   "dependencies": {
     "amqplib": "^0.5.5",

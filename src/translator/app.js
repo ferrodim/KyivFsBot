@@ -2,6 +2,7 @@ let connect = require('amqplib').connect(process.env.RABBIT_URL);
 let queueName = 'translator';
 let db = {userLang: {}};
 
+
 const fs = require('fs');
 const Gettext = require('node-gettext');
 const po = require('gettext-parser').po;
