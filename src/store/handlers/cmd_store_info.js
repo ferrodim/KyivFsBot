@@ -1,4 +1,4 @@
-const {mongo, _} = require('../../shared/framework');
+const {mongo, _} = require('flatground');
 const sendText = require('../sendText');
 
 module.exports = async function (event){

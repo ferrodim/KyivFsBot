@@ -8,5 +8,6 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "flatground": "ferrodim/flatground.git#master"
   }
 }

@@ -1,4 +1,4 @@
-const {rabbit} = require('../shared/framework');
+const {rabbit} = require('flatground');
 
 module.exports = function (chatId, text, placeholders){
     let outcomeEvent = {

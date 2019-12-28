@@ -29,7 +29,6 @@ services:
     build: src/logger
     volumes:
       - "./src/logger:/app"
-      - "./src/shared:/shared"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
@@ -38,7 +37,6 @@ services:
     build: src/translator
     volumes:
       - "./src/translator:/app"
-      - "./src/shared:/shared"
       - "./i18n/:/i18n"
     environment:
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
@@ -49,7 +47,6 @@ services:
     env_file: .env
     volumes:
       - "./src/store:/app"
-      - "./src/shared:/shared"
     environment:
       MONGO_URL: "mongodb://mongo:27017/fsbot"
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
@@ -60,7 +57,6 @@ services:
     env_file: .env
     volumes:
       - "./src/front:/app"
-      - "./src/shared:/shared"
     environment:
       MONGO_URL: "mongodb://mongo:27017/fsbot"
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"

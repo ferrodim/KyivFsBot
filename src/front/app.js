@@ -1,4 +1,4 @@
-const {mongo, rabbit, _} = require('../shared/framework');
+const {mongo, rabbit, _} = require('flatground');
 const APP_NAME = 'front';
 
 const TelegramBot = require('node-telegram-bot-api');
