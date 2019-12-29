@@ -232,7 +232,7 @@ def cmd_agents(message, city):
         fraction = data["counters"][agentname].get("fraction", "-")
         img = fraction_icon(fraction)
         txt += "@%s %s `%s`" % (agentname.replace('_', '\\_'), img, nick.replace('_', '\\_'))
-    send_message(txt, message['chat']['id'])
+    send_message(txt, message['chat']['id'], parse_mode="Markdown")
 
 
 def notify_users(text, curChatId):
