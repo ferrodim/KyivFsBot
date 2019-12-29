@@ -717,6 +717,10 @@ def process_prime_tab_separated_text(message, city):
 
     if data["getStart"]:
         datakey = "start"
+        if 'start' in data["counters"][agentname].keys():
+            if 'LifetimeAP' in data["counters"][agentname]['start']:
+                if decoded['LifetimeAP'] > data["counters"][agentname]['start']['LifetimeAP']:
+                    datakey = "end"
     elif data["getEnd"]:
         datakey = "end"
     else:
