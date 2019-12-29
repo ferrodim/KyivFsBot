@@ -385,7 +385,6 @@ def cmd_best(message, city):
                  ["/best <category>", ', '.join(allowed_modes)], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1], city)
-    reply_to(message, _("Вы запросили инфу по %s"), [mode])
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -413,7 +412,6 @@ def cmd_bestn(message, city):
                  ["/bestn <category>", ', '.join(allowed_modes)], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1], city)
-    reply_to(message, _("Вы запросили инфу по %s") % mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
@@ -442,7 +440,6 @@ def cmd_bestabsolute(message, city):
                  ["/bestabsolute <category>", ', '.join(allowed_modes)], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1], city)
-    # reply_to(message, _("Вы запросили инфу по %s"), mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():

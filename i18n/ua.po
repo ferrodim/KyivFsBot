@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-29 15:19+0200\n"
+"POT-Creation-Date: 2019-12-29 21:39+0200\n"
 "PO-Revision-Date: 2019-12-29 21:05+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -89,13 +89,6 @@ msgstr "Приймаю фінішні данні!"
 msgid "No more agent stats!"
 msgstr "Більше не приймаю статистику гравців!"
 
-#, python-format
-msgid "Вы запросили инфу по %s"
-msgstr "Ви запитали інформацію про %s"
-
-msgid "Best %1$s:%2$s"
-msgstr "Найкращі %1$s:%2$s"
-
 msgid ""
 "Неверный формат запроса. Нужно писать:\n"
 "`%1$s`\n"
@@ -106,6 +99,9 @@ msgstr ""
 "`%1$s`\n"
 "де параметр приймає значення\n"
 "%2$s"
+
+msgid "Best %1$s:%2$s"
+msgstr "Найкращі %1$s:%2$s"
 
 #, python-format
 msgid ""
@@ -261,6 +257,9 @@ msgstr "Язик змінений на \"%s\""
 #, javascript-format
 msgid "Unknown language \"%s\""
 msgstr "Невідомий язик \"%s\""
+
+#~ msgid "Вы запросили инфу по %s"
+#~ msgstr "Ви запитали інформацію про %s"
 
 #~ msgid "Ник телеги: @%s\n"
 #~ msgstr "Нік телеграмму: @%s\n"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-29 15:19+0200\n"
+"POT-Creation-Date: 2019-12-29 21:39+0200\n"
 "PO-Revision-Date: 2019-12-07 13:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -80,20 +80,16 @@ msgstr "Finish agent stats are welcome!"
 msgid "No more agent stats!"
 msgstr "No more agent stats!"
 
-#, python-format
-msgid "Вы запросили инфу по %s"
-msgstr "You have asked info about %s"
-
-#, fuzzy
-msgid "Best %1$s:%2$s"
-msgstr "Best %1$s:%2$s"
-
 msgid ""
 "Неверный формат запроса. Нужно писать:\n"
 "`%1$s`\n"
 "где параметр принимает значения\n"
 "%2$s"
 msgstr ""
+
+#, fuzzy
+msgid "Best %1$s:%2$s"
+msgstr "Best %1$s:%2$s"
 
 #, python-format
 msgid ""
@@ -232,6 +228,9 @@ msgstr "Language changed to \"%s\""
 #, javascript-format
 msgid "Unknown language \"%s\""
 msgstr "Unknown language \"%s\""
+
+#~ msgid "Вы запросили инфу по %s"
+#~ msgstr "You have asked info about %s"
 
 #~ msgid "Список админов: %s"
 #~ msgstr "List of admins: %s"
