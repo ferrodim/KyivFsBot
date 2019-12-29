@@ -9,7 +9,7 @@ const Gettext = require('node-gettext');
 const po = require('gettext-parser').po;
 const printf = require('printf');
 const locales = ['ua', 'ru', 'en'];
-const DEFAULT_LANG = locales[0];
+const DEFAULT_LANG = env.DEFAULT_LANG || locales[0];
 const gt = new Gettext();
 
 locales.forEach((locale) => {

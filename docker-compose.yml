@@ -35,6 +35,7 @@ services:
       - rabbit
   translator:
     build: src/translator
+    env_file: .env
     volumes:
       - "./src/translator:/app"
       - "./i18n/:/i18n"
