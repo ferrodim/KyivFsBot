@@ -381,10 +381,8 @@ def cmd_best(message, city):
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1], city) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        send_message(("Неверный формат запроса. Нужно писать:\n"
-                      "`/best <category>`\n"
-                      "где category принимает значения\n"
-                      "" + ', '.join(allowed_modes)), message['chat']['id'], parse_mode="Markdown")
+        reply_to(message, _("Неверный формат запроса. Нужно писать:\n`%1$s`\nгде параметр принимает значения\n%2$s"),
+                 ["/best <category>", ', '.join(allowed_modes)], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1], city)
     reply_to(message, _("Вы запросили инфу по %s"), [mode])
@@ -411,10 +409,8 @@ def cmd_bestn(message, city):
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1], city) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
-                                             "`%1$s`\n"
-                                             "где параметр принимает значения\n%2$s")
-                                           % ("/best <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
+        reply_to(message, _("Неверный формат запроса. Нужно писать:\n`%1$s`\nгде параметр принимает значения\n%2$s"),
+                 ["/bestn <category>", ', '.join(allowed_modes)], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1], city)
     reply_to(message, _("Вы запросили инфу по %s") % mode)
@@ -442,13 +438,11 @@ def cmd_bestabsolute(message, city):
     is_valid_query = (len(chunks) in [2, 3] and (category_name_normalize(chunks[1], city) in allowed_modes))
     amount = int(chunks[2]) if len(chunks) == 3 else 10
     if not is_valid_query:
-        reply_to(message, (_("Неверный формат запроса. Нужно писать:\n"
-                                             "`%1$s`\n"
-                                             "где параметр принимает значения\n%2$s")
-                                           % ("/bestabsolute <category>", ', '.join(allowed_modes))), parse_mode="Markdown")
+        reply_to(message, _("Неверный формат запроса. Нужно писать:\n`%1$s`\nгде параметр принимает значения\n%2$s"),
+                 ["/bestabsolute <category>", ', '.join(allowed_modes)], parse_mode="Markdown")
         return
     mode = category_name_normalize(chunks[1], city)
-    reply_to(message, _("Вы запросили инфу по %s") % mode)
+    # reply_to(message, _("Вы запросили инфу по %s"), mode)
     user_data = []
     for agentname in data["counters"].keys():
         if "start" in data["counters"][agentname].keys() and "end" in data["counters"][agentname].keys():
