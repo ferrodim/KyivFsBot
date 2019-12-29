@@ -875,6 +875,8 @@ def on_message(channel, method_frame, header_frame, body):
                 city = decoded['city']
                 if cmd_name == '/ping':
                     send_message(_('Pong from %s'), decoded['chatid'], ['bot'])
+                elif cmd_name == '/agents':
+                    cmd_agents(raw_msg, city)
                 elif cmd_name == '/best':
                     cmd_best(raw_msg, city)
                 elif cmd_name == '/bestabsolute':
@@ -908,6 +910,8 @@ def on_message(channel, method_frame, header_frame, body):
                 elif cmd_name == '/resultfev':
                     cmd_resultfev(raw_msg, city)
                 elif cmd_name == '/send_all':
+                    cmd_send_all(raw_msg, city)
+                elif cmd_name == '/sendall':
                     cmd_send_all(raw_msg, city)
                 elif cmd_name == '/set':
                     cmd_set(raw_msg, city)
