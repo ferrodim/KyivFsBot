@@ -27,36 +27,40 @@ connect.then(con => {
     await ch.bindQueue(queueName, 'topic', 'call.setLang');
     await ch.bindQueue(queueName, 'topic', 'core.messageIn');
     ch.consume(queueName, function(msg) {
-        if (msg !== null) {
-            let event = JSON.parse(msg.content.toString());
-            console.log('{Rabbit} <= ' + JSON.stringify(event));
-            if (event.event === 'call.translateAndSend'){
-                sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
-            } else if (event.event === 'core.messageIn'){
-                if (!event.text){
-                    return;
-                }
-                if (event.text === '/lang'){
-                    sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
-                }
-                if (event.text === '/ping'){
-                    sendTxt(ch, event.chatid, _('Pong from %s'), ["translator"]);
-                }
-                if (event.text === '/langlist'){
-                    sendTxt(ch, event.chatid, _('List of languages: %s'), [locales.join()]);
-                }
-                if (event.text.indexOf('/lang ') === 0){
-                    let newLang = event.text.split(' ')[1];
-                    if (locales.includes(newLang)){
-                        db.userLang[event.chatid] = newLang;
-                        sendTxt(ch, event.chatid, _('Language changed to "%s"'), [newLang]);
-                    } else {
-                        sendTxt(ch, event.chatid, _('Unknown language "%s"'), [newLang]);
+        try {
+            if (msg !== null) {
+                let event = JSON.parse(msg.content.toString());
+                console.log('{Rabbit} <= ' + JSON.stringify(event));
+                if (event.event === 'call.translateAndSend'){
+                    sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
+                } else if (event.event === 'core.messageIn'){
+                    if (!event.text){
+                        return;
                     }
+                    if (event.text === '/lang'){
+                        sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
+                    }
+                    if (event.text === '/ping'){
+                        sendTxt(ch, event.chatid, _('Pong from %s'), ["translator"]);
+                    }
+                    if (event.text === '/langlist'){
+                        sendTxt(ch, event.chatid, _('List of languages: %s'), [locales.join()]);
+                    }
+                    if (event.text.indexOf('/lang ') === 0){
+                        let newLang = event.text.split(' ')[1];
+                        if (locales.includes(newLang)){
+                            db.userLang[event.chatid] = newLang;
+                            sendTxt(ch, event.chatid, _('Language changed to "%s"'), [newLang]);
+                        } else {
+                            sendTxt(ch, event.chatid, _('Unknown language "%s"'), [newLang]);
+                        }
+                    }
+                } else {
+                    console.log('unknown event', event);
                 }
-            } else {
-                console.log('unknown event', event);
             }
+        } catch (e){
+        } finally {
             ch.ack(msg);
         }
     });
