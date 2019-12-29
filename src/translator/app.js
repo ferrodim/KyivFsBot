@@ -1,4 +1,5 @@
-let connect = require('amqplib').connect(process.env.RABBIT_URL);
+const env = process.env;
+let connect = require('amqplib').connect(env.RABBIT_URL);
 let queueName = 'translator';
 let db = {userLang: {}};
 
