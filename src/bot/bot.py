@@ -9,6 +9,7 @@ import re
 import pika
 import logging
 from operator import itemgetter
+import datetime
 
 print("restart")
 
@@ -706,6 +707,11 @@ def process_prime_tab_separated_text(message, city):
         if re.fullmatch(r'\d+', val):
             val = int(val)
         decoded[titles[i]] = val
+
+    today = datetime.date.today()
+    if today.strftime('%Y-%m-%d') != decoded['Date']:
+        reply_to(message, _("You have send old statistic"))
+        return
 
     LOG.info('decoded ' + str(decoded))
 
