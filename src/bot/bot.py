@@ -570,6 +570,8 @@ def reply_user_info(chatId, username, city):
     game_nick = user_data.get("Nick", "-")
     if game_nick != '-':
         placeholders.append(game_nick.replace('_', '\\_'))
+    else:
+        placeholders.append('<no nick>')
     fraction = user_data.get("fraction", "")
     placeholders.append(full_fraction_name(fraction))
 
