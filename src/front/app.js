@@ -1,8 +1,9 @@
 const {mongo, rabbit, _} = require('flatground');
 const APP_NAME = 'front';
 
+const env = process.env;
 const TelegramBot = require('node-telegram-bot-api');
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: {interval: 1000}});
+const bot = new TelegramBot(env.TELEGRAM_TOKEN, {polling: {interval: 1000}});
 const DEFAULT_CITY = 1;
 
 Promise.all([
@@ -38,6 +39,10 @@ Promise.all([
 
     bot.on('photo', async function(msg){
         if (msg.chat.id < 0){
+            return;
+        }
+        if (env.IMG_DISABLED){
+            sendTxt(msg.chat.id, _('Image parsing disabled'));
             return;
         }
         let tgName = get_tg_nick(msg);
