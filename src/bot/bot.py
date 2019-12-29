@@ -583,8 +583,9 @@ def reply_user_info(chatId, username, city):
             value = user_data["end"].get(mode, "-")
             end_values += "\n_%s_: *%s*" % (mode, value)
             if mode in user_data["start"].keys() and mode in user_data["end"].keys():
-                delta = (user_data["end"][mode] - user_data["start"][mode])
-                end_values += " (+%s)" % delta
+                if type(user_data["start"][mode]) == int and type(user_data["end"][mode]) == int:
+                    delta = (user_data["end"][mode] - user_data["start"][mode])
+                    end_values += " (+%s)" % delta
 
     if end_values:
         txt = _("Ник телеги: @%s\n"
