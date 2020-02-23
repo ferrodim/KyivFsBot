@@ -801,7 +801,8 @@ def parse_title(title):
     title = str(title).replace('Stealth Ops Missions', 'StealthOps')
     title = str(title).replace('OPR Live Events', 'OPRLive')
     title = str(title).replace('Umbra: Unique Resonator Slots Deployed', 'Umbra')
-    title = str(title).replace('Didact: Total Fields Created', 'Didact')
+    title = str(title).replace('Didact: Total Fields Created', 'Didact') # legacy
+    title = str(title).replace('Didact Fields Created', 'Didact')
     ans = title.split(' ')
     ans.pop()
     return ans
