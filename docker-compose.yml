@@ -62,6 +62,7 @@ services:
       MONGO_URL: "mongodb://mongo:27017/fsbot"
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
       IMG_DISABLED: 1
+      IMG_CHAT: -1001312371614
     depends_on:
       - rabbit
   mongo:
