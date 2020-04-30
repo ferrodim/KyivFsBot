@@ -356,7 +356,7 @@ def cmd_resultfev(message, city):
 
 @restricted
 def cmd_resultcovid(message, city):
-    delimiter = message['text'][len("/resultfev "):len("/resultfev ") + 1]
+    delimiter = message['text'][len("/resultcovid "):len("/resultcovid ") + 1]
     if delimiter == '':
         delimiter = ','
     txt = "Agent Name;Agent Fraction;Start Level;End Level;Level Gain;Start Lifetime AP;End Lifetime AP;AP Gain;Start XM Recharger;End XM Recharger;XM Recharged"
@@ -367,14 +367,14 @@ def cmd_resultcovid(message, city):
     for agentname in data["counters"].keys():
         agentdata = {"start": {}, "end": {}}
         for mode in allowed_modes:
-            agentdata["start"][mode] = "-"
-            agentdata["end"][mode] = "-"
+            agentdata["start"][mode] = 0
+            agentdata["end"][mode] = 0
         if "start" in data["counters"][agentname].keys():
             agentdata["start"].update(data["counters"][agentname]["start"])
         if "end" in data["counters"][agentname].keys():
             agentdata["end"].update(data["counters"][agentname]["end"])
         nick = data["counters"][agentname].get("Nick", "-")
-        fraction = data["counters"][agentname].get("fraction", "-")
+        fraction = full_fraction_name(data["counters"][agentname].get("fraction", "-"))
         is_anything_filled = False
         for mode in allowed_modes:
             if agentdata["start"][mode] != '-':
@@ -382,6 +382,12 @@ def cmd_resultcovid(message, city):
             if agentdata["end"][mode] != '-':
                 is_anything_filled = True
         if is_anything_filled:
+            if agentdata["end"]["Level"] < agentdata["start"]["Level"]:
+                agentdata["end"]["Level"] = agentdata["start"]["Level"]
+            if agentdata["end"]["AP"] < agentdata["start"]["AP"]:
+                agentdata["end"]["AP"] = agentdata["start"]["AP"]
+            if agentdata["end"]["Recharger"] < agentdata["start"]["Recharger"]:
+                agentdata["end"]["Recharger"] = agentdata["start"]["Recharger"]
             user_data.append((nick, fraction,
                               agentdata["start"]["Level"], agentdata["end"]["Level"], (agentdata["end"]["Level"] - agentdata["start"]["Level"]),
                               agentdata["start"]["AP"], agentdata["end"]["AP"], (agentdata["end"]["AP"] - agentdata["start"]["AP"]),
