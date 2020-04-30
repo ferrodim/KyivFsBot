@@ -354,6 +354,54 @@ def cmd_resultfev(message, city):
     rabbit_send(json.dumps(decode_query))
 
 
+@restricted
+def cmd_resultcovid(message, city):
+    delimiter = message['text'][len("/resultfev "):len("/resultfev ") + 1]
+    if delimiter == '':
+        delimiter = ','
+    txt = "Agent Name;Agent Fraction;Start Level;End Level;Level Gain;Start Lifetime AP;End Lifetime AP;AP Gain;Start XM Recharger;End XM Recharger;XM Recharged"
+    allowed_modes = ["Level", "AP", "Recharger"]
+    txt += "\n"
+
+    user_data = []
+    for agentname in data["counters"].keys():
+        agentdata = {"start": {}, "end": {}}
+        for mode in allowed_modes:
+            agentdata["start"][mode] = "-"
+            agentdata["end"][mode] = "-"
+        if "start" in data["counters"][agentname].keys():
+            agentdata["start"].update(data["counters"][agentname]["start"])
+        if "end" in data["counters"][agentname].keys():
+            agentdata["end"].update(data["counters"][agentname]["end"])
+        nick = data["counters"][agentname].get("Nick", "-")
+        fraction = data["counters"][agentname].get("fraction", "-")
+        is_anything_filled = False
+        for mode in allowed_modes:
+            if agentdata["start"][mode] != '-':
+                is_anything_filled = True
+            if agentdata["end"][mode] != '-':
+                is_anything_filled = True
+        if is_anything_filled:
+            user_data.append((nick, fraction,
+                              agentdata["start"]["Level"], agentdata["end"]["Level"], (agentdata["end"]["Level"] - agentdata["start"]["Level"]),
+                              agentdata["start"]["AP"], agentdata["end"]["AP"], (agentdata["end"]["AP"] - agentdata["start"]["AP"]),
+                              agentdata["start"]["Recharger"], agentdata["end"]["Recharger"], (agentdata["end"]["Recharger"] - agentdata["start"]["Recharger"])
+                              ))
+    user_data.sort(key=itemgetter(1))
+    for row in user_data:
+        txt += '"%s";"%s";%s;%s;%s;%s;%s;%s;%s;%s;%s\n' % row
+    txt = txt.replace(';', delimiter)
+    decode_query = {
+        "event": 'call.sendRawFile',
+        "args": {
+            "chatId": message['chat']['id'],
+            "body": txt,
+            "filename": "resultcovid.csv",
+        }
+    }
+    rabbit_send(json.dumps(decode_query))
+
+
 def category_name_normalize(name, city):
     allowed_modes = ["AP", "Level"] + city['modes']
     for mode in allowed_modes:
@@ -902,6 +950,8 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_result(raw_msg, city)
                 elif cmd_name == '/resultfev':
                     cmd_resultfev(raw_msg, city)
+                elif cmd_name == '/resultcovid':
+                    cmd_resultcovid(raw_msg, city)
                 elif cmd_name == '/send_all':
                     cmd_send_all(raw_msg, city)
                 elif cmd_name == '/sendall':
