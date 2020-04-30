@@ -897,9 +897,9 @@ def parse_title(title):
 
 def full_fraction_name(short_name):
     if short_name == 'e':
-        return 'Enlight'
+        return 'Enlightened'
     elif short_name == 'r':
-        return 'Resist'
+        return 'Resistance'
     else:
         return 'Unknown'
 
