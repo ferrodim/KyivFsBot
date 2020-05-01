@@ -665,6 +665,10 @@ def get_tg_nick(message, city):
 def process_msg(message, city):
     if message['chat']['id'] < 0:
         return
+
+    if "statUrl" in city and city['statUrl'] is not None:
+        send_message(_('You must use google table for statistic: %s'), message['chat']['id'], [city['statUrl']])
+        return
     tg_name = get_tg_nick(message, city)
     # decode_query = {
     #     "event": 'core.messageIn',
@@ -971,7 +975,7 @@ def on_message(channel, method_frame, header_frame, body):
                     cmd_startevent(raw_msg, city)
                 elif cmd_name == '/stop':
                     cmd_stop(raw_msg, city)
-                else:
+                elif raw_msg['text'][0] != '/':
                     process_msg(raw_msg, city)
             else:
                 LOG.warning('unknown event ' + decoded['event'])
