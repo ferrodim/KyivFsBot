@@ -37,22 +37,33 @@ Promise.all([
         //console.log('onMessage', msg);
     });
 
+    const IMG_MIME_TYPES = ['image/png', 'image/jpg', 'image/jpeg'];
+    async function proceedPhoto(msg){
+        if (!msg.caption){
+            sendTxt(msg.chat.id, _('Image must have a caption'));
+            return;
+        }
+        if (!msg.caption.match(/^[a-zA-Z_]+$/)){
+            sendTxt(msg.chat.id, _('Image caption must be your nickname'));
+            return;
+        }
+        await bot.forwardMessage(env.IMG_CHAT, msg.chat.id, msg.message_id);
+    }
+
+    bot.on('document', async function(msg){
+        if (env.IMG_CHAT && IMG_MIME_TYPES.includes(msg.document.mime_type)){
+            return proceedPhoto(msg);
+        }
+        sendTxt(msg.chat.id, _('Files are not allowed'));
+    });
+
     bot.on('photo', async function(msg){
         if (msg.chat.id < 0){
             return;
         }
 
         if (env.IMG_CHAT){
-            if (!msg.caption){
-                sendTxt(msg.chat.id, _('Image must have a caption'));
-                return;
-            }
-            if (!msg.caption.match(/^[a-zA-Z_]+$/)){
-                sendTxt(msg.chat.id, _('Image caption must be your nickname'));
-                return;
-            }
-            await bot.forwardMessage(env.IMG_CHAT, msg.chat.id, msg.message_id);
-            return;
+            return proceedPhoto(msg);
         }
         if (env.IMG_DISABLED){
             sendTxt(msg.chat.id, _('Image parsing disabled'));
