@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-06 12:04+0300\n"
+"POT-Creation-Date: 2020-06-06 12:11+0300\n"
 "PO-Revision-Date: 2019-12-07 13:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -209,6 +209,14 @@ msgstr ""
 
 msgid "Image caption must be your nickname"
 msgstr ""
+
+#, fuzzy
+msgid "Image forwarded"
+msgstr ""
+"Зображення покладено в чергу\\n\\nБудь-ласка, надсилайте статистику текстом "
+"- це зберігае ваш час і час організаторів, що виправляють неточності "
+"розпізнавання. Можливо в майбутньому, статистика зі світлин не буде більше "
+"прийматися"
 
 msgid "Files are not allowed"
 msgstr ""

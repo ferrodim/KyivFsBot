@@ -48,6 +48,7 @@ Promise.all([
             return;
         }
         await bot.forwardMessage(env.IMG_CHAT, msg.chat.id, msg.message_id);
+        sendTxt(msg.chat.id, _('Image forwarded'));
     }
 
     bot.on('document', async function(msg){
