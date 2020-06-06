@@ -43,6 +43,14 @@ Promise.all([
         }
 
         if (env.IMG_CHAT){
+            if (!msg.caption){
+                sendTxt(msg.chat.id, _('Image must have a caption'));
+                return;
+            }
+            if (!msg.caption.match(/^[a-zA-Z_]+$/)){
+                sendTxt(msg.chat.id, _('Image caption must be your nickname'));
+                return;
+            }
             await bot.forwardMessage(env.IMG_CHAT, msg.chat.id, msg.message_id);
             return;
         }
@@ -84,9 +92,9 @@ Promise.all([
         });
     });
     bot.on('text', async function(msg){
-        if (msg.chat.id < 0){
+        /*if (msg.chat.id < 0){
             return;
-        }
+        }*/
 
         let tgName = get_tg_nick(msg);
 
