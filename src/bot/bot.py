@@ -722,7 +722,7 @@ def process_prime_tab_separated_text(message, city):
 
     if not found:
         # bot.forward_message(CHAT_FAIL, chatid, msgid)
-        reply_to(message, _("Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"))
+        reply_to(message, _("Не могу разобрать выгрузку!"))
         return
 
     time_span = found[1]
@@ -749,7 +749,7 @@ def process_prime_tab_separated_text(message, city):
         LOG.info(titles)
         LOG.info(rest2)
         # bot.forward_message(CHAT_FAIL, chatid, msgid)
-        reply_to(message, _("Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте пожалуйста скрин картинкой"))
+        reply_to(message, _("Не могу разобрать выгрузку - обнаружен неизвестный боту параметр."))
         return
 
     decoded = {}
@@ -859,7 +859,7 @@ def parse_title(title):
     title = str(title).replace('Stealth Ops Missions', 'StealthOps')
     title = str(title).replace('OPR Live Events', 'OPRLive')
     title = str(title).replace('Umbra: Unique Resonator Slots Deployed', 'Umbra')
-    title = str(title).replace('Didact: Total Fields Created', 'Didact') # legacy
+    title = str(title).replace('Didact: Total Fields Created', 'Didact')  # legacy
     title = str(title).replace('Didact Fields Created', 'Didact')
     title = str(title).replace('Portal Scans Uploaded', 'Scans')
     ans = title.split(' ')
