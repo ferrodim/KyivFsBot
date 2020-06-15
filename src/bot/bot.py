@@ -862,6 +862,11 @@ def parse_title(title):
     title = str(title).replace('Didact: Total Fields Created', 'Didact')  # legacy
     title = str(title).replace('Didact Fields Created', 'Didact')
     title = str(title).replace('Portal Scans Uploaded', 'Scans')
+    title = str(title).replace('Drone Hacks', 'DroneHacks')  # legacy
+    title = str(title).replace('Drone Hacker', 'DroneHacks')
+    title = str(title).replace('Unique Portals Drone Visited', 'UniquePortalsDroneVisited')
+    title = str(title).replace('Furthest Drone Flight Distance', 'FurthestDroneFlightDistance')
+    title = str(title).replace('Forced Drone Recalls', 'ForcedDroneRecalls')
     ans = title.split(' ')
     ans.pop()
     return ans
