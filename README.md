@@ -1,5 +1,6 @@
 With friendship with:
 * https://github.com/DreidSpb/FsSpbBot
+* https://github.com/sshadkov/FsSpbBot
 * https://github.com/john1123/FirstSaturdayBot
 
 Manual installation
