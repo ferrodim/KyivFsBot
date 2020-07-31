@@ -5,7 +5,7 @@ With friendship with:
 
 Manual installation
 -----------------------------------
-* register you own telegramm bot via https://telegram.me/botfather and save Token for future use (API_TOKEN)
+* register you own telegram bot via https://telegram.me/botfather and save Token for future use (API_TOKEN)
 * download the sources
 * copy sample.env -> .env
 * inside .env fill TELEGRAM_TOKEN - value, obtained from BotFather
