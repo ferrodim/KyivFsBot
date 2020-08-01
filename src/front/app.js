@@ -144,8 +144,8 @@ Promise.all([
             let startTime = city.startTime || 'not filled';
             let endTime = city.endTime || 'not filled';
             // let modes = city.modes || [];
-            let template = _('Welcome, export me your start data at *%s*, and finish data at *%s*. Write /help for more info');
-            sendTxt(msg.chat.id, template, [startTime, endTime]);
+            let template = _('Welcome, export me your start data at *%s*, and finish data at *%s*. Also use [google form](%s). Write /help for more info');
+            sendTxt(msg.chat.id, template, [startTime, endTime, city.statUrl]);
         }
     });
 }, err=>{

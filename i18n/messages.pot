@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-06 12:13+0300\n"
+"POT-Creation-Date: 2020-08-01 10:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,7 +145,7 @@ msgid ""
 "Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"
 msgstr ""
 
-msgid "Не могу разобрать выгрузку! Отправьте пожалуйста скрин картинкой"
+msgid "Не могу разобрать выгрузку!"
 msgstr ""
 
 msgid "Вы прислали месячную стату. А нужно \"за всё время\""
@@ -157,9 +157,7 @@ msgstr ""
 msgid "Вы прислали дневную стату. А нужно \"за всё время\""
 msgstr ""
 
-msgid ""
-"Не могу разобрать выгрузку - обнаружен неизвестный боту параметр. Отправьте "
-"пожалуйста скрин картинкой"
+msgid "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр."
 msgstr ""
 
 msgid "You have send old statistic"
@@ -209,8 +207,8 @@ msgstr ""
 
 #, javascript-format
 msgid ""
-"Welcome, export me your start data at *%s*, and finish data at *%s*. Write /"
-"help for more info"
+"Welcome, export me your start data at *%s*, and finish data at *%s*. Also "
+"use [google form](%s). Write /help for more info"
 msgstr ""
 
 #, javascript-format
