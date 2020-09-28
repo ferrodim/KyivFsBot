@@ -18,13 +18,6 @@ services:
 #      - "15672:15672"
     expose:
       - 5672
-#  decoder:
-#    build: src/decoder
-#    depends_on:
-#      - rabbit
-#    restart: always
-#    volumes:
-#      - "./src/decoder:/app"
   logger:
     build: src/logger
     volumes:
@@ -61,7 +54,6 @@ services:
     environment:
       MONGO_URL: "mongodb://mongo:27017/fsbot"
       RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-      IMG_DISABLED: 1
     depends_on:
       - rabbit
   mongo:

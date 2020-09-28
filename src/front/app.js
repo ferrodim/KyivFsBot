@@ -66,42 +66,8 @@ Promise.all([
         if (env.IMG_CHAT){
             return proceedPhoto(msg);
         }
-        if (env.IMG_DISABLED){
-            sendTxt(msg.chat.id, _('Image parsing disabled'));
-            return;
-        }
-        let tgName = get_tg_nick(msg);
-        let city = await mongo.collection('city').findOne({
-                cityId: DEFAULT_CITY,
-            }, {
-                projection: {_id:0},
-            }
-        ) || {modes:[]};
 
-        const photo = msg.photo.pop();
-        const fileId = photo.file_id;
-
-        const fileStream = bot.getFileStream(fileId, {});
-        let bufs = [];
-        fileStream.on('data', d => bufs.push(d));
-        fileStream.on('end', async () => {
-            const img64 = Buffer.concat(bufs).toString('base64');
-
-            let event = {
-                "event": 'core.photoIn',
-                "text": '',
-                "raw_img": img64,
-                "msgid": msg.message_id,
-                "chatid": msg.from.id,
-                "rawMsg": msg,
-                "tg_name": tgName,
-                "isAdmin": await isAdmin(tgName),
-                "cityId": city.cityId || DEFAULT_CITY,
-                "city": city,
-            };
-
-            rabbit.emit(event);
-        });
+        sendTxt(msg.chat.id, _('Image parsing disabled'));
     });
     bot.on('text', async function(msg){
         /*if (msg.chat.id < 0){

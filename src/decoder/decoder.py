@@ -73,7 +73,7 @@ if __name__ == '__main__':
     channel.queue_declare(queue='decoders', durable=True)
     channel.queue_bind('decoders', 'topic', 'parseRequest')
     channel.queue_bind('decoders', 'topic', 'core.messageIn')
-    channel.queue_bind('decoders', 'topic', 'core.photoIn')
+    # channel.queue_bind('decoders', 'topic', 'core.photoIn')
 
     channel.basic_consume('decoders', on_message)
 
