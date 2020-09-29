@@ -6,6 +6,28 @@ const TelegramBot = require('node-telegram-bot-api');
 const bot = new TelegramBot(env.TELEGRAM_TOKEN, {polling: {interval: 1000}});
 const DEFAULT_CITY = 1;
 
+// translator init
+const fs = require('fs');
+const Gettext = require('node-gettext');
+const po = require('gettext-parser').po;
+const printf = require('printf');
+const locales = ['ua', 'ru', 'en'];
+const DEFAULT_LANG = env.DEFAULT_LANG || locales[0];
+const gt = new Gettext();
+locales.forEach((locale) => {
+    const translationsContent = fs.readFileSync('/i18n/'+ locale + '.po', 'utf8');
+    const parsedTranslations = po.parse(translationsContent);
+    gt.addTranslations(locale, 'messages', parsedTranslations);
+});
+
+function botSend(args){
+    let options  = {};
+    if (args.formatted){
+        options.parse_mode = 'Markdown';
+    }
+    bot.sendMessage(args.chatId, args.text, options);
+}
+
 Promise.all([
     mongo.configure({
         url: process.env.MONGO_URL
@@ -14,14 +36,11 @@ Promise.all([
         url: process.env.RABBIT_URL,
     }),
 ]).then(async () => {
-    await rabbit.bind(APP_NAME, ['call.telegramSend'], function(event) {
+    await rabbit.bind(APP_NAME, ['call.telegramSend', 'call.translateAndSend'], function(event) {
         if (event.event === 'call.telegramSend'){
-            let args = event.args;
-            let options  = {};
-            if (args.formatted){
-                options.parse_mode = 'Markdown';
-            }
-            bot.sendMessage(args.chatId, args.text, options);
+            botSend(event.args);
+        } else if (event.event === 'call.translateAndSend') {
+            sendTxt2(event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
         }
     });
 
@@ -123,14 +142,33 @@ function get_tg_nick(msg){
 }
 
 function sendTxt(chatId, text, placeholders){
-    let outcomeEvent = {
-        event: 'call.translateAndSend',
-        args: {
-            chatId: chatId,
-            text: text,
-            placeholders:  placeholders || [],
-            formatted: true,
-        }
-    };
-    rabbit.emit(outcomeEvent);
+    sendTxt2(chatId, text, placeholders || [], true);
+}
+
+function sendTxt2(chatId, text, placeholders, formatted){
+    let userLang = getUserLang(chatId);
+    botSend({
+        chatId: chatId,
+        text: translate(text, userLang, placeholders),
+        formatted: !!formatted
+    });
+}
+
+let db = {userLang: {}};
+
+function getUserLang(chatId){
+    return db.userLang[chatId] || DEFAULT_LANG;
+}
+
+function translate(text, lang, placeholders){
+    if (!lang){
+        lang = DEFAULT_LANG;
+    }
+    gt.setLocale(lang);
+    text = gt.gettext(text);
+
+    if (Array.isArray(placeholders)){
+        text = printf(text, ...placeholders);
+    }
+    return text;
 }

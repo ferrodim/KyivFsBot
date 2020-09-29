@@ -5,10 +5,13 @@
   "author": "",
   "main": "app.js",
   "scripts": {
-    "start": "npm i && node app.js"
+    "start": "npm up && npm i && node app.js"
   },
   "dependencies": {
     "flatground": "github:ferrodim/flatground#master",
-    "node-telegram-bot-api": "^0.40.0"
+    "gettext-parser": "^4.0.2",
+    "node-gettext": "^2.0.0",
+    "node-telegram-bot-api": "^0.40.0",
+    "printf": "^0.5.2"
   }
 }

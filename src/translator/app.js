@@ -23,16 +23,13 @@ connect.then(con => {
     return con.createChannel();
 }).then(async ch => {
     await ch.assertQueue(queueName);
-    await ch.bindQueue(queueName, 'topic', 'call.translateAndSend');
     await ch.bindQueue(queueName, 'topic', 'core.messageIn');
     ch.consume(queueName, function(msg) {
         try {
             if (msg !== null) {
                 let event = JSON.parse(msg.content.toString());
                 console.log('{Rabbit} <= ' + JSON.stringify(event));
-                if (event.event === 'call.translateAndSend'){
-                    sendTxt(ch, event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
-                } else if (event.event === 'core.messageIn'){
+                if (event.event === 'core.messageIn'){
                     if (!event.text){
                         return;
                     }
