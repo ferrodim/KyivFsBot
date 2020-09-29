@@ -33,24 +33,6 @@ connect.then(con => {
                     if (!event.text){
                         return;
                     }
-                    if (event.text === '/lang'){
-                        sendTxt(ch, event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
-                    }
-                    if (event.text === '/ping'){
-                        sendTxt(ch, event.chatid, _('Pong from %s'), ["translator"]);
-                    }
-                    if (event.text === '/langlist'){
-                        sendTxt(ch, event.chatid, _('List of languages: %s'), [locales.join()]);
-                    }
-                    if (event.text.indexOf('/lang ') === 0){
-                        let newLang = event.text.split(' ')[1];
-                        if (locales.includes(newLang)){
-                            db.userLang[event.chatid] = newLang;
-                            sendTxt(ch, event.chatid, _('Language changed to "%s"'), [newLang]);
-                        } else {
-                            sendTxt(ch, event.chatid, _('Unknown language "%s"'), [newLang]);
-                        }
-                    }
                 } else {
                     console.log('unknown event', event);
                 }

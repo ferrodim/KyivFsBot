@@ -124,6 +124,21 @@ Promise.all([
             let template = _('Welcome, export me your start data at *%s*, and finish data at *%s*. Also use [google form](%s). Write /help for more info');
             sendTxt(msg.chat.id, template, [startTime, endTime, city.statUrl]);
         }
+        if (msg.text === '/lang'){
+            sendTxt(msg.chat.id, _('Current language is "%s"'), [getUserLang(event.chatid)]);
+        }
+        if (msg.text === '/langlist'){
+            sendTxt(msg.chat.id, _('List of languages: %s'), [locales.join()]);
+        }
+        if (msg.text.indexOf('/lang ') === 0){
+            let newLang = msg.text.split(' ')[1];
+            if (locales.includes(newLang)){
+                db.userLang[msg.chat.id] = newLang;
+                sendTxt(msg.chat.id, _('Language changed to "%s"'), [newLang]);
+            } else {
+                sendTxt(msg.chat.id, _('Unknown language "%s"'), [newLang]);
+            }
+        }
     });
 }, err=>{
     console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
