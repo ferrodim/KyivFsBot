@@ -2,23 +2,11 @@ const {mongo, rabbit, _} = require('flatground');
 const APP_NAME = 'front';
 
 const env = process.env;
-const TelegramBot = require('node-telegram-bot-api');
-const bot = new TelegramBot(env.TELEGRAM_TOKEN, {polling: {interval: 1000}});
+const bot = require('./services/bot');
 const DEFAULT_CITY = 1;
 
 // translator init
-const fs = require('fs');
-const Gettext = require('node-gettext');
-const po = require('gettext-parser').po;
-const printf = require('printf');
-const locales = ['ua', 'ru', 'en'];
-const DEFAULT_LANG = env.DEFAULT_LANG || locales[0];
-const gt = new Gettext();
-locales.forEach((locale) => {
-    const translationsContent = fs.readFileSync('/i18n/'+ locale + '.po', 'utf8');
-    const parsedTranslations = po.parse(translationsContent);
-    gt.addTranslations(locale, 'messages', parsedTranslations);
-});
+const {getUserLang, translate, db, locales} = require('./services/lang');
 
 function botSend(args){
     let options  = {};
@@ -108,7 +96,9 @@ Promise.all([
 
         msg.isAdmin = event.isAdmin; // for legacy in module "bot"
 
-        rabbit.emit(event);
+        let cmd = event.text.split(' ')[0];
+        findCmdHandler(cmd)(event);
+        //rabbit.emit(event);
 
         console.log('msg.text', msg.text);
 
@@ -144,6 +134,21 @@ Promise.all([
     console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
 });
 
+function findCmdHandler(cmd){
+    switch (cmd){
+        case '/admin_add': return require('./handlers/cmd_admin_add');
+        case '/admin_list': return require('./handlers/cmd_admin_list');
+        case '/admin_remove': return require('./handlers/cmd_admin_remove');
+
+        case '/city_start_time': return require('./handlers/cmd_city_start_time');
+        case '/city_end_time': return require('./handlers/cmd_city_end_time');
+        case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
+
+        case '/help': return require('./handlers/cmd_help');
+        default: return function(){};
+    }
+}
+
 async function isAdmin(tgName){
     if (process.env.SUPER_ADMIN === tgName){
         return true;
@@ -169,21 +174,6 @@ function sendTxt2(chatId, text, placeholders, formatted){
     });
 }
 
-let db = {userLang: {}};
 
-function getUserLang(chatId){
-    return db.userLang[chatId] || DEFAULT_LANG;
-}
 
-function translate(text, lang, placeholders){
-    if (!lang){
-        lang = DEFAULT_LANG;
-    }
-    gt.setLocale(lang);
-    text = gt.gettext(text);
 
-    if (Array.isArray(placeholders)){
-        text = printf(text, ...placeholders);
-    }
-    return text;
-}

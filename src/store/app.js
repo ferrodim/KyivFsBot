@@ -18,19 +18,6 @@ Promise.all([
     console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
 });
 
-function findCmdHandler(cmd){
-    switch (cmd){
-        case '/admin_add': return require('./handlers/cmd_admin_add');
-        case '/admin_list': return require('./handlers/cmd_admin_list');
-        case '/admin_remove': return require('./handlers/cmd_admin_remove');
 
-        case '/city_start_time': return require('./handlers/cmd_city_start_time');
-        case '/city_end_time': return require('./handlers/cmd_city_end_time');
-        case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
-
-        case '/help': return require('./handlers/cmd_help');
-        default: return function(){};
-    }
-}
 
 
