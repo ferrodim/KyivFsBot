@@ -11,16 +11,6 @@ services:
 #      - "15672:15672"
     expose:
       - 5672
-  translator:
-    build: src/translator
-    env_file: .env
-    volumes:
-      - "./src/translator:/app"
-      - "./i18n/:/i18n"
-    environment:
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-    depends_on:
-      - rabbit
   store:
     build: src/store
     env_file: .env
