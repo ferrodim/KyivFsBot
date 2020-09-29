@@ -20,19 +20,14 @@ Promise.all([
 
 function findCmdHandler(cmd){
     switch (cmd){
-        case '/store_info': return require('./handlers/cmd_store_info');
-        case '/store_increment': return require('./handlers/cmd_store_increment');
-        case '/store_read': return require('./handlers/cmd_store_read');
-        case '/ping': return require('./handlers/cmd_ping');
         case '/admin_add': return require('./handlers/cmd_admin_add');
         case '/admin_list': return require('./handlers/cmd_admin_list');
         case '/admin_remove': return require('./handlers/cmd_admin_remove');
-        case '/modes_add': return require('./handlers/cmd_modes_add');
-        case '/modes_list': return require('./handlers/cmd_modes_list');
-        case '/modes_remove': return require('./handlers/cmd_modes_remove');
+
         case '/city_start_time': return require('./handlers/cmd_city_start_time');
         case '/city_end_time': return require('./handlers/cmd_city_end_time');
         case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
+
         case '/help': return require('./handlers/cmd_help');
         default: return function(){};
     }
