@@ -11,16 +11,6 @@ services:
 #      - "15672:15672"
     expose:
       - 5672
-  store:
-    build: src/store
-    env_file: .env
-    volumes:
-      - "./src/store:/app"
-    environment:
-      MONGO_URL: "mongodb://mongo:27017/fsbot"
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-    depends_on:
-      - rabbit
   front:
     build: src/front
     env_file: .env
