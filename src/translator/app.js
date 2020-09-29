@@ -24,7 +24,6 @@ connect.then(con => {
 }).then(async ch => {
     await ch.assertQueue(queueName);
     await ch.bindQueue(queueName, 'topic', 'call.translateAndSend');
-    await ch.bindQueue(queueName, 'topic', 'call.setLang');
     await ch.bindQueue(queueName, 'topic', 'core.messageIn');
     ch.consume(queueName, function(msg) {
         try {
