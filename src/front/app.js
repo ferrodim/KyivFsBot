@@ -1,4 +1,4 @@
-const {mongo, rabbit, _} = require('flatground');
+const {mongo, _} = require('flatground');
 const APP_NAME = 'front';
 
 const env = process.env;
@@ -20,18 +20,7 @@ Promise.all([
     mongo.configure({
         url: process.env.MONGO_URL
     }),
-    rabbit.configure({
-        url: process.env.RABBIT_URL,
-    }),
 ]).then(async () => {
-    await rabbit.bind(APP_NAME, ['call.telegramSend', 'call.translateAndSend'], function(event) {
-        if (event.event === 'call.telegramSend'){
-            botSend(event.args);
-        } else if (event.event === 'call.translateAndSend') {
-            sendTxt2(event.args.chatId, event.args.text, event.args.placeholders, event.args.formatted);
-        }
-    });
-
     bot.on('message', async function(msg){
         //console.log('onMessage', msg);
     });
@@ -98,7 +87,6 @@ Promise.all([
 
         let cmd = event.text.split(' ')[0];
         findCmdHandler(cmd)(event);
-        //rabbit.emit(event);
 
         console.log('msg.text', msg.text);
 

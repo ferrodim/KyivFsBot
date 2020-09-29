@@ -1,16 +1,5 @@
 version: '3'
 services:
-  rabbit:
-    image: "rabbitmq:3-management"
-    restart: always
-    environment:
-      RABBITMQ_DEFAULT_USER: "rabbitmq"
-      RABBITMQ_DEFAULT_PASS: "rabbitmq"
-      RABBITMQ_DEFAULT_VHOST: "/"
-#    ports:
-#      - "15672:15672"
-    expose:
-      - 5672
   front:
     build: src/front
     env_file: .env
@@ -19,9 +8,8 @@ services:
       - "./i18n/:/i18n"
     environment:
       MONGO_URL: "mongodb://mongo:27017/fsbot"
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
     depends_on:
-      - rabbit
+      - mongo
   mongo:
     image: 'mongo'
     volumes:
