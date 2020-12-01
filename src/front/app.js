@@ -21,9 +21,7 @@ Promise.all([
         url: process.env.MONGO_URL
     }),
 ]).then(async () => {
-    bot.on('message', async function(msg){
-        //console.log('onMessage', msg);
-    });
+    // bot.on('message', async function(msg){//console.log('onMessage', msg);});
 
     const IMG_MIME_TYPES = ['image/png', 'image/jpg', 'image/jpeg'];
     async function proceedPhoto(msg){
@@ -75,7 +73,8 @@ Promise.all([
             "event": 'core.messageIn',
             "text": msg.text,
             "msgid": msg.message_id,
-            "chatid": msg.from.id,
+            "chatid": msg.chat.id,
+            //'fromId': msg.from.id,
             "rawMsg": msg,
             "tg_name": tgName,
             "isAdmin": await isAdmin(tgName),
@@ -86,37 +85,15 @@ Promise.all([
         msg.isAdmin = event.isAdmin; // for legacy in module "bot"
 
         let cmd = event.text.split(' ')[0];
+
+        let isDummyRequest = msg.text[0] !== '/' && msg.text.length < 50 && !event.isAdmin;
+        if (isDummyRequest){
+            cmd = '/start';
+        }
+
         findCmdHandler(cmd)(event);
 
         console.log('msg.text', msg.text);
-
-        let isDummyRequest = msg.text[0] !== '/' && msg.text.length < 50 && !event.isAdmin;
-        if (msg.text === '/ping'){
-            sendTxt(msg.chat.id, _('Pong from %s'), ["front"]);
-        } else if (msg.text === '/chatid'){
-            sendTxt(msg.chat.id, _('Id of this chat is %s'), [msg.chat.id]);
-        } else if (msg.text === '/start' || isDummyRequest){
-            let startTime = city.startTime || 'not filled';
-            let endTime = city.endTime || 'not filled';
-            // let modes = city.modes || [];
-            let template = _('Welcome, export me your start data at *%s*, and finish data at *%s*. Also use [google form](%s). Write /help for more info');
-            sendTxt(msg.chat.id, template, [startTime, endTime, city.statUrl]);
-        }
-        if (msg.text === '/lang'){
-            sendTxt(msg.chat.id, _('Current language is "%s"'), [getUserLang(event.chatid)]);
-        }
-        if (msg.text === '/langlist'){
-            sendTxt(msg.chat.id, _('List of languages: %s'), [locales.join()]);
-        }
-        if (msg.text.indexOf('/lang ') === 0){
-            let newLang = msg.text.split(' ')[1];
-            if (locales.includes(newLang)){
-                db.userLang[msg.chat.id] = newLang;
-                sendTxt(msg.chat.id, _('Language changed to "%s"'), [newLang]);
-            } else {
-                sendTxt(msg.chat.id, _('Unknown language "%s"'), [newLang]);
-            }
-        }
     });
 }, err=>{
     console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
@@ -132,9 +109,16 @@ function findCmdHandler(cmd){
         case '/city_end_time': return require('./handlers/cmd_city_end_time');
         case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
 
+        case '/ping': return require('./handlers/cmd_ping');
+        case '/chatid': return require('./handlers/cmd_chatid');
+        case '/start': return require('./handlers/cmd_start');
+        case '/lang': return require('./handlers/cmd_lang');
+        case '/langlist': return require('./handlers/cmd_langlist');
+
         case '/help': return require('./handlers/cmd_help');
-        default: return function(){};
+        default: return require('./handlers/cmd_start');
     }
+
 }
 
 async function isAdmin(tgName){
