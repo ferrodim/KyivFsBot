@@ -29,7 +29,7 @@ Promise.all([
             sendTxt(msg.chat.id, _('Image must have a caption'));
             return;
         }
-        if (!msg.caption.match(/^[a-zA-Z0-9_]+$/)){
+        if (!msg.caption.match(/^@?[a-zA-Z0-9_]+$/)){
             sendTxt(msg.chat.id, _('Image caption must be your nickname'));
             return;
         }
