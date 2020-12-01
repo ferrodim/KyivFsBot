@@ -1,8 +1,6 @@
 const {mongo, _} = require('flatground');
-const APP_NAME = 'front';
-
-const env = process.env;
 const bot = require('./services/bot');
+const env = process.env;
 const DEFAULT_CITY = 1;
 
 Promise.all([
@@ -46,7 +44,7 @@ Promise.all([
         console.log('msg.text', msg.text);
     });
 }, err=>{
-    console.error('Application "' + APP_NAME + '" could not start. Error: ', err);
+    console.error('Application "front" could not start. Error: ', err);
 });
 
 function findCmdHandler(event){
@@ -55,21 +53,17 @@ function findCmdHandler(event){
         case '/admin_add': return require('./handlers/cmd_admin_add');
         case '/admin_list': return require('./handlers/cmd_admin_list');
         case '/admin_remove': return require('./handlers/cmd_admin_remove');
-
         case '/city_start_time': return require('./handlers/cmd_city_start_time');
         case '/city_end_time': return require('./handlers/cmd_city_end_time');
         case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
-
         case '/ping': return require('./handlers/cmd_ping');
         case '/chatid': return require('./handlers/cmd_chatid');
         case '/start': return require('./handlers/cmd_start');
         case '/lang': return require('./handlers/cmd_lang');
         case '/langlist': return require('./handlers/cmd_langlist');
-
         case '/help': return require('./handlers/cmd_help');
         default: return require('./handlers/cmd_start');
     }
-
 }
 
 async function isAdmin(tgName){
