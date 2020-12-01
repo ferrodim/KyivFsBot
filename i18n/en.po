@@ -7,200 +7,83 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-01 10:50+0300\n"
-"PO-Revision-Date: 2020-08-01 11:00+0300\n"
+"POT-Creation-Date: 2020-12-01 05:30+0200\n"
+"PO-Revision-Date: 2020-12-01 05:31+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk_UA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.4.2\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 
-msgid "Доступ запрещён"
-msgstr "Not allowed"
-
-msgid "Done"
+msgid "Files are not allowed"
 msgstr ""
 
-msgid "Данные по вам изменились:"
-msgstr "Yours data changed:"
+msgid "Image parsing disabled"
+msgstr ""
 
-#, python-format
+msgid "This command allowed only for admins"
+msgstr ""
+
+#, javascript-format
+msgid "Admin added: %s"
+msgstr ""
+
+#, javascript-format
 msgid ""
-"Агент, вам сообщение от организаторов:\n"
-"\n"
+"Admin list:\n"
 "%s"
 msgstr ""
 
-msgid "Массовое сообщение доставленно %1$d/%2$d агентам"
+msgid "Admin list is empty"
 msgstr ""
 
-msgid ""
-"Вы правда хотите очистить всю базу, кроме ников?\n"
-"\n"
-"Введите */softreset ok*, если да"
+#, javascript-format
+msgid "Admin removed: %s"
 msgstr ""
 
-msgid "База данных очищена"
+#, javascript-format
+msgid "Id of this chat is %s"
 msgstr ""
 
-msgid ""
-"Вы правда хотите очистить всю базу?\n"
-"\n"
-"Введите */reset ok*, если да"
+msgid "City info updated"
 msgstr ""
 
-msgid "Уведомление агентов включено"
-msgstr "Notifications turned on"
+#, javascript-format
+msgid "Language changed to \"%s\""
+msgstr "Language changed to \"%s\""
 
-msgid "Уведомление агентов выключено"
-msgstr "Notifications turned off"
+#, javascript-format
+msgid "Unknown language \"%s\""
+msgstr "Unknown language \"%s\""
 
-msgid "Нельзя включить ночной режим во время эвента"
-msgstr "Night mode can't  be enabled during event"
+#, javascript-format
+msgid "Current language is \"%s\""
+msgstr "Current language is \"%s\""
 
-msgid "Ночной режим включен"
-msgstr "Night mode on"
+#, javascript-format
+msgid "List of languages: %s"
+msgstr "List of languages: %s"
 
-msgid "Ночной режим выключен"
-msgstr "Night mode off"
-
-msgid "Зарегистрированные агенты"
-msgstr "Зареестровані агенти"
-
-msgid "Start agent stats are welcome!"
-msgstr "Start agent stats are welcome!"
-
-msgid "Finish agent stats are welcome!"
-msgstr "Finish agent stats are welcome!"
-
-msgid "No more agent stats!"
-msgstr "No more agent stats!"
-
-msgid ""
-"Неверный формат запроса. Нужно писать:\n"
-"`%1$s`\n"
-"где параметр принимает значения\n"
-"%2$s"
-msgstr ""
-
-#, fuzzy
-msgid "Best %1$s:%2$s"
-msgstr "Best %1$s:%2$s"
-
-#, python-format
-msgid ""
-"Вы правда хотите удалить данные c нулевой стартовой статистикой?\n"
-"\n"
-"Введите *%s*, если да"
-msgstr ""
-
-#, python-format
-msgid "Удалено %d записей с нулевой стартовой статистикой"
-msgstr ""
-
-#, python-format
-msgid "Данные @%s удалены"
-msgstr ""
-
-#, python-format
-msgid "Бот не располагает данными на @%s"
-msgstr ""
-
-msgid "Ваши данные удалены"
-msgstr "Your data removed"
-
-msgid "Бот не располагает данными на вас"
-msgstr ""
-
-msgid "Бот ничего не знает по вам"
-msgstr ""
-
-#, python-format
-msgid ""
-"Ник телеги: @%s\n"
-"Ник в игре: %s\n"
-"Фракция: %s\n"
-"== Стартовые показатели:%s\n"
-"== Финишные показатели:%s"
-msgstr ""
-"Telegram nickname: @%s\n"
-"In-game nickname: %s\n"
-"Fraction: %s\n"
-"== Start values:%s\n"
-"== Finish values:%s"
-
-#, python-format
-msgid ""
-"Ник телеги: @%s\n"
-"Ник в игре: %s\n"
-"Фракция: %s\n"
-"== Стартовые показатели:\n"
-"%s"
-msgstr ""
-"Telegram nickname: @%s\n"
-"In-game nickname: %s\n"
-"Fraction: %s\n"
-"== Start values:%s"
-
-#, python-format
-msgid "You must use google table for statistic: %s"
-msgstr ""
-
-msgid "That user is not found in database"
-msgstr "That user is not found in database"
-
-msgid ""
-"Не могу разобрать выгрузку! Возможно к тексту попала приписка Forwarded?"
-msgstr ""
-
-msgid "Не могу разобрать выгрузку!"
-msgstr ""
-
-msgid "Вы прислали месячную стату. А нужно \"за всё время\""
-msgstr ""
-
-msgid "Вы прислали недельную стату. А нужно \"за всё время\""
-msgstr ""
-
-msgid "Вы прислали дневную стату. А нужно \"за всё время\""
-msgstr ""
-
-msgid "Не могу разобрать выгрузку - обнаружен неизвестный боту параметр."
-msgstr ""
-
-msgid "You have send old statistic"
-msgstr ""
-
-msgid ""
-"Регистрация на эвент ещё не началась. На твоей выгрузке я вижу вот что:\n"
-msgstr ""
-
-#, python-format, javascript-format
+#, javascript-format
 msgid "Pong from %s"
 msgstr ""
 
+#, fuzzy, javascript-format
 msgid ""
-"Регистрация на эвент ещё не началась. На твоём изображении я вижу вот что:\n"
+"Welcome to %s, export me your start data at *%s*, and finish data at *%s*. "
+"Also use [google form](%s). Write /help for more info"
 msgstr ""
-
-msgid "Данные с изображения распарсить не удалось"
-msgstr ""
-
-msgid ""
-"Не могу разобрать скрин! Отправьте другой, или зарегистрируйтесь у оргов "
-"вручную"
-msgstr ""
-
-msgid "Image retrieved"
-msgstr ""
-"Зображення покладено в чергу\\n\\nБудь-ласка, надсилайте статистику текстом "
-"- це зберігае ваш час і час організаторів, що виправляють неточності "
-"розпізнавання. Можливо в майбутньому, статистика зі світлин не буде більше "
-"прийматися"
+"Hi! Welcome to Ingress FS %s.\n"
+"\n"
+"Please send me your selfie with Ingress badge or other merch and hashtag "
+"#IngressFSathome. The pic must be signed with your Ingress game name. "
+"Timeslot for sending is *%s* to *%s*, The pic is needed for FS verification\n"
+"\n"
+"Also, send your game statistic to [google form](%s)"
 
 msgid "Image must have a caption"
 msgstr ""
@@ -216,45 +99,80 @@ msgstr ""
 "розпізнавання. Можливо в майбутньому, статистика зі світлин не буде більше "
 "прийматися"
 
-msgid "Files are not allowed"
-msgstr ""
+#~ msgid "Доступ запрещён"
+#~ msgstr "Not allowed"
 
-msgid "Image parsing disabled"
-msgstr ""
+#~ msgid "Данные по вам изменились:"
+#~ msgstr "Yours data changed:"
 
-#, javascript-format
-msgid "Id of this chat is %s"
-msgstr ""
+#~ msgid "Уведомление агентов включено"
+#~ msgstr "Notifications turned on"
 
-#, javascript-format
-msgid ""
-"Welcome, export me your start data at *%s*, and finish data at *%s*. Also "
-"use [google form](%s). Write /help for more info"
-msgstr ""
-"Hi! Welcome to Ingress FS Kyiv - August 2020.\n"
-"\n"
-"Please send me your selfie with Ingress badge or other merch and hashtag "
-"#IngressFSathome. The pic must be signed with your Ingress game name. "
-"Timeslot for sending is *%s* to *%s*, The pic is needed for FS "
-"verification\n"
-"\n"
-"Also, send your game statistic to [google form](%s)"
+#~ msgid "Уведомление агентов выключено"
+#~ msgstr "Notifications turned off"
 
-#, javascript-format
-msgid "Current language is \"%s\""
-msgstr "Current language is \"%s\""
+#~ msgid "Нельзя включить ночной режим во время эвента"
+#~ msgstr "Night mode can't  be enabled during event"
 
-#, javascript-format
-msgid "List of languages: %s"
-msgstr "List of languages: %s"
+#~ msgid "Ночной режим включен"
+#~ msgstr "Night mode on"
 
-#, javascript-format
-msgid "Language changed to \"%s\""
-msgstr "Language changed to \"%s\""
+#~ msgid "Ночной режим выключен"
+#~ msgstr "Night mode off"
 
-#, javascript-format
-msgid "Unknown language \"%s\""
-msgstr "Unknown language \"%s\""
+#~ msgid "Зарегистрированные агенты"
+#~ msgstr "Зареестровані агенти"
+
+#~ msgid "Start agent stats are welcome!"
+#~ msgstr "Start agent stats are welcome!"
+
+#~ msgid "Finish agent stats are welcome!"
+#~ msgstr "Finish agent stats are welcome!"
+
+#~ msgid "No more agent stats!"
+#~ msgstr "No more agent stats!"
+
+#, fuzzy
+#~ msgid "Best %1$s:%2$s"
+#~ msgstr "Best %1$s:%2$s"
+
+#~ msgid "Ваши данные удалены"
+#~ msgstr "Your data removed"
+
+#~ msgid ""
+#~ "Ник телеги: @%s\n"
+#~ "Ник в игре: %s\n"
+#~ "Фракция: %s\n"
+#~ "== Стартовые показатели:%s\n"
+#~ "== Финишные показатели:%s"
+#~ msgstr ""
+#~ "Telegram nickname: @%s\n"
+#~ "In-game nickname: %s\n"
+#~ "Fraction: %s\n"
+#~ "== Start values:%s\n"
+#~ "== Finish values:%s"
+
+#~ msgid ""
+#~ "Ник телеги: @%s\n"
+#~ "Ник в игре: %s\n"
+#~ "Фракция: %s\n"
+#~ "== Стартовые показатели:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Telegram nickname: @%s\n"
+#~ "In-game nickname: %s\n"
+#~ "Fraction: %s\n"
+#~ "== Start values:%s"
+
+#~ msgid "That user is not found in database"
+#~ msgstr "That user is not found in database"
+
+#~ msgid "Image retrieved"
+#~ msgstr ""
+#~ "Зображення покладено в чергу\\n\\nБудь-ласка, надсилайте статистику "
+#~ "текстом - це зберігае ваш час і час організаторів, що виправляють "
+#~ "неточності розпізнавання. Можливо в майбутньому, статистика зі світлин не "
+#~ "буде більше прийматися"
 
 #~ msgid "Вы запросили инфу по %s"
 #~ msgstr "You have asked info about %s"

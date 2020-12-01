@@ -53,6 +53,7 @@ function findCmdHandler(event){
         case '/admin_add': return require('./handlers/cmd_admin_add');
         case '/admin_list': return require('./handlers/cmd_admin_list');
         case '/admin_remove': return require('./handlers/cmd_admin_remove');
+        case '/city_fs_name': return require('./handlers/cmd_city_fs_name');
         case '/city_start_time': return require('./handlers/cmd_city_start_time');
         case '/city_end_time': return require('./handlers/cmd_city_end_time');
         case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
