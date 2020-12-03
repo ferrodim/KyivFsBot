@@ -8,7 +8,7 @@ module.exports = async function proceedPhoto(msg){
         sendText(msg.chat.id, _('Image must have a caption'));
         return;
     }
-    if (!msg.caption.match(/^@?[a-zA-Z0-9_]+$/)){
+    if (!msg.caption.match(/^[a-zA-Z0-9_]+$/)){
         sendText(msg.chat.id, _('Image caption must be your nickname'));
         return;
     }
