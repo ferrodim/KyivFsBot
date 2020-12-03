@@ -1,11 +1,7 @@
 #!/bin/bash
 apt update -y
 apt upgrade -y
-apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt update -y
-apt install -y docker-ce docker-ce-cli containerd.io docker-compose git
+apt install -y docker-compose
 git clone https://github.com/ferrodim/KyivFsBot.git
 cd KyivFsBot/
 cp .env.sample .env
