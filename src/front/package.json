@@ -1,11 +1,13 @@
 {
   "name": "front",
   "version": "0.0.0",
-  "description": "",
-  "author": "",
+  "description": "node.js driven telegram bot, that help Kyiv FS events to make image forwarding + provide fs rules",
+  "author": "ferrodim",
+  "license": "GPL-3.0-or-later",
+  "repository": "https://github.com/ferrodim/KyivFsBot.git",
   "main": "app.js",
   "scripts": {
-    "start": "npm up && npm i && node app.js"
+    "start": "npm i && node app.js"
   },
   "dependencies": {
     "flatground": "github:ferrodim/flatground#master",
