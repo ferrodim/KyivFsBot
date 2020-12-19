@@ -6,13 +6,19 @@ module.exports = async function (event){
         sendText(event.chatid, _("This command allowed only for admins"));
         return;
     }
-    let modeName = event.text.split(' ')[1];
+
+    let chunks = event.text.split(' ');
+    chunks.shift(); // remove cmd part
+
+    let fsName = chunks.join(' ');
 
     await mongo.collection('city').findOneAndUpdate({
         cityId: event.cityId,
     },{
-        $pull: {'modes': modeName}
+        $set: {'fsName': fsName}
+    }, {
+        upsert: true
     });
 
-    sendText(event.chatid, _("Mode removed: %s"), [modeName]);
+    sendText(event.chatid, _("City info updated"));
 };

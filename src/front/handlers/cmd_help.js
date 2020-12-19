@@ -11,8 +11,6 @@ module.exports = async function (event){
     txt += "/city_start_time <time> - Used inside welcome notification\n";
     txt += "/city_end_time <time> - Used inside welcome notification\n";
     txt += "/city_stat_url <url> - Full url for Autoscore google-table\n";
-    txt += "/modes_list - Configure modes for /me, /result \n";
-    txt += "/modes_add <mode> - Configure modes for /me, /result \n";
-    txt += "/modes_remove <mode> - Configure modes for /me, /result\n";
+    txt += "/city_fs_name <name> - FS name, e.g. 'Kyiv - August 2020'\n";
     sendText(event.chatid, txt);
 };

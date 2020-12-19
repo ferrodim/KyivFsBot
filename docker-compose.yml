@@ -1,69 +1,15 @@
 version: '3'
 services:
-  bot:
-    build: src/bot
-    restart: always
-    volumes:
-      - "./src/bot:/app"
-    depends_on:
-      - rabbit
-  rabbit:
-    image: "rabbitmq:3-management"
-    restart: always
-    environment:
-      RABBITMQ_DEFAULT_USER: "rabbitmq"
-      RABBITMQ_DEFAULT_PASS: "rabbitmq"
-      RABBITMQ_DEFAULT_VHOST: "/"
-#    ports:
-#      - "15672:15672"
-    expose:
-      - 5672
-#  decoder:
-#    build: src/decoder
-#    depends_on:
-#      - rabbit
-#    restart: always
-#    volumes:
-#      - "./src/decoder:/app"
-  logger:
-    build: src/logger
-    volumes:
-      - "./src/logger:/app"
-    environment:
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-    depends_on:
-      - rabbit
-  translator:
-    build: src/translator
-    env_file: .env
-    volumes:
-      - "./src/translator:/app"
-      - "./i18n/:/i18n"
-    environment:
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-    depends_on:
-      - rabbit
-  store:
-    build: src/store
-    env_file: .env
-    volumes:
-      - "./src/store:/app"
-    environment:
-      MONGO_URL: "mongodb://mongo:27017/fsbot"
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-    depends_on:
-      - rabbit
   front:
     build: src/front
     env_file: .env
     volumes:
       - "./src/front:/app"
+      - "./i18n/:/i18n"
     environment:
       MONGO_URL: "mongodb://mongo:27017/fsbot"
-      RABBIT_URL: "amqp://rabbitmq:rabbitmq@rabbit"
-      IMG_DISABLED: 1
     depends_on:
-      - rabbit
+      - mongo
   mongo:
     image: 'mongo'
     volumes:
