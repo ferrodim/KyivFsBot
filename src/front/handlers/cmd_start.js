@@ -7,5 +7,10 @@ module.exports = async function (event){
     let startTime = city.startTime || '??';
     let endTime = city.endTime || '??';
     let template = _('Welcome to %s, export me your start data at *%s*, and finish data at *%s*. Also use [google form](%s). Write /help for more info');
+
+    if (event.chatid < 0){
+        return; // ignore txt messages in chat groups
+    }
+
     sendText(event.chatid, template, [fsName, startTime, endTime, city.statUrl], true);
 };
