@@ -63,14 +63,17 @@ let routes = {
     '/lang': require('./handlers/cmd_lang'),
     '/langlist': require('./handlers/cmd_langlist'),
     '/help': require('./handlers/cmd_help'),
-    'About_bot': require('./handlers/txt/aboutBot'),
-    'welcome': require('./handlers/txt/welcome'),
-    'default': require('./handlers/cmd_start'),
 };
+
+const fs = require('fs');
+fs.readdirSync('./handlers/txt').forEach(fileName => {
+    let cmd = fileName.split('.')[0];
+    routes[cmd] = require('./handlers/txt/' + fileName);
+});
 
 function findCmdHandler(event){
     let cmd = event.text.split(' ')[0];
-    return routes[cmd] || routes['default'];
+    return routes[cmd] || routes['/start'];
 }
 
 async function isAdmin(tgName){
