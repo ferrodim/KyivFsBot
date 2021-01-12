@@ -13,9 +13,9 @@ module.exports = async function (event){
         parse_mode: 'Markdown',
         reply_markup: JSON.stringify({
             keyboard: [
-                ['Register'],
-                ['Profile'],
-                ['About_bot']
+                ['language'],
+                ['register'],
+                ['rules'],
             ]
         })
     });

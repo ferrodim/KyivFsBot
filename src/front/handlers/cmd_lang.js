@@ -1,6 +1,6 @@
 const {_} = require('flatground');
 const sendText = require('../sendText');
-const {getUserLang, db, locales} = require('../services/lang');
+const {db, locales} = require('../services/lang');
 
 module.exports = async function (event){
     let newLang = event.text.split(' ')[1];
@@ -13,6 +13,6 @@ module.exports = async function (event){
             sendText(event.chatid, _('Unknown language "%s"'), [newLang]);
         }
     } else {
-        sendText(event.chatid, _('Current language is "%s"'), [getUserLang(event.chatid)]);
+        sendText(event.chatid, _('Current language is "%s"'), [event.userLang]);
     }
 };

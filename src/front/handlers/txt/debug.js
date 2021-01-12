@@ -9,7 +9,7 @@ module.exports = async function (e){
     let msg = JSON5.stringify(e, null, 4);
 
     await bot.sendMessage(e.chatid, msg, {
-        parse_mode: 'Markdown',
+        // parse_mode: 'Markdown',
         reply_markup: JSON.stringify({
             keyboard: [
                 ['Register'],

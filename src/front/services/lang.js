@@ -16,7 +16,9 @@ locales.forEach((locale) => {
     gt.addTranslations(locale, 'messages', parsedTranslations);
 });
 
-
+/**
+ * @deprecated
+ * */
 function getUserLang(chatId){
     return db.userLang[chatId] || DEFAULT_LANG;
 }
