@@ -49,23 +49,16 @@ Promise.all([
     console.error('Application "front" could not start. Error: ', err);
 });
 
-let routes = {
-    '/admin_add': require('./handlers/cmd_admin_add'),
-    '/admin_list': require('./handlers/cmd_admin_list'),
-    '/admin_remove': require('./handlers/cmd_admin_remove'),
-    '/city_fs_name': require('./handlers/cmd_city_fs_name'),
-    '/city_start_time': require('./handlers/cmd_city_start_time'),
-    '/city_end_time': require('./handlers/cmd_city_end_time'),
-    '/city_stat_url': require('./handlers/cmd_city_stats_url'),
-    '/ping': require('./handlers/cmd_ping'),
-    '/chatid': require('./handlers/cmd_chatid'),
-    '/start': require('./handlers/cmd_start'),
-    '/lang': require('./handlers/cmd_lang'),
-    '/langlist': require('./handlers/cmd_langlist'),
-    '/help': require('./handlers/cmd_help'),
-};
-
+let routes = {};
 const fs = require('fs');
+fs.readdirSync('./handlers').forEach(fileName => {
+    let chunks = fileName.match(/^cmd_(.+).js$/);
+    if (chunks){
+        let cmd = '/' + chunks[1];
+        // console.log('found cmd '+ cmd);
+        routes[cmd] = require('./handlers/' + fileName);
+    }
+});
 fs.readdirSync('./handlers/txt').forEach(fileName => {
     let cmd = fileName.split('.')[0];
     routes[cmd] = require('./handlers/txt/' + fileName);
