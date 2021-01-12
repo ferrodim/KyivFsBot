@@ -1,5 +1,6 @@
 const {mongo, _} = require('flatground');
 const bot = require('./services/bot');
+const {getUserLang} = require('./services/lang');
 const env = process.env;
 const DEFAULT_CITY = 1;
 
@@ -36,6 +37,7 @@ Promise.all([
             "isAdmin": await isAdmin(tgName),
             "cityId": city.cityId || DEFAULT_CITY,
             "city": city,
+            userLang: getUserLang(msg.chat.id),
         };
 
         let handler = findCmdHandler(event);
