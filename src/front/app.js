@@ -65,6 +65,8 @@ function findCmdHandler(event){
         case '/lang': return require('./handlers/cmd_lang');
         case '/langlist': return require('./handlers/cmd_langlist');
         case '/help': return require('./handlers/cmd_help');
+        case 'About_bot': return require('./handlers/txt/aboutBot');
+        case 'welcome': return require('./handlers/txt/welcome');
         default: return require('./handlers/cmd_start');
     }
 }

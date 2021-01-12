@@ -1,6 +1,4 @@
-const {_} = require('flatground');
-const {translate} = require('../services/lang');
-const bot = require('../services/bot');
+const {_, translate, bot} = require('../core');
 
 module.exports = async function (event){
     let city = event.city;
@@ -16,5 +14,12 @@ module.exports = async function (event){
     let msg = translate(text, event.userLang, [fsName, startTime, endTime, city.statUrl]);
     await bot.sendMessage(event.chatid, msg, {
         parse_mode: 'Markdown',
+        reply_markup: JSON.stringify({
+            keyboard: [
+                ['Register'],
+                ['Profile'],
+                ['About_bot']
+            ]
+        })
     });
 };
