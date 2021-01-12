@@ -49,26 +49,28 @@ Promise.all([
     console.error('Application "front" could not start. Error: ', err);
 });
 
+let routes = {
+    '/admin_add': require('./handlers/cmd_admin_add'),
+    '/admin_list': require('./handlers/cmd_admin_list'),
+    '/admin_remove': require('./handlers/cmd_admin_remove'),
+    '/city_fs_name': require('./handlers/cmd_city_fs_name'),
+    '/city_start_time': require('./handlers/cmd_city_start_time'),
+    '/city_end_time': require('./handlers/cmd_city_end_time'),
+    '/city_stat_url': require('./handlers/cmd_city_stats_url'),
+    '/ping': require('./handlers/cmd_ping'),
+    '/chatid': require('./handlers/cmd_chatid'),
+    '/start': require('./handlers/cmd_start'),
+    '/lang': require('./handlers/cmd_lang'),
+    '/langlist': require('./handlers/cmd_langlist'),
+    '/help': require('./handlers/cmd_help'),
+    'About_bot': require('./handlers/txt/aboutBot'),
+    'welcome': require('./handlers/txt/welcome'),
+    'default': require('./handlers/cmd_start'),
+};
+
 function findCmdHandler(event){
     let cmd = event.text.split(' ')[0];
-    switch (cmd){
-        case '/admin_add': return require('./handlers/cmd_admin_add');
-        case '/admin_list': return require('./handlers/cmd_admin_list');
-        case '/admin_remove': return require('./handlers/cmd_admin_remove');
-        case '/city_fs_name': return require('./handlers/cmd_city_fs_name');
-        case '/city_start_time': return require('./handlers/cmd_city_start_time');
-        case '/city_end_time': return require('./handlers/cmd_city_end_time');
-        case '/city_stat_url': return require('./handlers/cmd_city_stats_url');
-        case '/ping': return require('./handlers/cmd_ping');
-        case '/chatid': return require('./handlers/cmd_chatid');
-        case '/start': return require('./handlers/cmd_start');
-        case '/lang': return require('./handlers/cmd_lang');
-        case '/langlist': return require('./handlers/cmd_langlist');
-        case '/help': return require('./handlers/cmd_help');
-        case 'About_bot': return require('./handlers/txt/aboutBot');
-        case 'welcome': return require('./handlers/txt/welcome');
-        default: return require('./handlers/cmd_start');
-    }
+    return routes[cmd] || routes['default'];
 }
 
 async function isAdmin(tgName){
