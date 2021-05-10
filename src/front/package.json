@@ -12,7 +12,7 @@
   "dependencies": {
     "flatground": "github:ferrodim/flatground#master",
     "gettext-parser": "^4.0.2",
-    "json5": "^2.1.3",
+    "json5": "^2.2.0",
     "node-gettext": "^2.0.0",
     "node-telegram-bot-api": "^0.40.0",
     "printf": "^0.5.2"
