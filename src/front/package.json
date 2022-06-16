@@ -10,7 +10,7 @@
     "start": "npm i && node app.js"
   },
   "dependencies": {
-    "flatground": "github:ferrodim/flatground#master",
+    "flatground": "git+https://git@github.com/ferrodim/flatground.git#master",
     "gettext-parser": "^4.0.2",
     "node-gettext": "^2.0.0",
     "node-telegram-bot-api": "^0.40.0",
