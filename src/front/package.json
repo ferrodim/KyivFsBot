@@ -13,7 +13,7 @@
     "flatground": "git+https://git@github.com/ferrodim/flatground.git#master",
     "gettext-parser": "^4.2.0",
     "node-gettext": "^2.0.0",
-    "node-telegram-bot-api": "^0.40.0",
+    "node-telegram-bot-api": "^0.57.0",
     "printf": "^0.6.1"
   }
 }
